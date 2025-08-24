@@ -5,16 +5,16 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Navbar */}
       <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center">
           <span className="ep-nav-brand">EquiPool</span>
-
-          <nav className="hidden md:flex items-center gap-6">
-            <a className="ep-nav-link">About Us</a>
-            <a className="ep-nav-link">Security</a>
-            <a className="ep-nav-link">Learn</a>
-            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
-          </nav>
         </div>
+
+        <nav className="hidden md:flex items-center gap-6">
+          <a className="ep-nav-link">About Us</a>
+          <a className="ep-nav-link">Security</a>
+          <a className="ep-nav-link">Learn</a>
+          <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+        </nav>
 
         <div className="flex items-center gap-4">
           <a className="ep-nav-login">Login</a>
@@ -23,7 +23,7 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <main className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row items-start gap-8">
+      <main className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row items-start gap-8" style={{marginTop: 160}}>
         <section className="flex-1">
       <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'inline-flex'}}>
       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'flex'}}>
@@ -82,8 +82,8 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* Value proposition - 10px below Trusted by */}
-      <div style={{marginTop: 10}}>
+      {/* Value proposition - 20px below Trusted by */}
+      <div style={{marginTop: 160}}>
         <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex', boxSizing: 'border-box'}}>
           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
             <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Value proposition</div>
@@ -113,7 +113,7 @@ export default function Home() {
     </div>
     </div>
 
-    <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 80, display: 'inline-flex'}}>
+    <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 80, display: 'inline-flex', marginTop: 160}}>
   <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 20, display: 'flex'}}>
     <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
       <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>How it works?</div>
@@ -180,7 +180,7 @@ export default function Home() {
 </div>
 
   {/* F.A.Q section */}
-  <div style={{width: '100%', height: '100%', paddingTop: 10, paddingBottom: 10, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'inline-flex'}}>
+  <div style={{width: '100%', height: '100%', paddingTop: 10, paddingBottom: 10, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'inline-flex', marginTop: 160}}>
   <div style={{width: 1080, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
     <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>F.A.Q</div>
     <div style={{alignSelf: 'stretch', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', overflow: 'hidden', borderRadius: 12, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
@@ -233,7 +233,7 @@ export default function Home() {
 </div>
 
   {/* Call-to-action section under F.A.Q */}
-  <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex'}}>
+  <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex', marginTop: 160}}>
   <div style={{width: 1090, height: 422, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 32, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex'}}>
     <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start building your wealth today</div>
     <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
@@ -250,7 +250,7 @@ export default function Home() {
   </div>
 
   {/* Footer section */}
-  <div style={{width: '100%', height: '100%', paddingTop: 32, paddingBottom: 32, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
+  <div style={{width: '100%', height: '100%', paddingTop: 32, paddingBottom: 32, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'inline-flex', marginTop: 160}}>
     <div style={{width: 1080, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 130, display: 'inline-flex'}}>
         <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 40, display: 'inline-flex'}}>
             <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
