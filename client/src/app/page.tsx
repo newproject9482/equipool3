@@ -233,15 +233,11 @@ export default function Home() {
     <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start building your wealth today</div>
     <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
       <div data-left-icon="true" data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
-        <div data-icon="ic:handshake" style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
-          <div style={{width: 24, height: 18, left: 0, top: 3, position: 'absolute', background: 'var(--Light-Grey, #F4F4F4)'}} />
-        </div>
+        <Image src="/icons.svg" alt="Handshake icon" width={24} height={24} />
         <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Button</div>
       </div>
       <div data-left-icon="true" data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
-        <div data-icon="ic:give" style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
-          <div style={{width: 21, height: 21, left: 1.50, top: 1.50, position: 'absolute', background: '#113D7B'}} />
-        </div>
+        <Image src="/invest.svg" alt="Investment icon" width={24} height={24} />
         <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Button</div>
       </div>
     </div>
