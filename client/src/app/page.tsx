@@ -113,9 +113,146 @@ export default function Home() {
                 <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>AI verifies documents, suggests ROI ranges, and flags inconsistencies — so you can move faster with confidence.</div>
               </div>
             </div>
-          </div>
+      </div>
+    </div>
+    </div>
+
+    <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 80, display: 'inline-flex'}}>
+  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 20, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+      <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'Avenir', fontWeight: '800', wordWrap: 'break-word'}}>How it works?</div>
+    </div>
+    <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Simple steps. Smart infrastructure.</div>
+  </div>
+  <div style={{width: 1090, paddingTop: 32, paddingBottom: 64, paddingLeft: 56, paddingRight: 56, background: '#F4F4F4', borderRadius: 40, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 80, display: 'flex'}}>
+    <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 8, paddingBottom: 8, background: 'white', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+      <div style={{height: 64, paddingLeft: 20, paddingRight: 20, background: '#F4F4F4', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+        <div style={{textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</div>
+      </div>
+      <div style={{height: 64, paddingLeft: 10, paddingRight: 10, borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+        <div style={{textAlign: 'center', color: '#B2B2B2', fontSize: 20, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Investor</div>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', height: 238, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+        </div>
+        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Receive funding</div>
+          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}> When funded, money is disbursed through escrow and your repayment schedule begins.</div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+        </div>
+        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+          <div style={{color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Submit property & loan request</div>
+          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Add property details, upload optional documents, and set your loan amount, term, and preferred ROI.</div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+        </div>
+        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+          <div style={{color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Get AI support & approval</div>
+          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Add property details, upload optional documents, and set your loan amount, term, and preferred ROI.</div>
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+        </div>
+        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+          <div style={{color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Launch your pool</div>
+          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Once approved, your loan pool is live and visible to investors.</div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+  {/* F.A.Q section */}
+  <div style={{width: '100%', height: '100%', paddingTop: 10, paddingBottom: 10, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'inline-flex'}}>
+  <div style={{width: 1080, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>F.A.Q</div>
+    <div style={{alignSelf: 'stretch', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', overflow: 'hidden', borderRadius: 12, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: '#F4F4F4', borderTopLeftRadius: 12, borderTopRightRadius: 12, borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+          <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Can I use Flowbite in open-source projects?</div>
+        </div>
+        <div style={{width: 20, height: 20, position: 'relative'}}>
+          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 5.83, position: 'absolute', background: '#101828'}} />
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
+        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Generally, it is accepted to use Flowbite in open-source projects, as long as it is not a UI library, a theme, a template, a page-builder that would be considered as an alternative to Flowbite itself.</div>
+        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>With that being said, feel free to use this design kit for your open-source projects.</div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+          <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
+        </div>
+        <div style={{width: 20, height: 20, position: 'relative'}}>
+          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+          <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
+        </div>
+        <div style={{width: 20, height: 20, position: 'relative'}}>
+          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+          <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
+        </div>
+        <div style={{width: 20, height: 20, position: 'relative'}}>
+          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+        </div>
+      </div>
+      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+          <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
+        </div>
+        <div style={{width: 20, height: 20, position: 'relative'}}>
+          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  {/* Call-to-action section under F.A.Q */}
+  <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex'}}>
+  <div style={{width: 1090, height: 422, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 32, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Start building your wealth today</div>
+    <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+      <div data-left-icon="true" data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
+        <div data-icon="ic:handshake" style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
+          <div style={{width: 24, height: 18, left: 0, top: 3, position: 'absolute', background: 'var(--Light-Grey, #F4F4F4)'}} />
+        </div>
+        <div style={{color: 'white', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Button</div>
+      </div>
+      <div data-left-icon="true" data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
+        <div data-icon="ic:give" style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
+          <div style={{width: 21, height: 21, left: 1.50, top: 1.50, position: 'absolute', background: '#113D7B'}} />
+        </div>
+        <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Button</div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  </div>
   );
 }
+
