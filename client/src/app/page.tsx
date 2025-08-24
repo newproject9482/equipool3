@@ -129,45 +129,50 @@ export default function Home() {
         <div style={{textAlign: 'center', color: '#B2B2B2', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Investor</div>
       </div>
     </div>
-    <div style={{alignSelf: 'stretch', height: 238, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
-          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+    
+    {/* 2x2 Grid Layout */}
+    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 40, width: '100%', maxWidth: 900}}>
+      {/* Top Left: Submit property & loan request */}
+      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <Image src="/group.svg" alt="Submit property icon" width={24} height={24} />
         </div>
-        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Receive funding</div>
-          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> When funded, money is disbursed through escrow and your repayment schedule begins.</div>
-        </div>
-      </div>
-      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
-          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
-        </div>
-        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
           <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit property & loan request</div>
-          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add property details, upload optional documents, and set your loan amount, term, and preferred ROI.</div>
+          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add property details, upload optional documents, and set your loan amount, term, and preferred ROI.</div>
         </div>
       </div>
-      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
-          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+
+      {/* Top Right: Get AI support & approval */}
+      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <Image src="/group.svg" alt="AI support icon" width={24} height={24} />
         </div>
-        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
           <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Get AI support & approval</div>
-          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add property details, upload optional documents, and set your loan amount, term, and preferred ROI.</div>
+          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>AI verifies documents, suggests ROI ranges, and flags inconsistencies — so you can move faster with confidence.</div>
         </div>
       </div>
-      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', overflow: 'hidden', borderRadius: 30, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-          <div style={{width: 16, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
-          <div style={{width: 6, height: 6, outline: '2px black solid', outlineOffset: '-1px'}} />
+
+      {/* Bottom Left: Launch your pool */}
+      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <Image src="/group.svg" alt="Launch pool icon" width={24} height={24} />
         </div>
-        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
           <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Launch your pool</div>
-          <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Once approved, your loan pool is live and visible to investors.</div>
+          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Once approved, your loan pool is live and visible to investors.</div>
+        </div>
+      </div>
+
+      {/* Bottom Right: Receive funding */}
+      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
+        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <Image src="/group.svg" alt="Receive funding icon" width={24} height={24} />
+        </div>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
+          <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Receive funding</div>
+          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>When funded, money is disbursed through escrow and your repayment schedule begins.</div>
         </div>
       </div>
     </div>
@@ -293,15 +298,9 @@ export default function Home() {
                 <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Socials</div>
             </div>
             <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-                <div style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
-                    <div style={{width: 20, height: 20, left: 2, top: 2, position: 'absolute', background: '#4A5565'}} />
-                </div>
-                <div style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
-                    <div style={{width: 20, height: 19.95, left: 2, top: 2, position: 'absolute', background: '#4A5565'}} />
-                </div>
-                <div style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
-                    <div style={{width: 18, height: 18, left: 3, top: 3, position: 'absolute', background: '#4A5565'}} />
-                </div>
+                <Image src="/mdi-instagram.svg" alt="Instagram" width={24} height={24} />
+                <Image src="/ic-baseline-facebook.svg" alt="Facebook" width={24} height={24} />
+                <Image src="/mdi-linkedin.svg" alt="LinkedIn" width={24} height={24} />
             </div>
         </div>
         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
