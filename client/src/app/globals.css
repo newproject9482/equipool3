@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  /* Prefer Avenir when available (per Figma). Fallbacks follow. */
+  font-family: Avenir, 'Avenir Next', Arial, Helvetica, sans-serif;
+}
+
+/* EquiPool design tokens (test styles from Figma) */
+:root {
+  /* Colors */
+  --ep-black: #000000;
+  --ep-brand: #113D7B;
+  --ep-muted: #4A5565;
+
+  /* Font stack */
+  --ep-font-avenir: Avenir, 'Avenir Next', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Sizes */
+  --ep-nav-brand-size: 24px;
+  --ep-nav-link-size: 14px;
+  --ep-nav-soon-size: 10px;
+  --ep-hero-kicker-size: 20px;
+  --ep-hero-heading-size: 48px;
+  --ep-hero-copy-size: 20px;
+  --ep-btn-font-size: 16px;
+  --ep-trusted-size: 20px;
+  --ep-trusted-item-size: 16px;
+}
+
+/* Navbar test classes */
+.ep-nav-brand {
+  color: var(--ep-black);
+  font-size: var(--ep-nav-brand-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 800;
+  line-height: 24px;
+  word-wrap: break-word;
+}
+
+.ep-nav-link {
+  color: var(--ep-muted);
+  font-size: var(--ep-nav-link-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  line-height: 20px;
+  word-wrap: break-word;
+}
+
+.ep-nav-soon {
+  color: var(--ep-muted);
+  font-size: var(--ep-nav-soon-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  word-wrap: break-word;
+}
+
+.ep-nav-login {
+  color: var(--ep-brand);
+  font-size: var(--ep-nav-link-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  word-wrap: break-word;
+}
+
+.ep-cta-join {
+  background: var(--ep-brand);
+  color: white;
+  font-size: var(--ep-nav-link-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Hero test classes */
+.ep-hero-kicker {
+  color: var(--ep-brand);
+  font-size: var(--ep-hero-kicker-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 800;
+  word-wrap: break-word;
+}
+
+.ep-hero-heading {
+  color: var(--ep-black);
+  font-size: var(--ep-hero-heading-size);
+  font-family: var(--ep-font-avenir);
+  word-wrap: break-word;
+}
+.ep-hero-heading--light {
+  font-weight: 400;
+}
+.ep-hero-heading--strong {
+  font-weight: 800;
+}
+
+.ep-hero-copy {
+  color: var(--ep-black);
+  font-size: var(--ep-hero-copy-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  word-wrap: break-word;
+}
+
+.ep-btn-primary {
+  background: var(--ep-brand);
+  color: white;
+  font-size: var(--ep-btn-font-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+}
+
+.ep-btn-secondary {
+  background: transparent;
+  color: var(--ep-brand);
+  font-size: var(--ep-btn-font-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  border: 1px solid var(--ep-brand);
+  cursor: pointer;
+}
+
+.ep-trusted-heading {
+  color: var(--ep-brand);
+  font-size: var(--ep-trusted-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 800;
+  word-wrap: break-word;
+}
+
+.ep-trusted-item {
+  color: var(--ep-muted);
+  font-size: var(--ep-trusted-item-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  line-height: 20px;
+  word-wrap: break-word;
+}
