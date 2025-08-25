@@ -1041,7 +1041,7 @@ export default function Home() {
                   <button 
                     onClick={() => {
                       console.log('Verification code:', verificationCode);
-                      closeSignUpModal();
+                      setModalStep('accountCreated');
                     }}
                     style={{
                       paddingLeft: 16, 
@@ -1075,6 +1075,45 @@ export default function Home() {
                     }}
                   >
                     ← Back
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {modalStep === 'accountCreated' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Account successfully created</div>
+                </div>
+                <div style={{alignSelf: 'stretch', paddingLeft: 200, paddingRight: 200, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Welcome to Equipool</div>
+                </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <button 
+                    onClick={closeSignUpModal}
+                    style={{
+                      paddingLeft: 16, 
+                      paddingRight: 16, 
+                      paddingTop: 10, 
+                      paddingBottom: 10, 
+                      background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', 
+                      borderRadius: 12, 
+                      outline: '1px #F4F4F4 solid',
+                      border: 'none',
+                      cursor: 'pointer',
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: 8, 
+                      display: 'inline-flex'
+                    }}
+                  >
+                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                   </button>
                 </div>
               </div>
