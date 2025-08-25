@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ['python39']
+
+[phases.install]
+cmds = ['cd server && pip install -r requirements.txt']
+
+[phases.build]
+cmds = ['cd server && python manage.py collectstatic --noinput']
+
+[start]
+cmd = 'cd server && python manage.py migrate && gunicorn server.wsgi --bind 0.0.0.0:$PORT'
