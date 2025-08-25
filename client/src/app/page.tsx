@@ -50,7 +50,16 @@ export default function Home() {
     });
   };
   const goToBorrowerSignUp = () => { setSelectedRole('borrower'); setModalStep('borrowerSignUp'); };
-  const goToInvestorSignUp = () => { setSelectedRole('investor'); setModalStep('investorSignUp'); };
+  const goToInvestorSignUp = () => { 
+    setSelectedRole('investor'); 
+    setModalStep('investorSignUp'); 
+    // Reset any open date picker UI state when switching steps
+    setShowDatePicker(false);
+    setShowMonthDropdown(false);
+    setShowYearDropdown(false);
+    setEditingMonth(false);
+    setEditingYear(false);
+  };
   const goBackToRoleSelection = () => setModalStep('roleSelection');
   const goBackToBorrowerSignUp = () => setModalStep('borrowerSignUp');
 
@@ -999,9 +1008,208 @@ export default function Home() {
                         <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                           <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Full name</div>
                         </div>
-                        <div data-righticon="true" data-state="dropdown" style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Date of Birth</div>
-                          <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                        <div style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex', position: 'relative'}}>
+                          <div 
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                            style={{
+                              flex: '1 1 0', 
+                              color: formData.dateOfBirth ? 'black' : '#B2B2B2', 
+                              fontSize: 14, 
+                              fontFamily: 'var(--ep-font-avenir)', 
+                              fontWeight: '500', 
+                              wordWrap: 'break-word',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {formData.dateOfBirth ? `${selectedMonth} ${selectedDate}, ${selectedYear}` : 'Date of Birth'}
+                          </div>
+                          {showDatePicker && (
+                            <div 
+                              style={{
+                                width: 288, 
+                                padding: 20, 
+                                left: 35, 
+                                top: 47, 
+                                position: 'absolute', 
+                                background: 'white', 
+                                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.05)', 
+                                overflow: 'hidden', 
+                                borderRadius: 12, 
+                                outline: '1px #E5E7EB solid', 
+                                outlineOffset: '-1px', 
+                                flexDirection: 'column', 
+                                justifyContent: 'flex-start', 
+                                alignItems: 'center', 
+                                gap: 16, 
+                                display: 'inline-flex',
+                                zIndex: 1000
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div style={{alignSelf: 'stretch', overflow: 'hidden', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                                <button 
+                                  onClick={() => navigateMonth('prev')}
+                                  style={{width: 24, height: 24, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                >
+                                  <Image src="/weui-arrow-filled-left.svg" alt="Previous month" width={24} height={24} />
+                                </button>
+                                <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex', position: 'relative'}}>
+                                  <div style={{position: 'relative'}}>
+                                    {editingMonth ? (
+                                      <input
+                                        type="text"
+                                        value={monthInput}
+                                        onChange={(e) => setMonthInput(e.target.value)}
+                                        onKeyDown={handleMonthInputKeyDown}
+                                        onBlur={handleMonthInputSubmit}
+                                        autoFocus
+                                        style={{
+                                          paddingLeft: 8, 
+                                          paddingRight: 8, 
+                                          paddingTop: 6, 
+                                          paddingBottom: 6, 
+                                          borderRadius: 8, 
+                                          outline: '1px #767676 solid', 
+                                          outlineOffset: '-1px',
+                                          background: 'white',
+                                          border: 'none',
+                                          textAlign: 'center',
+                                          color: '#101828', 
+                                          fontSize: 14, 
+                                          fontFamily: 'var(--ep-font-avenir)', 
+                                          fontWeight: '500',
+                                          width: 80
+                                        }}
+                                      />
+                                    ) : (
+                                      <button
+                                        onClick={() => {
+                                          setEditingMonth(true);
+                                          setMonthInput(selectedMonth);
+                                          setShowMonthDropdown(!showMonthDropdown);
+                                        }}
+                                        style={{paddingLeft: 8, paddingRight: 8, paddingTop: 6, paddingBottom: 6, borderRadius: 8, outline: '1px #767676 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 2, display: 'flex', background: 'transparent', border: 'none', cursor: 'pointer'}}
+                                      >
+                                        <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.43, wordWrap: 'break-word'}}>{selectedMonth}</div>
+                                      </button>
+                                    )}
+                                    {showMonthDropdown && (
+                                      <div style={{position: 'absolute', top: '100%', left: 0, background: 'white', border: '1px solid #767676', borderRadius: 8, boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', zIndex: 1001, maxHeight: 200, overflowY: 'auto'}}>
+                                        {months.map((month) => (
+                                          <div
+                                            key={month}
+                                            onClick={() => {
+                                              setSelectedMonth(month);
+                                              setShowMonthDropdown(false);
+                                            }}
+                                            style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
+                                            onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5'; }}
+                                            onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent'; }}
+                                          >
+                                            {month}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div style={{position: 'relative'}}>
+                                    {editingYear ? (
+                                      <input
+                                        type="number"
+                                        value={yearInput}
+                                        onChange={(e) => setYearInput(e.target.value)}
+                                        onKeyDown={handleYearInputKeyDown}
+                                        onBlur={handleYearInputSubmit}
+                                        autoFocus
+                                        min="1900"
+                                        max={new Date().getFullYear()}
+                                        style={{
+                                          paddingLeft: 8, 
+                                          paddingRight: 8, 
+                                          paddingTop: 6, 
+                                          paddingBottom: 6, 
+                                          borderRadius: 8, 
+                                          outline: '1px #767676 solid', 
+                                          outlineOffset: '-1px',
+                                          background: 'white',
+                                          border: 'none',
+                                          textAlign: 'center',
+                                          color: '#101828', 
+                                          fontSize: 14, 
+                                          fontFamily: 'var(--ep-font-avenir)', 
+                                          fontWeight: '500',
+                                          width: 60
+                                        }}
+                                      />
+                                    ) : (
+                                      <button
+                                        onClick={() => {
+                                          setEditingYear(true);
+                                          setYearInput(selectedYear);
+                                          setShowYearDropdown(!showYearDropdown);
+                                        }}
+                                        style={{paddingLeft: 8, paddingRight: 8, paddingTop: 6, paddingBottom: 6, borderRadius: 8, outline: '1px #767676 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 2, display: 'flex', background: 'transparent', border: 'none', cursor: 'pointer'}}
+                                      >
+                                        <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.43, wordWrap: 'break-word'}}>{selectedYear}</div>
+                                      </button>
+                                    )}
+                                    {showYearDropdown && (
+                                      <div style={{position: 'absolute', top: '100%', left: 0, background: 'white', border: '1px solid #767676', borderRadius: 8, boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', zIndex: 1001, maxHeight: 200, overflowY: 'auto'}}>
+                                        {years.map((year) => (
+                                          <div
+                                            key={year}
+                                            onClick={() => {
+                                              setSelectedYear(year);
+                                              setShowYearDropdown(false);
+                                            }}
+                                            style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
+                                            onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5'; }}
+                                            onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent'; }}
+                                          >
+                                            {year}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                <button 
+                                  onClick={() => navigateMonth('next')}
+                                  style={{width: 24, height: 24, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                >
+                                  <Image src="/weui-arrow-filled_right.svg" alt="Next month" width={24} height={24} />
+                                </button>
+                              </div>
+                              <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+                                <div style={{width: 252, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Sun</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Mon</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Tue</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Wed</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Thu</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Fri</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Sat</div>
+                                  </div>
+                                </div>
+                                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                  {renderCalendarDays()}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                           <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Email</div>
@@ -1027,7 +1235,7 @@ export default function Home() {
                             <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>SSN</div>
                           </div>
                           <div style={{alignSelf: 'stretch', paddingLeft: 8, paddingRight: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Used for identity and investor risk verification</div>
+                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 3.2, wordWrap: 'break-word'}}>Used for identity and investor risk verification</div>
                           </div>
                         </div>
                       </div>
@@ -1058,18 +1266,58 @@ export default function Home() {
                           </div>
                         </div>
                         <div data-righticon="true" data-state="password" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Password</div>
-                          <div data-icon="ic: eyeoff" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                            <div style={{width: 11.99, height: 11.99, left: 2.01, top: 2.01, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                            <div style={{width: 15, height: 10, left: 0.50, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                          </div>
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={(e) => handleInputChange('password', e.target.value)}
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: formData.password ? 'black' : '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(p => !p)}
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            style={{background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                          >
+                            <Image src="/show_password.svg" alt={showPassword ? 'Hide password' : 'Show password'} width={16} height={16} />
+                          </button>
                         </div>
                         <div data-righticon="true" data-state="password" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Repeat</div>
-                          <div data-icon="ic: eyeoff" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                            <div style={{width: 11.99, height: 11.99, left: 2.01, top: 2.01, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                            <div style={{width: 15, height: 10, left: 0.50, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                          </div>
+                          <input
+                            type={showRepeatPassword ? 'text' : 'password'}
+                            placeholder="Repeat"
+                            value={formData.repeatPassword}
+                            onChange={(e) => handleInputChange('repeatPassword', e.target.value)}
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: formData.repeatPassword ? 'black' : '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowRepeatPassword(p => !p)}
+                            aria-label={showRepeatPassword ? 'Hide repeat password' : 'Show repeat password'}
+                            style={{background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                          >
+                            <Image src="/show_password.svg" alt={showRepeatPassword ? 'Hide repeat password' : 'Show repeat password'} width={16} height={16} />
+                          </button>
                         </div>
                       </div>
                     </div>
