@@ -146,7 +146,8 @@ export default function Home() {
         setIsAuthenticated(true);
         // Persist simple flag (session cookie is real auth)
         if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
-        setModalStep('verifyContact');
+  // Borrower flow: go straight to email verification step
+  setModalStep('emailVerification');
       } catch (e:any) {
         alert(e.message || 'Network error');
       }
@@ -155,6 +156,7 @@ export default function Home() {
   // investor path keeps prior behavior but set auth state
   setIsAuthenticated(true);
   if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+  // Investor flow: go to combined contact verification first
   setModalStep('verifyContact');
   };
 
@@ -1835,7 +1837,11 @@ export default function Home() {
                   <button 
                     onClick={() => {
                       console.log('Verification code:', verificationCode);
-                      setModalStep('accountCreated');
+                      if(selectedRole === 'borrower') {
+                        setModalStep('accountCreated');
+                      } else {
+                        setModalStep('livenessCheck');
+                      }
                     }}
                     style={{
                       paddingLeft: 16, 
@@ -1876,27 +1882,45 @@ export default function Home() {
 
             {modalStep === 'accountCreated' && (
               <div style={{width:'100%', height:'100%', paddingTop:24, paddingBottom:24, position:'relative', flexDirection:'column', justifyContent:'space-between', alignItems:'center', display:'inline-flex'}}>
-                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'flex-start', gap:4, display:'flex'}}>
-                  <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:24, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Account successfully created</div>
-                </div>
-                <div style={{alignSelf:'stretch', paddingLeft:200, paddingRight:200, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
-                  <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:20, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>To start investing please make your first deposit.</div>
-                </div>
                 <button
                   onClick={closeSignUpModal}
                   style={{width:32, height:32, right:32, top:32, position:'absolute', background:'transparent', border:'none', cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center'}}
                 >
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
-                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'center', alignItems:'center', gap:10, display:'flex'}}>
-                  <div data-left-icon="false" data-state="default" style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background:'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius:12, outline:'1px var(--Light-Grey, #F4F4F4) solid', justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor:'pointer'}}>
-                    <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Make a deposit</div>
-                  </div>
-                  <div data-left-icon="true" data-state="secondary" style={{paddingTop:8, paddingLeft:16, paddingRight:16, borderRadius:12, justifyContent:'center', alignItems:'center', gap:4, display:'inline-flex', cursor:'pointer'}}>
-                    <div style={{color:'var(--Black, black)', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Skip for now</div>
-                    <Image src="/skip.svg" alt="Skip" width={12} height={13} />
-                  </div>
-                </div>
+                {selectedRole === 'investor' ? (
+                  <>
+                    <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'flex-start', gap:4, display:'flex'}}>
+                      <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:24, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Account successfully created</div>
+                    </div>
+                    <div style={{alignSelf:'stretch', paddingLeft:200, paddingRight:200, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
+                      <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:20, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>To start investing please make your first deposit.</div>
+                    </div>
+                    <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'center', alignItems:'center', gap:10, display:'flex'}}>
+                      <div data-left-icon="false" data-state="default" style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background:'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius:12, outline:'1px var(--Light-Grey, #F4F4F4) solid', justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor:'pointer'}}>
+                        <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Make a deposit</div>
+                      </div>
+                      <div data-left-icon="true" data-state="secondary" style={{paddingTop:8, paddingLeft:16, paddingRight:16, borderRadius:12, justifyContent:'center', alignItems:'center', gap:4, display:'inline-flex', cursor:'pointer'}}>
+                        <div style={{color:'var(--Black, black)', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Skip for now</div>
+                        <Image src="/skip.svg" alt="Skip" width={12} height={13} />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'flex-start', gap:4, display:'flex'}}>
+                      <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:32, fontFamily:'var(--ep-font-avenir)', fontWeight:800, wordWrap:'break-word'}}>Welcome to EquiPool</div>
+                    </div>
+                    <div style={{alignSelf:'stretch', paddingLeft:160, paddingRight:160, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
+                      <div style={{alignSelf:'stretch', textAlign:'center', color:'#4A5565', fontSize:16, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Your borrower account has been created successfully.</div>
+                    </div>
+                    <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'center', alignItems:'center', gap:10, display:'flex'}}>
+                      <div onClick={closeSignUpModal} data-left-icon="false" data-state="default" style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background:'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius:12, outline:'1px var(--Light-Grey, #F4F4F4) solid', justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor:'pointer'}}>
+                        <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Continue</div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
