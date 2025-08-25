@@ -153,11 +153,84 @@ export default function Home() {
       }
       return;
     }
-  // investor path keeps prior behavior but set auth state
-  setIsAuthenticated(true);
-  if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
-  // Investor flow: go to combined contact verification first
-  setModalStep('verifyContact');
+
+    // Investor signup path
+    if(selectedRole === 'investor') {
+      try {
+        const payload = {
+          fullName: formData.fullName,
+          dateOfBirth: formData.dateOfBirth,
+          email: formData.email,
+          phone: formData.phone,
+          ssn: formData.ssn,
+          address1: formData.address1,
+          address2: formData.address2,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip,
+          country: formData.country,
+          password: formData.password,
+        };
+        const res = await fetch('/api/investors/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if(!res.ok){
+          const err = await res.json().catch(()=>({error:'Signup failed'}));
+          alert(err.error || 'Signup failed');
+          return;
+        }
+        // On success mark authenticated and continue to verification
+        setIsAuthenticated(true);
+        // Persist simple flag (session cookie is real auth)
+        if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+        // Investor flow: go to combined contact verification first
+        setModalStep('verifyContact');
+      } catch (e:any) {
+        alert(e.message || 'Network error');
+      }
+      return;
+    }
+  };
+
+  const handleInvestorSignUp = async () => {
+    try {
+      const payload = {
+        fullName: formData.fullName,
+        dateOfBirth: formData.dateOfBirth,
+        email: formData.email,
+        phone: formData.phone,
+        ssn: formData.ssn,
+        address1: formData.address1,
+        address2: formData.address2,
+        city: formData.city,
+        state: formData.state,
+        zip: formData.zip,
+        country: formData.country,
+        password: formData.password,
+      };
+      console.log('Sending investor signup payload:', payload);
+      const res = await fetch('/api/investors/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if(!res.ok){
+        const err = await res.json().catch(()=>({error:'Signup failed'}));
+        alert(err.error || 'Signup failed');
+        return;
+      }
+      // On success mark authenticated and continue to verification
+      setSelectedRole('investor');
+      setIsAuthenticated(true);
+      // Persist simple flag (session cookie is real auth)
+      if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+      // Investor flow: go to combined contact verification first
+      setModalStep('verifyContact');
+    } catch (e:any) {
+      alert(e.message || 'Network error');
+    }
   };
 
   const handleLogout = async () => {
@@ -1621,7 +1694,11 @@ export default function Home() {
                 </button>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
                   <div
-                    onClick={() => { if(investorCanContinue){ setSelectedRole('investor'); handleSignUp(); } }}
+                    onClick={() => { 
+                      if(investorCanContinue){ 
+                        handleInvestorSignUp();
+                      } 
+                    }}
                     style={{
                       paddingLeft:16,
                       paddingRight:16,

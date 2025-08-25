@@ -23,7 +23,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
     if(!canLogin || submitting) return;
     setSubmitting(true);
     try {
-      const res = await fetch('/api/borrowers/login', {
+      const endpoint = role === 'borrower' ? '/api/borrowers/login' : '/api/investors/login';
+      const res = await fetch(endpoint, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ email, password })
