@@ -5,9 +5,222 @@ import { useState } from "react";
 
 export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'emailVerification', 'accountCreated'
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    fullName: '',
+    dateOfBirth: '',
+    email: '',
+    password: '',
+    repeatPassword: ''
+  });
+  const [verificationCode, setVerificationCode] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(17);
+  const [selectedMonth, setSelectedMonth] = useState('June');
+  const [selectedYear, setSelectedYear] = useState('1993');
+  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
+  const [showYearDropdown, setShowYearDropdown] = useState(false);
+  const [editingMonth, setEditingMonth] = useState(false);
+  const [editingYear, setEditingYear] = useState(false);
+  const [monthInput, setMonthInput] = useState('June');
+  const [yearInput, setYearInput] = useState('1993');
+
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                 'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({length: 100}, (_, i) => (currentYear - i).toString());
 
   const openSignUpModal = () => setShowSignUpModal(true);
-  const closeSignUpModal = () => setShowSignUpModal(false);
+  const closeSignUpModal = () => {
+    setShowSignUpModal(false);
+    setModalStep('roleSelection');
+    // Reset form data
+    setFormData({
+      fullName: '',
+      dateOfBirth: '',
+      email: '',
+      password: '',
+      repeatPassword: ''
+    });
+  };
+  const goToBorrowerSignUp = () => setModalStep('borrowerSignUp');
+  const goBackToRoleSelection = () => setModalStep('roleSelection');
+  const goBackToBorrowerSignUp = () => setModalStep('borrowerSignUp');
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSignUp = () => {
+    // Move to email verification step
+    setModalStep('emailVerification');
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const currentMonthIndex = months.indexOf(selectedMonth);
+    let newMonthIndex = currentMonthIndex;
+    let newYear = parseInt(selectedYear);
+
+    if (direction === 'next') {
+      newMonthIndex = currentMonthIndex + 1;
+      if (newMonthIndex > 11) {
+        newMonthIndex = 0;
+        newYear += 1;
+      }
+    } else {
+      newMonthIndex = currentMonthIndex - 1;
+      if (newMonthIndex < 0) {
+        newMonthIndex = 11;
+        newYear -= 1;
+      }
+    }
+
+    setSelectedMonth(months[newMonthIndex]);
+    setSelectedYear(newYear.toString());
+  };
+
+  const handleDateSelect = (day: number) => {
+    setSelectedDate(day);
+    const dateString = `${selectedYear}-${String(getMonthNumber(selectedMonth)).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    handleInputChange('dateOfBirth', dateString);
+    setShowDatePicker(false);
+    setShowMonthDropdown(false);
+    setShowYearDropdown(false);
+  };
+
+  const handleMonthInputSubmit = () => {
+    if (months.includes(monthInput)) {
+      setSelectedMonth(monthInput);
+      setEditingMonth(false);
+    } else {
+      // Reset to previous value if invalid
+      setMonthInput(selectedMonth);
+      setEditingMonth(false);
+    }
+  };
+
+  const handleYearInputSubmit = () => {
+    const year = parseInt(yearInput);
+    if (year >= 1900 && year <= new Date().getFullYear()) {
+      setSelectedYear(yearInput);
+      setEditingYear(false);
+    } else {
+      // Reset to previous value if invalid
+      setYearInput(selectedYear);
+      setEditingYear(false);
+    }
+  };
+
+  const handleMonthInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleMonthInputSubmit();
+    } else if (e.key === 'Escape') {
+      setMonthInput(selectedMonth);
+      setEditingMonth(false);
+    }
+  };
+
+  const handleYearInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleYearInputSubmit();
+    } else if (e.key === 'Escape') {
+      setYearInput(selectedYear);
+      setEditingYear(false);
+    }
+  };
+
+  const getMonthNumber = (monthName: string) => {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                   'July', 'August', 'September', 'October', 'November', 'December'];
+    return months.indexOf(monthName) + 1;
+  };
+
+  const getDaysInMonth = (month: string, year: string) => {
+    const monthNum = getMonthNumber(month);
+    return new Date(parseInt(year), monthNum, 0).getDate();
+  };
+
+  const renderCalendarDays = () => {
+    const daysInMonth = getDaysInMonth(selectedMonth, selectedYear);
+    const monthNum = getMonthNumber(selectedMonth);
+    const year = parseInt(selectedYear);
+    
+    // Get first day of month (0 = Sunday, 1 = Monday, etc.)
+    const firstDay = new Date(year, monthNum - 1, 1).getDay();
+    
+    const rows = [];
+    let dayCount = 1;
+    
+    // Create exactly 6 weeks to match standard calendar layout
+    for (let week = 0; week < 6; week++) {
+      const weekDays = [];
+      
+      for (let dayInWeek = 0; dayInWeek < 7; dayInWeek++) {
+        if (week === 0 && dayInWeek < firstDay) {
+          // Empty cells before month starts
+          weekDays.push(
+            <div key={`empty-start-${dayInWeek}`} style={{width: 36, height: 36}} />
+          );
+        } else if (dayCount <= daysInMonth) {
+          // Actual days of the month
+          const currentDay = dayCount;
+          const isSelected = currentDay === selectedDate;
+          
+          weekDays.push(
+            <div 
+              key={currentDay}
+              onClick={() => handleDateSelect(currentDay)}
+              style={{
+                width: 36, 
+                height: 36, 
+                background: isSelected ? '#113D7B' : 'transparent',
+                overflow: 'hidden', 
+                borderRadius: 8, 
+                flexDirection: 'column', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                display: 'inline-flex',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{
+                textAlign: 'center', 
+                color: isSelected ? 'white' : '#4A5565', 
+                fontSize: 12, 
+                fontFamily: 'var(--ep-font-avenir)', 
+                fontWeight: '500', 
+                wordWrap: 'break-word'
+              }}>
+                {currentDay}
+              </div>
+            </div>
+          );
+          dayCount++;
+        } else {
+          // Empty cells after month ends
+          weekDays.push(
+            <div key={`empty-end-${week}-${dayInWeek}`} style={{width: 36, height: 36}} />
+          );
+        }
+      }
+      
+      rows.push(
+        <div key={week} style={{width: 252, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+          {weekDays}
+        </div>
+      );
+    }
+    
+    return rows;
+  };
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
@@ -347,50 +560,525 @@ export default function Home() {
         }}>
           <div style={{
             width: 720,
-            height: 480,
+            height: 580,
             background: 'white',
             borderRadius: 24,
             position: 'relative',
             boxShadow: '0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)'
           }}>
-            <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-              <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
-              <div style={{alignSelf: 'stretch', paddingLeft: 200, paddingRight: 200, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                <div style={{height: 320, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
-                  <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Choose your role</div>
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>You can't switch roles later, but you can register a second account using a different email if needed.</div>
-                  </div>
-                  <div style={{width: 452, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                    <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={closeSignUpModal}>
-                      <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Image src="/vaadin-handshake.svg" alt="Borrow icon" width={32} height={32} />
-                      </div>
-                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                        <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I want to borrow</div>
-                        <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Access community-powered capital using your real estate as collateral.</div>
-                      </div>
+            {modalStep === 'roleSelection' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                <div style={{alignSelf: 'stretch', paddingLeft: 200, paddingRight: 200, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{height: 320, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
+                    <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Choose your role</div>
+                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>You can't switch roles later, but you can register a second account using a different email if needed.</div>
                     </div>
-                    <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={closeSignUpModal}>
-                      <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Image src="/invest.svg" alt="Invest icon" width={32} height={32} />
+                    <div style={{width: 452, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                      <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={goToBorrowerSignUp}>
+                        <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                          <Image src="/vaadin-handshake.svg" alt="Borrow icon" width={32} height={32} />
+                        </div>
+                        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                          <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I want to borrow</div>
+                          <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Access community-powered capital using your real estate as collateral.</div>
+                        </div>
                       </div>
-                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                        <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I want to Invest</div>
-                        <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Fund vetted property-backed loans and earn passive income.</div>
+                      <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={closeSignUpModal}>
+                        <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                          <Image src="/invest.svg" alt="Invest icon" width={32} height={32} />
+                        </div>
+                        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                          <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I want to Invest</div>
+                          <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Fund vetted property-backed loans and earn passive income.</div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}} />
               </div>
-              <button 
-                onClick={closeSignUpModal}
-                style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-              >
-                <div style={{width: 18.67, height: 18.67, background: 'black', clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}} />
-              </button>
-              <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}} />
-            </div>
+            )}
+
+            {modalStep === 'borrowerSignUp' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</span>
+                    <span style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> </span>
+                  </div>
+                </div>
+                <div style={{alignSelf: 'stretch', paddingLeft: 200, paddingRight: 200, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
+                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="text"
+                            placeholder="Full name"
+                            value={formData.fullName}
+                            onChange={(e) => handleInputChange('fullName', e.target.value)}
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: formData.fullName ? 'black' : '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500'
+                            }}
+                          />
+                        </div>
+                        <div style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex', position: 'relative'}}>
+                          <div 
+                            onClick={() => setShowDatePicker(!showDatePicker)}
+                            style={{
+                              flex: '1 1 0', 
+                              color: formData.dateOfBirth ? 'black' : '#B2B2B2', 
+                              fontSize: 14, 
+                              fontFamily: 'var(--ep-font-avenir)', 
+                              fontWeight: '500', 
+                              wordWrap: 'break-word',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {formData.dateOfBirth ? `${selectedMonth} ${selectedDate}, ${selectedYear}` : 'Date of Birth'}
+                          </div>
+                          
+                          {showDatePicker && (
+                            <div 
+                              style={{
+                                width: 288, 
+                                padding: 20, 
+                                left: 35, 
+                                top: 47, 
+                                position: 'absolute', 
+                                background: 'white', 
+                                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.05)', 
+                                overflow: 'hidden', 
+                                borderRadius: 12, 
+                                outline: '1px #E5E7EB solid', 
+                                outlineOffset: '-1px', 
+                                flexDirection: 'column', 
+                                justifyContent: 'flex-start', 
+                                alignItems: 'center', 
+                                gap: 16, 
+                                display: 'inline-flex',
+                                zIndex: 1000
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div style={{alignSelf: 'stretch', overflow: 'hidden', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                                <button 
+                                  onClick={() => navigateMonth('prev')}
+                                  style={{width: 24, height: 24, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                >
+                                  <Image src="/weui-arrow-filled-left.svg" alt="Previous month" width={24} height={24} />
+                                </button>
+                                <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex', position: 'relative'}}>
+                                  <div style={{position: 'relative'}}>
+                                    {editingMonth ? (
+                                      <input
+                                        type="text"
+                                        value={monthInput}
+                                        onChange={(e) => setMonthInput(e.target.value)}
+                                        onKeyDown={handleMonthInputKeyDown}
+                                        onBlur={handleMonthInputSubmit}
+                                        autoFocus
+                                        style={{
+                                          paddingLeft: 8, 
+                                          paddingRight: 8, 
+                                          paddingTop: 6, 
+                                          paddingBottom: 6, 
+                                          borderRadius: 8, 
+                                          outline: '1px #767676 solid', 
+                                          outlineOffset: '-1px',
+                                          background: 'white',
+                                          border: 'none',
+                                          textAlign: 'center',
+                                          color: '#101828', 
+                                          fontSize: 14, 
+                                          fontFamily: 'var(--ep-font-avenir)', 
+                                          fontWeight: '500',
+                                          width: 80
+                                        }}
+                                      />
+                                    ) : (
+                                      <button
+                                        onClick={() => {
+                                          setEditingMonth(true);
+                                          setMonthInput(selectedMonth);
+                                          setShowMonthDropdown(!showMonthDropdown);
+                                        }}
+                                        style={{paddingLeft: 8, paddingRight: 8, paddingTop: 6, paddingBottom: 6, borderRadius: 8, outline: '1px #767676 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 2, display: 'flex', background: 'transparent', border: 'none', cursor: 'pointer'}}
+                                      >
+                                        <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.43, wordWrap: 'break-word'}}>{selectedMonth}</div>
+                                      </button>
+                                    )}
+                                    {showMonthDropdown && (
+                                      <div style={{position: 'absolute', top: '100%', left: 0, background: 'white', border: '1px solid #767676', borderRadius: 8, boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', zIndex: 1001, maxHeight: 200, overflowY: 'auto'}}>
+                                        {months.map((month) => (
+                                          <div
+                                            key={month}
+                                            onClick={() => {
+                                              setSelectedMonth(month);
+                                              setShowMonthDropdown(false);
+                                            }}
+                                            style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                          >
+                                            {month}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div style={{position: 'relative'}}>
+                                    {editingYear ? (
+                                      <input
+                                        type="number"
+                                        value={yearInput}
+                                        onChange={(e) => setYearInput(e.target.value)}
+                                        onKeyDown={handleYearInputKeyDown}
+                                        onBlur={handleYearInputSubmit}
+                                        autoFocus
+                                        min="1900"
+                                        max={new Date().getFullYear()}
+                                        style={{
+                                          paddingLeft: 8, 
+                                          paddingRight: 8, 
+                                          paddingTop: 6, 
+                                          paddingBottom: 6, 
+                                          borderRadius: 8, 
+                                          outline: '1px #767676 solid', 
+                                          outlineOffset: '-1px',
+                                          background: 'white',
+                                          border: 'none',
+                                          textAlign: 'center',
+                                          color: '#101828', 
+                                          fontSize: 14, 
+                                          fontFamily: 'var(--ep-font-avenir)', 
+                                          fontWeight: '500',
+                                          width: 60
+                                        }}
+                                      />
+                                    ) : (
+                                      <button
+                                        onClick={() => {
+                                          setEditingYear(true);
+                                          setYearInput(selectedYear);
+                                          setShowYearDropdown(!showYearDropdown);
+                                        }}
+                                        style={{paddingLeft: 8, paddingRight: 8, paddingTop: 6, paddingBottom: 6, borderRadius: 8, outline: '1px #767676 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 2, display: 'flex', background: 'transparent', border: 'none', cursor: 'pointer'}}
+                                      >
+                                        <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.43, wordWrap: 'break-word'}}>{selectedYear}</div>
+                                      </button>
+                                    )}
+                                    {showYearDropdown && (
+                                      <div style={{position: 'absolute', top: '100%', left: 0, background: 'white', border: '1px solid #767676', borderRadius: 8, boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', zIndex: 1001, maxHeight: 200, overflowY: 'auto'}}>
+                                        {years.map((year) => (
+                                          <div
+                                            key={year}
+                                            onClick={() => {
+                                              setSelectedYear(year);
+                                              setShowYearDropdown(false);
+                                            }}
+                                            style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                          >
+                                            {year}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                <button 
+                                  onClick={() => navigateMonth('next')}
+                                  style={{width: 24, height: 24, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                >
+                                  <Image src="/weui-arrow-filled_right.svg" alt="Next month" width={24} height={24} />
+                                </button>
+                              </div>
+                              <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+                                <div style={{width: 252, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Sun</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Mon</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Tue</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Wed</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Thu</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Fri</div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Sat</div>
+                                  </div>
+                                </div>
+                                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                  {renderCalendarDays()}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: formData.email ? 'black' : '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500'
+                            }}
+                          />
+                        </div>
+                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={(e) => handleInputChange('password', e.target.value)}
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: formData.password ? 'black' : '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              WebkitAppearance: 'none',
+                              WebkitTextSecurity: showPassword ? 'none' : 'disc'
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            style={{background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'}}
+                          >
+                            <Image src="/show_password.svg" alt="Toggle password visibility" width={16} height={16} />
+                          </button>
+                        </div>
+                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type={showRepeatPassword ? 'text' : 'password'}
+                            placeholder="Repeat"
+                            value={formData.repeatPassword}
+                            onChange={(e) => handleInputChange('repeatPassword', e.target.value)}
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: formData.repeatPassword ? 'black' : '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500'
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                            style={{background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center'}}
+                          >
+                            <Image src="/show_password.svg" alt="Toggle password visibility" width={16} height={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                      <div style={{textAlign: 'center'}}>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>By signing up, you agree to our </span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Terms of Service</span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> and </span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Privacy Policy</span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>.</span>
+                      </div>
+                      <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Already have an account?</span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> </span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Log In</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <button 
+                    onClick={handleSignUp}
+                    style={{
+                      paddingLeft: 16, 
+                      paddingRight: 16, 
+                      paddingTop: 10, 
+                      paddingBottom: 10, 
+                      background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', 
+                      borderRadius: 12, 
+                      border: 'none',
+                      cursor: 'pointer',
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: 8, 
+                      display: 'inline-flex'
+                    }}
+                  >
+                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  </button>
+                  <button 
+                    onClick={goBackToRoleSelection}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#4A5565',
+                      fontSize: 12,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '400',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    ← Back
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {modalStep === 'emailVerification' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</span>
+                    <span style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> </span>
+                  </div>
+                </div>
+                <div style={{alignSelf: 'stretch', paddingLeft: 200, paddingRight: 200, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
+                    <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your email</div>
+                      <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Please enter the code sent to your email</div>
+                    </div>
+                    <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                      <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        <input
+                          type="text"
+                          placeholder="_ _ _ _"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value)}
+                          maxLength={4}
+                          style={{
+                            flex: '1 1 0',
+                            background: 'transparent',
+                            border: 'none',
+                            outline: 'none',
+                            color: verificationCode ? 'black' : '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            letterSpacing: '0.5em',
+                            textAlign: 'center'
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Didn't receive the code?</span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> </span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}>Resend</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                    <div style={{textAlign: 'center'}}>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>By signing up, you agree to our </span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Terms of Service</span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> and </span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Privacy Policy</span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>.</span>
+                    </div>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <button 
+                    onClick={() => {
+                      console.log('Verification code:', verificationCode);
+                      closeSignUpModal();
+                    }}
+                    style={{
+                      paddingLeft: 16, 
+                      paddingRight: 16, 
+                      paddingTop: 10, 
+                      paddingBottom: 10, 
+                      background: '#113D7B', 
+                      borderRadius: 12, 
+                      outline: '1px #F4F4F4 solid',
+                      border: 'none',
+                      cursor: 'pointer',
+                      justifyContent: 'center', 
+                      alignItems: 'center', 
+                      gap: 8, 
+                      display: 'inline-flex'
+                    }}
+                  >
+                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  </button>
+                  <button 
+                    onClick={goBackToBorrowerSignUp}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#4A5565',
+                      fontSize: 12,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '400',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    ← Back
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
