@@ -5,7 +5,8 @@ import { useState } from "react";
 
 export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
-  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'emailVerification', 'accountCreated'
+  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'emailVerification', 'accountCreated'
+  const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -48,7 +49,8 @@ export default function Home() {
       repeatPassword: ''
     });
   };
-  const goToBorrowerSignUp = () => setModalStep('borrowerSignUp');
+  const goToBorrowerSignUp = () => { setSelectedRole('borrower'); setModalStep('borrowerSignUp'); };
+  const goToInvestorSignUp = () => { setSelectedRole('investor'); setModalStep('investorSignUp'); };
   const goBackToRoleSelection = () => setModalStep('roleSelection');
   const goBackToBorrowerSignUp = () => setModalStep('borrowerSignUp');
 
@@ -560,11 +562,12 @@ export default function Home() {
         }}>
           <div style={{
             width: 720,
-            height: 580,
+            height: modalStep === 'investorSignUp' ? 640 : 580,
             background: 'white',
             borderRadius: 24,
             position: 'relative',
-            boxShadow: '0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            boxShadow: '0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            transition: 'height 0.2s ease'
           }}>
             {modalStep === 'roleSelection' && (
               <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
@@ -585,7 +588,7 @@ export default function Home() {
                           <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Access community-powered capital using your real estate as collateral.</div>
                         </div>
                       </div>
-                      <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={closeSignUpModal}>
+                      <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={goToInvestorSignUp}>
                         <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                           <Image src="/invest.svg" alt="Invest icon" width={32} height={32} />
                         </div>
@@ -734,8 +737,8 @@ export default function Home() {
                                               setShowMonthDropdown(false);
                                             }}
                                             style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
-                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                            onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5'; }}
+                                            onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent'; }}
                                           >
                                             {month}
                                           </div>
@@ -794,8 +797,8 @@ export default function Home() {
                                               setShowYearDropdown(false);
                                             }}
                                             style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
-                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                            onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5'; }}
+                                            onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent'; }}
                                           >
                                             {year}
                                           </div>
@@ -876,7 +879,7 @@ export default function Home() {
                               fontFamily: 'var(--ep-font-avenir)',
                               fontWeight: '500',
                               WebkitAppearance: 'none',
-                              WebkitTextSecurity: showPassword ? 'none' : 'disc'
+                              // visually mimic password bullets while allowing toggle; rely on input type instead
                             }}
                           />
                           <button
@@ -975,12 +978,142 @@ export default function Home() {
               </div>
             )}
 
+            {modalStep === 'investorSignUp' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#113D7B', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Investor</div>
+                </div>
+                <div style={{alignSelf: 'stretch', height: 455, paddingLeft: 200, paddingRight: 200, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
+                  <div style={{padding: 4, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                    <div style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                      <div style={{textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Individual</div>
+                    </div>
+                    <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                      <div style={{textAlign: 'center', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Company</div>
+                    </div>
+                  </div>
+                  <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
+                    <div style={{height: 320, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Full name</div>
+                        </div>
+                        <div data-righticon="true" data-state="dropdown" style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Date of Birth</div>
+                          <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                        </div>
+                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Email</div>
+                        </div>
+                        <div data-righticon="false" data-state="phoneNumber" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                          <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                            <div style={{width: 22, height: 16, position: 'relative', overflow: 'hidden', borderRadius: 2}}>
+                              <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', background: 'var(--Mid-Grey, #B2B2B2)', borderRadius: 2}} />
+                              <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', overflow: 'hidden'}}>
+                                <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', background: '#F7FCFF'}} />
+                                <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', background: '#E31D1C'}} />
+                                <div style={{width: 13.75, height: 8.67, left: 0, top: 0, position: 'absolute', background: '#2E42A5'}} />
+                                <div style={{width: 12.49, height: 6.81, left: 0.41, top: 0.82, position: 'absolute', background: '#F7FCFF'}} />
+                              </div>
+                            </div>
+                            <div data-icon="Icon6" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                          </div>
+                          <div style={{width: 20, height: 0, transform: 'rotate(90deg)', transformOrigin: 'top left', outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-0.50px'}}></div>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Phone Number</div>
+                        </div>
+                        <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                          <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--White, white)', borderRadius: 10, outline: '1px var(--Grey, #767676) solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>SSN</div>
+                          </div>
+                          <div style={{alignSelf: 'stretch', paddingLeft: 8, paddingRight: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Used for identity and investor risk verification</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{height: 320, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Address Line 1</div>
+                        </div>
+                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Address Line 2</div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                          <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>City</div>
+                          </div>
+                          <div data-righticon="true" data-state="dropdown" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>State</div>
+                            <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                          </div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                          <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Zip Code</div>
+                          </div>
+                          <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>United States</div>
+                          </div>
+                        </div>
+                        <div data-righticon="true" data-state="password" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Password</div>
+                          <div data-icon="ic: eyeoff" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                            <div style={{width: 11.99, height: 11.99, left: 2.01, top: 2.01, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                            <div style={{width: 15, height: 10, left: 0.50, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                          </div>
+                        </div>
+                        <div data-righticon="true" data-state="password" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Repeat</div>
+                          <div data-icon="ic: eyeoff" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                            <div style={{width: 11.99, height: 11.99, left: 2.01, top: 2.01, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                            <div style={{width: 15, height: 10, left: 0.50, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                    <div style={{textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>By signing up, you agree to our </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span></div>
+                    <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Already have an account?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Log In</span></div>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div data-left-icon="false" data-state="inactive" onClick={() => { setSelectedRole('investor'); handleSignUp(); }} style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Inactive-Blue, #B8C5D7)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex', cursor:'pointer'}}>
+                    <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                  </div>
+                  <button 
+                    onClick={goBackToRoleSelection}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#4A5565',
+                      fontSize: 12,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '400',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    ← Back
+                  </button>
+                </div>
+              </div>
+            )}
+
             {modalStep === 'emailVerification' && (
               <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
                   <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
                   <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
-                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</span>
+                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{selectedRole === 'investor' ? 'Investor' : 'Borrower'}</span>
                     <span style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> </span>
                   </div>
                 </div>
@@ -1062,7 +1195,7 @@ export default function Home() {
                     <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
                   </button>
                   <button 
-                    onClick={goBackToBorrowerSignUp}
+                    onClick={() => setModalStep(selectedRole === 'investor' ? 'investorSignUp' : 'borrowerSignUp')}
                     style={{
                       background: 'transparent',
                       border: 'none',
@@ -1086,7 +1219,7 @@ export default function Home() {
                   <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Account successfully created</div>
                 </div>
                 <div style={{alignSelf: 'stretch', paddingLeft: 200, paddingRight: 200, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, display: 'flex'}}>
-                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Welcome to Equipool</div>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Welcome to Equipool {selectedRole ? (selectedRole === 'investor' ? 'Investor' : 'Borrower') : ''}</div>
                 </div>
                 <button 
                   onClick={closeSignUpModal}
@@ -1125,4 +1258,3 @@ export default function Home() {
   </div>
   );
 }
-
