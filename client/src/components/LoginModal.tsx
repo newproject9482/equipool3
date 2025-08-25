@@ -37,8 +37,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
         onSuccess(role);
         onClose();
       }
-    } catch (e:any){
-      alert(e.message || 'Network error');
+    } catch (e: unknown){
+      const errorMessage = e instanceof Error ? e.message : 'Network error';
+      alert(errorMessage);
     } finally {
       setSubmitting(false);
     }

@@ -78,7 +78,7 @@ export default function Home() {
   useEffect(() => {
     // Reset highlight when filter changes
     setHighlightedStateIndex(filteredStates.length ? 0 : -1);
-  }, [formData.state]);
+  }, [formData.state, filteredStates.length]);
 
   const openSignUpModal = () => setShowSignUpModal(true);
   const closeSignUpModal = () => {
@@ -113,7 +113,6 @@ export default function Home() {
     setEditingYear(false);
   };
   const goBackToRoleSelection = () => setModalStep('roleSelection');
-  const goBackToBorrowerSignUp = () => setModalStep('borrowerSignUp');
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -148,8 +147,9 @@ export default function Home() {
         if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
   // Borrower flow: go straight to email verification step
   setModalStep('emailVerification');
-      } catch (e:any) {
-        alert(e.message || 'Network error');
+      } catch (e: unknown) {
+        const errorMessage = e instanceof Error ? e.message : 'Network error';
+        alert(errorMessage);
       }
       return;
     }
@@ -187,8 +187,9 @@ export default function Home() {
         if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
         // Investor flow: go to combined contact verification first
         setModalStep('verifyContact');
-      } catch (e:any) {
-        alert(e.message || 'Network error');
+      } catch (e: unknown) {
+        const errorMessage = e instanceof Error ? e.message : 'Network error';
+        alert(errorMessage);
       }
       return;
     }
@@ -228,15 +229,18 @@ export default function Home() {
       if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
       // Investor flow: go to combined contact verification first
       setModalStep('verifyContact');
-    } catch (e:any) {
-      alert(e.message || 'Network error');
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'Network error';
+      alert(errorMessage);
     }
   };
 
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method:'POST' });
-    } catch(_) {}
+    } catch {
+      // Ignore logout errors
+    }
     setIsAuthenticated(false);
     setShowProfileMenu(false);
     if (typeof window !== 'undefined') localStorage.removeItem('ep-auth');
@@ -253,7 +257,9 @@ export default function Home() {
             if(!cancelled && data.authenticated) setIsAuthenticated(true);
             return;
         }
-      } catch(_) {}
+      } catch {
+        // Ignore auth check errors
+      }
       // Fallback
       if(!cancelled && typeof window !== 'undefined' && localStorage.getItem('ep-auth')==='1') {
         setIsAuthenticated(true);
@@ -554,7 +560,7 @@ export default function Home() {
             <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Value proposition</div>
           </div>
           <div style={{width: 566, color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Fair Capital for Real People</div>
-          <div style={{width: 698, color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We eliminate middlemen, confusing terms, and bias. Whether you're a homeowner seeking refinancing or an investor looking for real-world returns.</div>
+          <div style={{width: 698, color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We eliminate middlemen, confusing terms, and bias. Whether you&apos;re a homeowner seeking refinancing or an investor looking for real-world returns.</div>
           <div style={{height: 460, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'inline-flex'}}>
             <div style={{width: 350, alignSelf: 'stretch', padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
               <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
@@ -828,7 +834,7 @@ export default function Home() {
                   <div style={{height: 320, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
                     <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
                       <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Choose your role</div>
-                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>You can't switch roles later, but you can register a second account using a different email if needed.</div>
+                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>You can&apos;t switch roles later, but you can register a second account using a different email if needed.</div>
                     </div>
                     <div style={{width: 452, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                       <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={goToBorrowerSignUp}>
@@ -1888,7 +1894,7 @@ export default function Home() {
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
                       <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Didn't receive the code?</span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Didn&apos;t receive the code?</span>
                         <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> </span>
                         <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}>Resend</span>
                       </div>
