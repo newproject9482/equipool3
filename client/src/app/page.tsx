@@ -494,7 +494,7 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <main className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row items-start gap-8" style={{marginTop: 160}}>
+      <main className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row items-start gap-8" style={{marginTop: 100}}>
         <section className="flex-1">
       <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'inline-flex'}}>
       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'flex'}}>

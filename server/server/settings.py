@@ -43,8 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    # Treat project package 'server' as an app so we can place models/views here
+    'django.contrib.staticfiles',-
     'server',
 ]
 
