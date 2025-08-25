@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import dynamic from 'next/dynamic';
+const LoginModal = dynamic(()=> import('../components/LoginModal'), { ssr:false });
 
 export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
@@ -38,6 +40,7 @@ export default function Home() {
   const [editingYear, setEditingYear] = useState(false);
   const [monthInput, setMonthInput] = useState('June');
   const [yearInput, setYearInput] = useState('1993');
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -310,7 +313,7 @@ export default function Home() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <a className="ep-nav-login">Login</a>
+          <button className="ep-nav-login" onClick={()=> setShowLoginModal(true)} style={{cursor:'pointer'}}>Login</button>
           <button className="ep-cta-join" onClick={openSignUpModal}>Join Equipool</button>
         </div>
       </header>
@@ -615,6 +618,14 @@ export default function Home() {
     </div>
     <div style={{width: 1080, color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
 </div>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <LoginModal 
+          onClose={()=> setShowLoginModal(false)}
+          onSwitchToSignUp={()=> { setShowLoginModal(false); setShowSignUpModal(true); setModalStep('roleSelection'); }}
+        />
+      )}
 
       {/* Sign Up Modal */}
       {showSignUpModal && (
