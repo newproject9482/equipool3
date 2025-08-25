@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ['python39', 'python39Packages.pip']
+nixPkgs = ['python3', 'python3Packages.pip', 'python3Packages.setuptools']
 
 [phases.install]
-cmds = ['cd server && python -m pip install -r requirements.txt']
+cmds = ['cd server && pip3 install -r requirements.txt']
 
 [phases.build]
-cmds = ['cd server && python manage.py collectstatic --noinput']
+cmds = ['cd server && python3 manage.py collectstatic --noinput']
 
 [start]
-cmd = 'cd server && python manage.py migrate && gunicorn server.wsgi --bind 0.0.0.0:$PORT'
+cmd = 'cd server && python3 manage.py migrate && gunicorn server.wsgi --bind 0.0.0.0:$PORT'
