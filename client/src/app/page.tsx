@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
@@ -40,9 +40,39 @@ export default function Home() {
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
+  const usStates = [
+    'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia',
+    'Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts',
+    'Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey',
+    'New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
+    'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
+    'Wisconsin','Wyoming'
+  ];
+  const stateFieldRef = useRef<HTMLDivElement | null>(null);
+  const [showStateDropdown, setShowStateDropdown] = useState(false);
+  const [highlightedStateIndex, setHighlightedStateIndex] = useState(-1);
   
   const currentYear = new Date().getFullYear();
   const years = Array.from({length: 100}, (_, i) => (currentYear - i).toString());
+  const filteredStates = formData.state
+    ? usStates.filter(s => s.toLowerCase().startsWith(formData.state.toLowerCase()))
+    : usStates;
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (stateFieldRef.current && !stateFieldRef.current.contains(e.target as Node)) {
+        setShowStateDropdown(false);
+        setHighlightedStateIndex(-1);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    // Reset highlight when filter changes
+    setHighlightedStateIndex(filteredStates.length ? 0 : -1);
+  }, [formData.state]);
 
   const openSignUpModal = () => setShowSignUpModal(true);
   const closeSignUpModal = () => {
@@ -1263,20 +1293,37 @@ export default function Home() {
                           />
                         </div>
             <div data-righticon="false" data-state={formData.phone? 'focus':'phoneNumber'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 12}}>
-                          {/* Country flag placeholder preserved */}
+                          {/* Country flag */}
                           <div style={{display:'flex', alignItems:'center', gap:4}}>
-                            <div style={{width:22, height:16, position:'relative', overflow:'hidden', borderRadius:2}}>
-                              <div style={{width:22,height:16,position:'absolute',left:0,top:0,background:'#F7FCFF'}}/>
-                              <div style={{width:22,height:16,position:'absolute',left:0,top:0,background:'#E31D1C', mixBlendMode:'multiply', opacity:.15}}/>
-                            </div>
+                            <Image src="/flagpack-us.svg" alt="US flag" width={22} height={17} style={{borderRadius:2}} />
                           </div>
                           <div style={{width: 20, height: 0, transform: 'rotate(90deg)', transformOrigin: 'top left', outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-0.50px'}} />
                           <input
-                            type="tel"
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             placeholder="Phone Number"
+                            aria-label="Phone Number"
                             value={formData.phone}
-                            onChange={(e)=>handleInputChange('phone', e.target.value)}
-                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.phone? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                            onChange={(e)=>{
+                              const digits = e.target.value.replace(/[^0-9]/g,'');
+                              handleInputChange('phone', digits);
+                            }}
+                            onPaste={(e)=>{
+                              e.preventDefault();
+                              const text = e.clipboardData.getData('text');
+                              const digits = text.replace(/[^0-9]/g,'');
+                              handleInputChange('phone', digits);
+                            }}
+                            onKeyDown={(e)=>{
+                              // Allow control keys
+                              const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+                              if(allowed.includes(e.key)) return;
+                              if(!/^[0-9]$/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.phone? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5px'}}
                           />
                         </div>
             <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, display: 'flex', flexDirection: 'column', gap:4}}>
@@ -1326,15 +1373,53 @@ export default function Home() {
                               style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.city? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
                             />
                           </div>
-                          <div data-righticon="true" data-state={formData.state? 'focus':'dropdown'} style={{width:111.2, height:45, padding:'12px 16px', background:'#F4F4F4', borderRadius:8, display:'flex', alignItems:'center', gap:4, flex:'0 0 auto'}}>
+                          <div ref={stateFieldRef} data-righticon="true" data-state={formData.state? 'focus':'dropdown'} style={{width:111.2, height:45, padding:'12px 16px', background:'#F4F4F4', borderRadius:8, display:'flex', alignItems:'center', gap:4, flex:'0 0 auto', position:'relative'}}>
                             <input
                               type="text"
                               placeholder="State"
                               value={formData.state}
-                              onChange={(e)=>handleInputChange('state', e.target.value)}
+                              onFocus={()=>{ setShowStateDropdown(true); setHighlightedStateIndex(filteredStates.length?0:-1); }}
+                              onChange={(e)=>{ handleInputChange('state', e.target.value); setShowStateDropdown(true); }}
+                              onKeyDown={(e)=>{
+                                if(!showStateDropdown) return;
+                                if(e.key === 'ArrowDown') { e.preventDefault(); setHighlightedStateIndex(i=> Math.min((i<0?0:i+1), filteredStates.length-1)); }
+                                else if(e.key === 'ArrowUp') { e.preventDefault(); setHighlightedStateIndex(i=> Math.max((i<=0?0:i-1), 0)); }
+                                else if(e.key === 'Enter') { 
+                                  e.preventDefault(); 
+                                  if(highlightedStateIndex >=0 && filteredStates[highlightedStateIndex]) { 
+                                    handleInputChange('state', filteredStates[highlightedStateIndex]); 
+                                    setShowStateDropdown(false); 
+                                  }
+                                } else if(e.key === 'Escape') { setShowStateDropdown(false); }
+                              }}
                               style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.state? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
                             />
-                            <div data-icon="ic:arrowdown" style={{width:16, height:16, position:'relative', overflow:'hidden'}} />
+                            <div data-icon="ic:arrowdown" style={{width:16, height:16, position:'relative', overflow:'hidden', cursor:'pointer'}} onClick={()=> setShowStateDropdown(o=>!o)} />
+                            {showStateDropdown && (
+                              <div style={{position:'absolute', top:'100%', left:0, marginTop:4, width:200, maxHeight:200, overflowY:'auto', background:'white', borderRadius:8, boxShadow:'0 4px 10px rgba(0,0,0,0.08)', outline:'1px #E5E7EB solid', outlineOffset:'-1px', zIndex:2000}}>
+                                {filteredStates.length ? filteredStates.map((s, idx)=>(
+                                  <div
+                                    key={s}
+                                    onMouseDown={(e)=>{ e.preventDefault(); handleInputChange('state', s); setShowStateDropdown(false); }}
+                                    onMouseEnter={()=> setHighlightedStateIndex(idx)}
+                                    style={{
+                                      padding:'8px 12px',
+                                      cursor:'pointer',
+                                      background: idx===highlightedStateIndex? '#F4F4F4':'white',
+                                      color:'#101828',
+                                      fontSize:14,
+                                      fontFamily:'var(--ep-font-avenir)',
+                                      fontWeight:500,
+                                      whiteSpace:'nowrap',
+                                      textOverflow:'ellipsis',
+                                      overflow:'hidden'
+                                    }}
+                                  >{s}</div>
+                                )) : (
+                                  <div style={{padding:'8px 12px', fontSize:12, color:'#4A5565', fontFamily:'var(--ep-font-avenir)'}}>No matches</div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
