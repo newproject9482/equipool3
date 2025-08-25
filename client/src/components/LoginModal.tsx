@@ -32,6 +32,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
       if(!res.ok){
         alert(data.error || 'Login failed');
       } else {
+        if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
         onSuccess(role);
         onClose();
       }

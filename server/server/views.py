@@ -79,5 +79,24 @@ def borrower_login(request: HttpRequest):
         return JsonResponse({'error':'Invalid credentials'}, status=401)
     if not check_password(password, b.password_hash):
         return JsonResponse({'error':'Invalid credentials'}, status=401)
-    # Simple success response. Later: issue token/session.
-    return JsonResponse({'id': b.id,'fullName': b.full_name,'email': b.email}, status=200)
+    # Establish session
+    request.session['borrower_id'] = b.id
+    request.session['role'] = 'borrower'
+    return JsonResponse({'id': b.id,'fullName': b.full_name,'email': b.email,'role':'borrower'}, status=200)
+
+@csrf_exempt
+def auth_logout(request: HttpRequest):
+    if request.method != 'POST':
+        return JsonResponse({'error':'Method not allowed'}, status=405)
+    request.session.flush()
+    return JsonResponse({'success': True})
+
+def auth_me(request: HttpRequest):
+    borrower_id = request.session.get('borrower_id')
+    if not borrower_id:
+        return JsonResponse({'authenticated': False}, status=401)
+    try:
+        b = Borrower.objects.get(id=borrower_id)
+    except Borrower.DoesNotExist:
+        return JsonResponse({'authenticated': False}, status=401)
+    return JsonResponse({'authenticated': True,'id': b.id,'fullName': b.full_name,'email': b.email,'role': request.session.get('role')})

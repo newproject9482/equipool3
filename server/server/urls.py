@@ -22,4 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/borrowers/signup', views.borrower_signup, name='borrower-signup'),
     path('api/borrowers/login', views.borrower_login, name='borrower-login'),
+    path('api/auth/logout', views.auth_logout, name='auth-logout'),
+    path('api/auth/me', views.auth_me, name='auth-me'),
 ]

@@ -144,6 +144,8 @@ export default function Home() {
         }
         // On success mark authenticated and continue to verification
         setIsAuthenticated(true);
+        // Persist simple flag (session cookie is real auth)
+        if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
         setModalStep('verifyContact');
       } catch (e:any) {
         alert(e.message || 'Network error');
@@ -152,13 +154,38 @@ export default function Home() {
     }
   // investor path keeps prior behavior but set auth state
   setIsAuthenticated(true);
+  if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
   setModalStep('verifyContact');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method:'POST' });
+    } catch(_) {}
     setIsAuthenticated(false);
     setShowProfileMenu(false);
+    if (typeof window !== 'undefined') localStorage.removeItem('ep-auth');
   };
+
+  // On mount, probe backend session; fallback to localStorage flag
+  useEffect(()=>{
+    let cancelled = false;
+    (async()=>{
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+            if(!cancelled && data.authenticated) setIsAuthenticated(true);
+            return;
+        }
+      } catch(_) {}
+      // Fallback
+      if(!cancelled && typeof window !== 'undefined' && localStorage.getItem('ep-auth')==='1') {
+        setIsAuthenticated(true);
+      }
+    })();
+  return ()=> { cancelled = true; };
+  },[]);
 
   const investorCanContinue = (
     !!formData.fullName &&
