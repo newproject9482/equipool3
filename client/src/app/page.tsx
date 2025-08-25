@@ -30,6 +30,7 @@ export default function Home() {
   });
   const [verificationCode, setVerificationCode] = useState(''); // email verification code (legacy / emailVerification step)
   const [phoneVerificationCode, setPhoneVerificationCode] = useState(''); // phone code for combined verifyContact step
+  const [acceptedTerms, setAcceptedTerms] = useState(false); // terms of service checkbox
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -84,6 +85,7 @@ export default function Home() {
   const closeSignUpModal = () => {
     setShowSignUpModal(false);
     setModalStep('roleSelection');
+    setAcceptedTerms(false); // Reset terms acceptance
     // Reset form data
     setFormData({
       fullName: '',
@@ -268,6 +270,15 @@ export default function Home() {
   return ()=> { cancelled = true; };
   },[]);
 
+  const borrowerCanContinue = (
+    !!formData.fullName &&
+    !!formData.dateOfBirth &&
+    !!formData.email &&
+    !!formData.password &&
+    formData.password === formData.repeatPassword &&
+    acceptedTerms
+  );
+
   const investorCanContinue = (
     !!formData.fullName &&
     !!formData.dateOfBirth &&
@@ -280,7 +291,8 @@ export default function Home() {
     !!formData.zip &&
     !!formData.country &&
     !!formData.password &&
-    formData.password === formData.repeatPassword
+    formData.password === formData.repeatPassword &&
+    acceptedTerms
   );
 
   const navigateMonth = (direction: 'prev' | 'next') => {
@@ -1176,12 +1188,26 @@ export default function Home() {
                       </div>
                     </div>
                     <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                      <div style={{textAlign: 'center'}}>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>By signing up, you agree to our </span>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Terms of Service</span>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> and </span>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Privacy Policy</span>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>.</span>
+                      <div style={{display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', width: '100%'}}>
+                        <input
+                          type="checkbox"
+                          id="termsCheckbox"
+                          checked={acceptedTerms}
+                          onChange={(e) => setAcceptedTerms(e.target.checked)}
+                          style={{
+                            width: 16,
+                            height: 16,
+                            accentColor: '#113D7B',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <label htmlFor="termsCheckbox" style={{cursor: 'pointer', textAlign: 'center'}}>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>I agree to the </span>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Terms of Service</span>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> and </span>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Privacy Policy</span>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>.</span>
+                        </label>
                       </div>
                       <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
                         <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Already have an account?</span>
@@ -1200,15 +1226,16 @@ export default function Home() {
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
                   <button 
                     onClick={handleSignUp}
+                    disabled={!borrowerCanContinue}
                     style={{
                       paddingLeft: 16, 
                       paddingRight: 16, 
                       paddingTop: 10, 
                       paddingBottom: 10, 
-                      background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', 
+                      background: borrowerCanContinue ? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)' : '#B2B2B2', 
                       borderRadius: 12, 
                       border: 'none',
-                      cursor: 'pointer',
+                      cursor: borrowerCanContinue ? 'pointer' : 'not-allowed',
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: 8, 
@@ -1688,7 +1715,27 @@ export default function Home() {
                     </div>
                   </div>
                   <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                    <div style={{textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>By signing up, you agree to our </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span></div>
+                    <div style={{display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', width: '100%'}}>
+                      <input
+                        type="checkbox"
+                        id="termsCheckboxInvestor"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          accentColor: '#113D7B',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <label htmlFor="termsCheckboxInvestor" style={{cursor: 'pointer', textAlign: 'center'}}>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>I agree to the </span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span>
+                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span>
+                      </label>
+                    </div>
                     <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Already have an account?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Log In</span></div>
                   </div>
                 </div>
