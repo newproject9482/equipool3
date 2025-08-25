@@ -1215,20 +1215,25 @@ export default function Home() {
                           <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Email</div>
                         </div>
                         <div data-righticon="false" data-state="phoneNumber" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                          <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
-                            <div style={{width: 22, height: 16, position: 'relative', overflow: 'hidden', borderRadius: 2}}>
-                              <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', background: 'var(--Mid-Grey, #B2B2B2)', borderRadius: 2}} />
-                              <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', overflow: 'hidden'}}>
-                                <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', background: '#F7FCFF'}} />
-                                <div style={{width: 22, height: 16, left: 0, top: 0, position: 'absolute', background: '#E31D1C'}} />
-                                <div style={{width: 13.75, height: 8.67, left: 0, top: 0, position: 'absolute', background: '#2E42A5'}} />
-                                <div style={{width: 12.49, height: 6.81, left: 0.41, top: 0.82, position: 'absolute', background: '#F7FCFF'}} />
-                              </div>
-                            </div>
-                            <div data-icon="Icon6" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                          <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+                            <Image src="/flagpack-us.svg" alt="United States" width={22} height={16} style={{borderRadius: 2}} />
+                            <div style={{color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>+1</div>
                           </div>
-                          <div style={{width: 20, height: 0, transform: 'rotate(90deg)', transformOrigin: 'top left', outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-0.50px'}}></div>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Phone Number</div>
+                          <div style={{width: 20, height: 0, transform: 'rotate(90deg)', transformOrigin: 'top left', outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-0.50px'}} />
+                          <input
+                            type="tel"
+                            placeholder="Phone Number"
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500'
+                            }}
+                          />
                         </div>
                         <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
                           <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--White, white)', borderRadius: 10, outline: '1px var(--Grey, #767676) solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
