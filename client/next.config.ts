@@ -2,12 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    // Proxy all /api/* calls during development to Django running on localhost:8000
-    // This lets frontend code call fetch('/api/...') without needing absolute backend URL.
+    // Use environment variable for backend URL, fallback to localhost for development
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8000/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
