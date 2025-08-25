@@ -13,6 +13,14 @@ export default function Home() {
     fullName: '',
     dateOfBirth: '',
     email: '',
+    phone: '',
+    ssn: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: 'United States',
     password: '',
     repeatPassword: ''
   });
@@ -45,6 +53,14 @@ export default function Home() {
       fullName: '',
       dateOfBirth: '',
       email: '',
+      phone: '',
+      ssn: '',
+      address1: '',
+      address2: '',
+      city: '',
+      state: '',
+      zip: '',
+      country: 'United States',
       password: '',
       repeatPassword: ''
     });
@@ -71,9 +87,24 @@ export default function Home() {
   };
 
   const handleSignUp = () => {
-    // Move to email verification step
+    // Move to email verification step (basic validation already passed if enabled)
     setModalStep('emailVerification');
   };
+
+  const investorCanContinue = (
+    !!formData.fullName &&
+    !!formData.dateOfBirth &&
+    !!formData.email &&
+    !!formData.phone &&
+    !!formData.ssn &&
+    !!formData.address1 &&
+    !!formData.city &&
+    !!formData.state &&
+    !!formData.zip &&
+    !!formData.country &&
+    !!formData.password &&
+    formData.password === formData.repeatPassword
+  );
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const currentMonthIndex = months.indexOf(selectedMonth);
@@ -570,7 +601,7 @@ export default function Home() {
           zIndex: 1000
         }}>
           <div style={{
-            width: 720,
+            width: 760,
             height: modalStep === 'investorSignUp' ? 640 : 580,
             background: 'white',
             borderRadius: 24,
@@ -993,7 +1024,7 @@ export default function Home() {
                   <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
                   <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Investor</div>
                 </div>
-                <div style={{alignSelf: 'stretch', height: 455, paddingLeft: 200, paddingRight: 200, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
+                <div style={{alignSelf: 'stretch', height: 455, paddingLeft: 32, paddingRight: 32, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
                   <div style={{padding: 4, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
                     <div style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
                       <div style={{textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Individual</div>
@@ -1002,12 +1033,21 @@ export default function Home() {
                       <div style={{textAlign: 'center', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Company</div>
                     </div>
                   </div>
-                  <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
-                    <div style={{height: 320, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
+                  <div style={{width: 654, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                    {/* Left Column */}
+                    <div style={{width: 322, height: '100%', paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
                       <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Full name</div>
-                        </div>
+                        {(() => { const error = !!formData.fullName && formData.fullName.length < 5; return (
+                          <div data-righticon="false" data-state={error? 'error': (formData.fullName? 'focus':'default')} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16, outline: error? '1px var(--Error, #CC4747) solid': undefined, outlineOffset: error? '-1px': undefined}}>
+                            <input
+                              type="text"
+                              placeholder="Full name"
+                              value={formData.fullName}
+                              onChange={(e)=>handleInputChange('fullName', e.target.value)}
+                              style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: formData.fullName ? 'black':'#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}
+                            />
+                          </div>
+                        ); })()}
                         <div style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex', position: 'relative'}}>
                           <div 
                             onClick={() => setShowDatePicker(!showDatePicker)}
@@ -1023,6 +1063,8 @@ export default function Home() {
                           >
                             {formData.dateOfBirth ? `${selectedMonth} ${selectedDate}, ${selectedYear}` : 'Date of Birth'}
                           </div>
+                          {/* Dropdown icon placeholder (calendar toggle) */}
+                          <div data-icon="ic:arrowdown" style={{width:16, height:16, position:'relative', overflow:'hidden'}} />
                           {showDatePicker && (
                             <div 
                               style={{
@@ -1211,66 +1253,111 @@ export default function Home() {
                             </div>
                           )}
                         </div>
-                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Email</div>
+            <div data-righticon="false" data-state={!formData.email? 'default': 'focus'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16}}>
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={(e)=>handleInputChange('email', e.target.value)}
+                            style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: formData.email ? 'black':'#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}
+                          />
                         </div>
-                        <div data-righticon="false" data-state="phoneNumber" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                          <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
-                            <Image src="/flagpack-us.svg" alt="United States" width={22} height={16} style={{borderRadius: 2}} />
-                            <div style={{color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>+1</div>
+            <div data-righticon="false" data-state={formData.phone? 'focus':'phoneNumber'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 12}}>
+                          {/* Country flag placeholder preserved */}
+                          <div style={{display:'flex', alignItems:'center', gap:4}}>
+                            <div style={{width:22, height:16, position:'relative', overflow:'hidden', borderRadius:2}}>
+                              <div style={{width:22,height:16,position:'absolute',left:0,top:0,background:'#F7FCFF'}}/>
+                              <div style={{width:22,height:16,position:'absolute',left:0,top:0,background:'#E31D1C', mixBlendMode:'multiply', opacity:.15}}/>
+                            </div>
                           </div>
                           <div style={{width: 20, height: 0, transform: 'rotate(90deg)', transformOrigin: 'top left', outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-0.50px'}} />
                           <input
                             type="tel"
                             placeholder="Phone Number"
-                            style={{
-                              flex: '1 1 0',
-                              background: 'transparent',
-                              border: 'none',
-                              outline: 'none',
-                              color: '#B2B2B2',
-                              fontSize: 14,
-                              fontFamily: 'var(--ep-font-avenir)',
-                              fontWeight: '500'
-                            }}
+                            value={formData.phone}
+                            onChange={(e)=>handleInputChange('phone', e.target.value)}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.phone? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
                           />
                         </div>
-                        <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                          <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--White, white)', borderRadius: 10, outline: '1px var(--Grey, #767676) solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>SSN</div>
+            <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, display: 'flex', flexDirection: 'column', gap:4}}>
+                          <div style={{alignSelf:'stretch', padding: '10px 12px', background: 'white', borderRadius:10, outline:'1px #767676 solid', outlineOffset:'-1px', display:'inline-flex', alignItems:'center', gap:10}}>
+                            <input
+                              type="text"
+                              placeholder="SSN"
+                              value={formData.ssn}
+                              onChange={(e)=>handleInputChange('ssn', e.target.value)}
+                              style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.ssn? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                            />
                           </div>
-                          <div style={{alignSelf: 'stretch', paddingLeft: 8, paddingRight: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 3.2, wordWrap: 'break-word'}}>Used for identity and investor risk verification</div>
+                          <div style={{alignSelf:'stretch', padding:'0 8px', display:'inline-flex', alignItems:'center', gap:10}}>
+                            <div style={{flex:'1 1 0', color:'var(--Black, black)', fontSize:12, fontFamily:'var(--ep-font-avenir)', fontWeight:400, lineHeight: '20px', wordWrap:'break-word'}}>Used for identity and investor risk verification</div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div style={{height: 320, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
+          {/* Right Column */}
+                    <div style={{width: 322, height: '100%', paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Address Line 1</div>
+                        <div data-righticon="false" data-state={formData.address1? 'focus':'default'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16}}>
+                          <input
+                            type="text"
+                            placeholder="Address Line 1"
+                            value={formData.address1}
+                            onChange={(e)=>handleInputChange('address1', e.target.value)}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.address1? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                          />
                         </div>
-                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Address Line 2</div>
+                        <div data-righticon="false" data-state={formData.address2? 'focus':'default'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16}}>
+                          <input
+                            type="text"
+                            placeholder="Address Line 2"
+                            value={formData.address2}
+                            onChange={(e)=>handleInputChange('address2', e.target.value)}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.address2? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                          />
                         </div>
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                          <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>City</div>
+                          <div data-righticon="false" data-state={formData.city? 'focus':'default'} style={{flex: '1 1 0', padding: '12px 16px', background:'#F4F4F4', borderRadius:8, display:'flex', alignItems:'center', gap:16}}>
+                            <input
+                              type="text"
+                              placeholder="City"
+                              value={formData.city}
+                              onChange={(e)=>handleInputChange('city', e.target.value)}
+                              style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.city? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                            />
                           </div>
-                          <div data-righticon="true" data-state="dropdown" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
-                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>State</div>
-                            <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                          <div data-righticon="true" data-state={formData.state? 'focus':'dropdown'} style={{width:111.2, height:45, padding:'12px 16px', background:'#F4F4F4', borderRadius:8, display:'flex', alignItems:'center', gap:4, flex:'0 0 auto'}}>
+                            <input
+                              type="text"
+                              placeholder="State"
+                              value={formData.state}
+                              onChange={(e)=>handleInputChange('state', e.target.value)}
+                              style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.state? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                            />
+                            <div data-icon="ic:arrowdown" style={{width:16, height:16, position:'relative', overflow:'hidden'}} />
                           </div>
                         </div>
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                          <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Zip Code</div>
+                          <div data-righticon="false" data-state={formData.zip? 'focus':'default'} style={{flex:'1 1 0', padding:'12px 16px', background:'#F4F4F4', borderRadius:8, display:'flex', alignItems:'center', gap:16}}>
+                            <input
+                              type="text"
+                              placeholder="Zip Code"
+                              value={formData.zip}
+                              onChange={(e)=>handleInputChange('zip', e.target.value)}
+                              style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.zip? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                            />
                           </div>
-                          <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>United States</div>
+                          <div data-righticon="false" data-state={formData.country? 'focus':'default'} style={{width:111.2, height:45, padding:'12px 16px', background:'#F4F4F4', borderRadius:8, outline:'1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset:'-1px', display:'flex', alignItems:'center', gap:16, flex:'0 0 auto'}}>
+                            <input
+                              type="text"
+                              placeholder="United States"
+                              value={formData.country}
+                              onChange={(e)=>handleInputChange('country', e.target.value)}
+                              style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.country? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                            />
                           </div>
                         </div>
-                        <div data-righticon="true" data-state="password" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        <div data-righticon="true" data-state="password" style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                           <input
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Password"
@@ -1297,7 +1384,7 @@ export default function Home() {
                             <Image src="/show_password.svg" alt={showPassword ? 'Hide password' : 'Show password'} width={16} height={16} />
                           </button>
                         </div>
-                        <div data-righticon="true" data-state="password" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        <div data-righticon="true" data-state="password" style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                           <input
                             type={showRepeatPassword ? 'text' : 'password'}
                             placeholder="Repeat"
@@ -1339,8 +1426,24 @@ export default function Home() {
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-                  <div data-left-icon="false" data-state="inactive" onClick={() => { setSelectedRole('investor'); handleSignUp(); }} style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Inactive-Blue, #B8C5D7)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex', cursor:'pointer'}}>
-                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                  <div
+                    onClick={() => { if(investorCanContinue){ setSelectedRole('investor'); handleSignUp(); } }}
+                    style={{
+                      paddingLeft:16,
+                      paddingRight:16,
+                      paddingTop:10,
+                      paddingBottom:10,
+                      background: investorCanContinue ? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)':'var(--Inactive-Blue, #B8C5D7)',
+                      borderRadius:12,
+                      justifyContent:'center',
+                      alignItems:'center',
+                      gap:8,
+                      display:'inline-flex',
+                      cursor: investorCanContinue ? 'pointer':'not-allowed',
+                      opacity: investorCanContinue ? 1 : 1
+                    }}
+                  >
+                    <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Continue</div>
                   </div>
                   <button 
                     onClick={goBackToRoleSelection}
