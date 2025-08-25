@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 
 export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
-  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'emailVerification', 'accountCreated'
+  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'verifyContact', 'livenessCheck', 'emailVerification', 'accountCreated'
   const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
   
   // Form state
@@ -24,7 +24,8 @@ export default function Home() {
     password: '',
     repeatPassword: ''
   });
-  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState(''); // email verification code (legacy / emailVerification step)
+  const [phoneVerificationCode, setPhoneVerificationCode] = useState(''); // phone code for combined verifyContact step
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -117,8 +118,8 @@ export default function Home() {
   };
 
   const handleSignUp = () => {
-    // Move to email verification step (basic validation already passed if enabled)
-    setModalStep('emailVerification');
+    // Move to combined email + phone verification step
+    setModalStep('verifyContact');
   };
 
   const investorCanContinue = (
@@ -1545,6 +1546,119 @@ export default function Home() {
                   >
                     ← Back
                   </button>
+                </div>
+              </div>
+            )}
+
+            {modalStep === 'verifyContact' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{selectedRole === 'investor' ? 'Investor' : 'Borrower'}</span>
+                    <span style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> </span>
+                  </div>
+                </div>
+                <div style={{alignSelf: 'stretch', height: 452, paddingLeft: 200, paddingRight: 200, paddingTop: 24, paddingBottom: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
+                  <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
+                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your email</div>
+                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your email</div>
+                      </div>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state={verificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="text"
+                            placeholder="_ _ _ _"
+                            value={verificationCode}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
+                              setVerificationCode(val);
+                            }}
+                            maxLength={4}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: verificationCode? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5em', textAlign:'center'}}
+                          />
+                        </div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn’t receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
+                      </div>
+                    </div>
+                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your phone number</div>
+                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your phone</div>
+                      </div>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state={phoneVerificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="text"
+                            placeholder="_ _ _ _"
+                            value={phoneVerificationCode}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
+                              setPhoneVerificationCode(val);
+                            }}
+                            maxLength={4}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: phoneVerificationCode? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5em', textAlign:'center'}}
+                          />
+                        </div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn’t receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
+                      </div>
+                    </div>
+                    <div style={{textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>By signing up, you agree to our </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span></div>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                {(() => { const canProceed = verificationCode.length===4 && phoneVerificationCode.length===4; return (
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div 
+                    onClick={()=> { if(canProceed){ setModalStep('livenessCheck'); } }}
+                    style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background: canProceed? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)':'var(--Inactive-Blue, #B8C5D7)', borderRadius:12, justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor: canProceed? 'pointer':'not-allowed'}}
+                  >
+                    <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Continue</div>
+                  </div>
+                  <button 
+                    onClick={() => setModalStep(selectedRole === 'investor' ? 'investorSignUp' : 'borrowerSignUp')}
+                    style={{background:'transparent', border:'none', cursor:'pointer', color:'#4A5565', fontSize:12, fontFamily:'var(--ep-font-avenir)', fontWeight:400, textDecoration:'underline'}}
+                  >
+                    ← Back
+                  </button>
+                </div>
+                ) })()}
+              </div>
+            )}
+
+            {modalStep === 'livenessCheck' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'flex-start', gap:4, display:'flex'}}>
+                  <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:24, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Liveness check</div>
+                </div>
+                <div style={{alignSelf:'stretch', paddingLeft:200, paddingRight:200, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
+                  <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:20, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>To start investing we need to verify that you’re a human.</div>
+                </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width:32, height:32, right:32, top:32, position:'absolute', background:'transparent', border:'none', cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'center', alignItems:'center', gap:10, display:'flex'}}>
+                  <div data-left-icon="false" data-state="default" style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background:'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius:12, outline:'1px var(--Light-Grey, #F4F4F4) solid', justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor:'pointer'}}>
+                    <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Start the check</div>
+                  </div>
+                  <div data-left-icon="true" data-state="secondary" style={{paddingTop:8, paddingLeft:16, paddingRight:16, borderRadius:12, justifyContent:'center', alignItems:'center', gap:6, display:'inline-flex', cursor:'pointer'}}>
+                    <div style={{color:'var(--Black, black)', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Skip for now</div>
+                    <Image src="/skip.svg" alt="Skip" width={12} height={13} />
+                  </div>
                 </div>
               </div>
             )}
