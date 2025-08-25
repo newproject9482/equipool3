@@ -5,9 +5,10 @@ import Image from 'next/image';
 interface LoginModalProps {
   onClose: () => void;
   onSwitchToSignUp: () => void;
+  onSuccess: (role: 'borrower' | 'investor') => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSuccess }) => {
   const [role, setRole] = useState<'borrower' | 'investor'>('borrower');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,6 +18,29 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp }) =>
   useEffect(() => { emailInputRef.current?.focus(); }, []);
 
   const canLogin = email.length > 0 && password.length > 0;
+  const [submitting, setSubmitting] = useState(false);
+  const handleLogin = async () => {
+    if(!canLogin || submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/borrowers/login', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok){
+        alert(data.error || 'Login failed');
+      } else {
+        onSuccess(role);
+        onClose();
+      }
+    } catch (e:any){
+      alert(e.message || 'Network error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div style={{
@@ -105,10 +129,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp }) =>
           <div 
             data-left-icon="false" 
             data-state={canLogin? 'active':'inactive'} 
-            style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background: canLogin? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)':'var(--Inactive-Blue, #B8C5D7)', borderRadius:12, justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor: canLogin? 'pointer':'not-allowed'}}
-            onClick={()=> { if(canLogin){ /* placeholder login action */ onClose(); } }}
+            style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background: canLogin? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)':'var(--Inactive-Blue, #B8C5D7)', opacity: submitting? 0.7:1, borderRadius:12, justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor: canLogin? 'pointer':'not-allowed'}}
+            onClick={handleLogin}
           >
-            <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Login</div>
+            <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>{submitting? 'Logging in...':'Login'}</div>
           </div>
         </div>
       </div>

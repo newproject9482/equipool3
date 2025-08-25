@@ -9,6 +9,8 @@ export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'verifyContact', 'livenessCheck', 'emailVerification', 'accountCreated'
   const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -120,9 +122,42 @@ export default function Home() {
     }));
   };
 
-  const handleSignUp = () => {
-    // Move to combined email + phone verification step
-    setModalStep('verifyContact');
+  const handleSignUp = async () => {
+    if(selectedRole === 'borrower') {
+      try {
+        const payload = {
+          fullName: formData.fullName,
+            // Backend accepts YYYY-MM-DD; formData.dateOfBirth already stored as ISO string
+          dateOfBirth: formData.dateOfBirth,
+          email: formData.email,
+          password: formData.password,
+        };
+        const res = await fetch('/api/borrowers/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if(!res.ok){
+          const err = await res.json().catch(()=>({error:'Signup failed'}));
+          alert(err.error || 'Signup failed');
+          return;
+        }
+        // On success mark authenticated and continue to verification
+        setIsAuthenticated(true);
+        setModalStep('verifyContact');
+      } catch (e:any) {
+        alert(e.message || 'Network error');
+      }
+      return;
+    }
+  // investor path keeps prior behavior but set auth state
+  setIsAuthenticated(true);
+  setModalStep('verifyContact');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowProfileMenu(false);
   };
 
   const investorCanContinue = (
@@ -312,9 +347,41 @@ export default function Home() {
           <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
         </nav>
 
-        <div className="flex items-center gap-4">
-          <button className="ep-nav-login" onClick={()=> setShowLoginModal(true)} style={{cursor:'pointer'}}>Login</button>
-          <button className="ep-cta-join" onClick={openSignUpModal}>Join Equipool</button>
+        {/* Auth Section */}
+        <div className="flex items-center gap-4" style={{position:'relative'}}>
+          {isAuthenticated ? (
+            <>
+              {/* Notification Icon (left) */}
+              <div
+                style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer'}}
+                onClick={()=> alert('Notifications placeholder')}
+                aria-label="Notifications"
+              >
+                <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+              </div>
+              {/* Profile Icon (right / opens menu) */}
+              <div
+                style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer', position:'relative'}}
+                onClick={()=> setShowProfileMenu(v=>!v)}
+                aria-haspopup="menu"
+                aria-expanded={showProfileMenu}
+              >
+                <Image src="/profile.svg" alt="Profile" width={16} height={16} />
+                {showProfileMenu && (
+                  <div style={{width:220,padding:24,position:'absolute',top:48,right:0,background:'#F4F4F4',overflow:'hidden',borderRadius:24,outline:'1px #E5E7EB solid',display:'inline-flex',flexDirection:'column',justifyContent:'flex-end',alignItems:'flex-start',gap:14,zIndex:50}} role="menu">
+                    <button style={{all:'unset',alignSelf:'stretch',color:'black',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem">Pools & Dashboard</button>
+                    <button style={{all:'unset',alignSelf:'stretch',color:'#B2B2B2',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem">Profile</button>
+                    <button style={{all:'unset',alignSelf:'stretch',color:'#CC4747',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <button className="ep-nav-login" onClick={()=> setShowLoginModal(true)} style={{cursor:'pointer'}}>Login</button>
+              <button className="ep-cta-join" onClick={openSignUpModal}>Join Equipool</button>
+            </>
+          )}
         </div>
       </header>
 
@@ -624,6 +691,7 @@ export default function Home() {
         <LoginModal 
           onClose={()=> setShowLoginModal(false)}
           onSwitchToSignUp={()=> { setShowLoginModal(false); setShowSignUpModal(true); setModalStep('roleSelection'); }}
+          onSuccess={(role)=> { setIsAuthenticated(true); setSelectedRole(role); }}
         />
       )}
 
