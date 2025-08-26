@@ -16,22 +16,28 @@ export default function PoolsPage() {
   const { toasts, removeToast, showSuccess, showError } = useToaster();
 
   useEffect(() => {
-    // Check authentication status
-    const checkAuth = async () => {
+    let cancelled = false;
+    (async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, {
           credentials: 'include'
         });
         if (response.ok) {
           const data = await response.json();
-          setIsAuthenticated(true);
+          if (!cancelled && data.authenticated) {
+            setIsAuthenticated(true);
+          }
+          return;
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        // Ignore auth check errors
       }
-    };
-
-    checkAuth();
+      // Fallback to localStorage
+      if (!cancelled && typeof window !== 'undefined' && localStorage.getItem('ep-auth') === '1') {
+        setIsAuthenticated(true);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const handleLogout = async () => {
@@ -42,6 +48,7 @@ export default function PoolsPage() {
       });
       setIsAuthenticated(false);
       setShowProfileMenu(false);
+      if (typeof window !== 'undefined') localStorage.removeItem('ep-auth');
       // Redirect to home page after logout
       window.location.href = '/';
     } catch (error) {
