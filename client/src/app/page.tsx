@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import dynamic from 'next/dynamic';
+import { Toaster, useToaster } from '../components/Toaster';
 const LoginModal = dynamic(()=> import('../components/LoginModal'), { ssr:false });
 
 export default function Home() {
@@ -44,6 +45,17 @@ export default function Home() {
   const [monthInput, setMonthInput] = useState('June');
   const [yearInput, setYearInput] = useState('1993');
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Toaster hook
+  const { toasts, removeToast, showInfo, showWarning } = useToaster();
+
+  // Hover states for buttons
+  const [borrowerHover, setBorrowerHover] = useState(false);
+  const [investorHover, setInvestorHover] = useState(false);
+  const [joinHover, setJoinHover] = useState(false);
+  const [loginHover, setLoginHover] = useState(false);
+  const [ctaBorrowerHover, setCtaBorrowerHover] = useState(false);
+  const [ctaInvestorHover, setCtaInvestorHover] = useState(false);
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -119,11 +131,13 @@ export default function Home() {
   // Handler functions for the main CTA buttons
   const handleBorrowerButtonClick = () => {
     if (isAuthenticated && selectedRole === 'borrower') {
-      // User is already authenticated as borrower, do nothing
+      // User is already authenticated as borrower, show toast
+      showInfo("You're already logged in as a borrower!");
       return;
     }
     if (isAuthenticated && selectedRole === 'investor') {
-      // User is authenticated as investor, do nothing
+      // User is authenticated as investor, show toast
+      showInfo("You're already logged in as an investor!");
       return;
     }
     // User is not authenticated, open signup modal for borrower
@@ -134,11 +148,13 @@ export default function Home() {
 
   const handleInvestorButtonClick = () => {
     if (isAuthenticated && selectedRole === 'investor') {
-      // User is already authenticated as investor, do nothing
+      // User is already authenticated as investor, show toast
+      showInfo("You're already logged in as an investor!");
       return;
     }
     if (isAuthenticated && selectedRole === 'borrower') {
-      // User is authenticated as borrower, do nothing
+      // User is authenticated as borrower, show toast
+      showInfo("You're already logged in as a borrower!");
       return;
     }
     // User is not authenticated, open signup modal for investor
@@ -535,8 +551,35 @@ export default function Home() {
             </>
           ) : (
             <>
-              <button className="ep-nav-login" onClick={()=> setShowLoginModal(true)} style={{cursor:'pointer'}}>Login</button>
-              <button className="ep-cta-join" onClick={openSignUpModal}>Join Equipool</button>
+              <button 
+                className="ep-nav-login" 
+                onClick={()=> setShowLoginModal(true)} 
+                style={{
+                  cursor:'pointer',
+                  transition: 'all 0.2s ease',
+                  opacity: loginHover ? 0.8 : 1,
+                  transform: loginHover ? 'translateY(-1px)' : 'translateY(0)'
+                }}
+                onMouseEnter={() => setLoginHover(true)}
+                onMouseLeave={() => setLoginHover(false)}
+              >
+                Login
+              </button>
+              <button 
+                className="ep-cta-join" 
+                onClick={openSignUpModal}
+                style={{
+                  cursor:'pointer',
+                  transition: 'all 0.2s ease',
+                  transform: joinHover ? 'translateY(-1px)' : 'translateY(0)',
+                  boxShadow: joinHover ? '0px 4px 12px rgba(17, 61, 123, 0.3)' : '0px 1px 3px rgba(0, 0, 0, 0.1)',
+                  background: joinHover ? 'linear-gradient(128deg, #0E3A6F 0%, #0C3E91 100%)' : undefined
+                }}
+                onMouseEnter={() => setJoinHover(true)}
+                onMouseLeave={() => setJoinHover(false)}
+              >
+                Join Equipool
+              </button>
             </>
           )}
         </div>
@@ -561,8 +604,26 @@ export default function Home() {
           <div 
             data-left-icon={true} 
             data-state="default" 
-            style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+            style={{
+              paddingLeft: 16, 
+              paddingRight: 16, 
+              paddingTop: 10, 
+              paddingBottom: 10, 
+              background: borrowerHover ? 'linear-gradient(128deg, #0E3A6F 0%, #0C3E91 100%)' : 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', 
+              borderRadius: 12, 
+              outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              gap: 8, 
+              display: 'flex', 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              transform: borrowerHover ? 'translateY(-1px)' : 'translateY(0)',
+              boxShadow: borrowerHover ? '0px 4px 12px rgba(17, 61, 123, 0.3)' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
+            }}
             onClick={handleBorrowerButtonClick}
+            onMouseEnter={() => setBorrowerHover(true)}
+            onMouseLeave={() => setBorrowerHover(false)}
           >
             <Image src="/icons.svg" alt="Handshake icon" width={24} height={24} />
             <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I need funding</div>
@@ -570,8 +631,26 @@ export default function Home() {
           <div 
             data-left-icon={true} 
             data-state="default" 
-            style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+            style={{
+              paddingLeft: 16, 
+              paddingRight: 16, 
+              paddingTop: 10, 
+              paddingBottom: 10, 
+              background: investorHover ? '#ECECEC' : 'var(--Light-Grey, #F4F4F4)', 
+              borderRadius: 12, 
+              outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              gap: 8, 
+              display: 'flex', 
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              transform: investorHover ? 'translateY(-1px)' : 'translateY(0)',
+              boxShadow: investorHover ? '0px 4px 12px rgba(17, 61, 123, 0.15)' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
+            }}
             onClick={handleInvestorButtonClick}
+            onMouseEnter={() => setInvestorHover(true)}
+            onMouseLeave={() => setInvestorHover(false)}
           >
             <Image src="/invest.svg" alt="Investment icon" width={24} height={24} />
             <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I want to invest</div>
@@ -770,20 +849,56 @@ export default function Home() {
       <div 
         data-left-icon="true" 
         data-state="default" 
-        style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+        style={{
+          paddingLeft: 16, 
+          paddingRight: 16, 
+          paddingTop: 10, 
+          paddingBottom: 10, 
+          background: ctaBorrowerHover ? 'linear-gradient(128deg, #0E3A6F 0%, #0C3E91 100%)' : 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', 
+          borderRadius: 12, 
+          outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          gap: 8, 
+          display: 'flex', 
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          transform: ctaBorrowerHover ? 'translateY(-1px)' : 'translateY(0)',
+          boxShadow: ctaBorrowerHover ? '0px 4px 12px rgba(17, 61, 123, 0.3)' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
+        }}
         onClick={handleBorrowerButtonClick}
+        onMouseEnter={() => setCtaBorrowerHover(true)}
+        onMouseLeave={() => setCtaBorrowerHover(false)}
       >
         <Image src="/icons.svg" alt="Handshake icon" width={24} height={24} />
-        <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I need funding</div>
+        <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I need funding</div>
       </div>
       <div 
         data-left-icon="true" 
         data-state="default" 
-        style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+        style={{
+          paddingLeft: 16, 
+          paddingRight: 16, 
+          paddingTop: 10, 
+          paddingBottom: 10, 
+          background: ctaInvestorHover ? '#ECECEC' : 'var(--Light-Grey, #F4F4F4)', 
+          borderRadius: 12, 
+          outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          gap: 8, 
+          display: 'flex', 
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          transform: ctaInvestorHover ? 'translateY(-1px)' : 'translateY(0)',
+          boxShadow: ctaInvestorHover ? '0px 4px 12px rgba(17, 61, 123, 0.15)' : '0px 1px 3px rgba(0, 0, 0, 0.1)'
+        }}
         onClick={handleInvestorButtonClick}
+        onMouseEnter={() => setCtaInvestorHover(true)}
+        onMouseLeave={() => setCtaInvestorHover(false)}
       >
         <Image src="/invest.svg" alt="Investment icon" width={24} height={24} />
-        <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I want to invest</div>
+        <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I want to invest</div>
       </div>
     </div>
   </div>
@@ -2113,6 +2228,9 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Toaster */}
+      <Toaster toasts={toasts} onRemoveToast={removeToast} />
 
   </div>
   );
