@@ -56,6 +56,7 @@ export default function Home() {
   const [loginHover, setLoginHover] = useState(false);
   const [ctaBorrowerHover, setCtaBorrowerHover] = useState(false);
   const [ctaInvestorHover, setCtaInvestorHover] = useState(false);
+  const [investorType, setInvestorType] = useState<'individual' | 'company'>('individual');
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1449,11 +1450,41 @@ export default function Home() {
                 </div>
                 <div style={{alignSelf: 'stretch', height: 455, paddingLeft: 32, paddingRight: 32, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
                   <div style={{padding: 4, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                    <div style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-                      <div style={{textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Individual</div>
+                    <div 
+                      onClick={() => setInvestorType('individual')}
+                      style={{
+                        paddingLeft: 20, 
+                        paddingRight: 20, 
+                        paddingTop: 12, 
+                        paddingBottom: 12, 
+                        background: investorType === 'individual' ? 'var(--White, white)' : 'transparent', 
+                        borderRadius: 24, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 10, 
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{textAlign: 'center', color: investorType === 'individual' ? 'black' : '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Individual</div>
                     </div>
-                    <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-                      <div style={{textAlign: 'center', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Company</div>
+                    <div 
+                      onClick={() => setInvestorType('company')}
+                      style={{
+                        paddingLeft: 20, 
+                        paddingRight: 20, 
+                        paddingTop: 12, 
+                        paddingBottom: 12, 
+                        background: investorType === 'company' ? 'var(--White, white)' : 'transparent', 
+                        borderRadius: 24, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 10, 
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{textAlign: 'center', color: investorType === 'company' ? 'black' : '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Company</div>
                     </div>
                   </div>
                   <div style={{width: 654, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
@@ -1464,7 +1495,7 @@ export default function Home() {
                           <div data-righticon="false" data-state={error? 'error': (formData.fullName? 'focus':'default')} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16, outline: error? '1px var(--Error, #CC4747) solid': undefined, outlineOffset: error? '-1px': undefined}}>
                             <input
                               type="text"
-                              placeholder="Full name"
+                              placeholder={investorType === 'individual' ? "Full name" : "Company name"}
                               value={formData.fullName}
                               onChange={(e)=>handleInputChange('fullName', e.target.value)}
                               style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: formData.fullName ? 'black':'#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}
@@ -1484,7 +1515,7 @@ export default function Home() {
                               cursor: 'pointer'
                             }}
                           >
-                            {formData.dateOfBirth ? `${selectedMonth} ${selectedDate}, ${selectedYear}` : 'Date of Birth'}
+                            {formData.dateOfBirth ? `${selectedMonth} ${selectedDate}, ${selectedYear}` : (investorType === 'individual' ? 'Date of Birth' : 'Date of Incorporation')}
                           </div>
                           {/* Dropdown icon placeholder (calendar toggle) */}
                           <div data-icon="ic:arrowdown" style={{width:16, height:16, position:'relative', overflow:'hidden'}} />
@@ -1723,14 +1754,16 @@ export default function Home() {
                           <div style={{alignSelf:'stretch', padding: '10px 12px', background: 'white', borderRadius:10, outline:'1px #767676 solid', outlineOffset:'-1px', display:'inline-flex', alignItems:'center', gap:10}}>
                             <input
                               type="text"
-                              placeholder="SSN"
+                              placeholder={investorType === 'individual' ? "SSN" : "EIN"}
                               value={formData.ssn}
                               onChange={(e)=>handleInputChange('ssn', e.target.value)}
                               style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.ssn? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
                             />
                           </div>
                           <div style={{alignSelf:'stretch', padding:'0 8px', display:'inline-flex', alignItems:'center', gap:10}}>
-                            <div style={{flex:'1 1 0', color:'var(--Black, black)', fontSize:12, fontFamily:'var(--ep-font-avenir)', fontWeight:400, lineHeight: '20px', wordWrap:'break-word'}}>Used for identity and investor risk verification</div>
+                            <div style={{flex:'1 1 0', color:'var(--Black, black)', fontSize:12, fontFamily:'var(--ep-font-avenir)', fontWeight:400, lineHeight: '20px', wordWrap:'break-word'}}>
+                              {investorType === 'individual' ? 'Used for identity and investor risk verification' : 'Used for company verification and compliance'}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1741,7 +1774,7 @@ export default function Home() {
                         <div data-righticon="false" data-state={formData.address1? 'focus':'default'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16}}>
                           <input
                             type="text"
-                            placeholder="Address Line 1"
+                            placeholder={investorType === 'individual' ? "Address Line 1" : "Company Address Line 1"}
                             value={formData.address1}
                             onChange={(e)=>handleInputChange('address1', e.target.value)}
                             style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.address1? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
@@ -1750,7 +1783,7 @@ export default function Home() {
                         <div data-righticon="false" data-state={formData.address2? 'focus':'default'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16}}>
                           <input
                             type="text"
-                            placeholder="Address Line 2"
+                            placeholder={investorType === 'individual' ? "Address Line 2" : "Company Address Line 2"}
                             value={formData.address2}
                             onChange={(e)=>handleInputChange('address2', e.target.value)}
                             style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.address2? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
