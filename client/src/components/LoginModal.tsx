@@ -83,7 +83,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
                 <div onClick={() => setRole('borrower')} style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: role==='borrower'? 'var(--White, white)':'transparent', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', cursor:'pointer'}}>
                   <div style={{textAlign: 'center', color: role==='borrower'? 'black':'#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Borrower</div>
                 </div>
-                <div onClick={() => setRole('investor')} style={{paddingLeft: 10, paddingRight: 10, paddingTop: 12, paddingBottom: 12, borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', cursor:'pointer'}}>
+                <div onClick={() => setRole('investor')} style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: role==='investor'? 'var(--White, white)':'transparent', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', cursor:'pointer'}}>
                   <div style={{textAlign: 'center', color: role==='investor'? 'black':'#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Investor</div>
                 </div>
               </div>
