@@ -190,19 +190,19 @@ export default function PoolsPage() {
   <div style={{width: '100%', height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'start', alignItems: 'start'}}>
   <div style={{width: 350, height: 355, padding: 32, background: 'var(--White, white)', borderRadius: 24, border: '1px #E5E7EB solid', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
     <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', wordWrap: 'break-word'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>#EP010525</div>
       <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: '#DDF4E6', borderRadius: 50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
         <div style={{width: 8, height: 8, background: '#65CC8E', borderRadius: 9999}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Active Liability</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Active Liability</div>
       </div>
     </div>
     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Pool Amount</div>
-        <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>$350 000</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pool Amount</div>
+        <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$350 000</div>
       </div>
       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>34% Paid</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>34% Paid</div>
         <div style={{alignSelf: 'stretch', height: 8, position: 'relative'}}>
           <div style={{width: '100%', height: 8, position: 'absolute', background: '#E5E7EB', borderRadius: 50}} />
           <div style={{width: '34%', height: 8, position: 'absolute', background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 50}} />
@@ -212,27 +212,27 @@ export default function PoolsPage() {
     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
       <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
         <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Date Created</div>
-          <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>01/05/2025</div>
+          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Date Created</div>
+          <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>01/05/2025</div>
         </div>
         <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Type</div>
-          <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Equity pool</div>
+          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Type</div>
+          <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity pool</div>
         </div>
       </div>
       <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
         <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Terms</div>
-          <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>12% / 24 Months</div>
+          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Terms</div>
+          <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>12% / 24 Months</div>
         </div>
         <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Repayment</div>
-          <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Flexible</div>
+          <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Repayment</div>
+          <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Flexible</div>
         </div>
       </div>
     </div>
     <div style={{paddingTop: 8, paddingLeft: 16, paddingRight: 16, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
@@ -252,7 +252,7 @@ export default function PoolsPage() {
   }}>
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
       <div style={{
         padding: '4px 10px',
         background: '#DDF4E6',
@@ -262,19 +262,19 @@ export default function PoolsPage() {
         gap: 6
       }}>
         <div style={{width: 8, height: 8, background: '#65CC8E', borderRadius: '50%'}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Active Liability</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Active Liability</div>
       </div>
     </div>
 
     {/* Pool Amount */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
-      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>$350 000</div>
     </div>
 
     {/* Progress Bar Section */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>12% Paid</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% Paid</div>
       <div style={{position: 'relative', height: 8, width: '100%'}}>
         <div style={{
           width: '100%',
@@ -302,20 +302,20 @@ export default function PoolsPage() {
       height: 'auto'
     }}>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>01/05/2025</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Equity pool</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Equity pool</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
 
@@ -329,7 +329,7 @@ export default function PoolsPage() {
       gap: 4,
       cursor: 'pointer'
     }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
@@ -349,7 +349,7 @@ export default function PoolsPage() {
   }}>
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
       <div style={{
         padding: '4px 10px',
         background: '#F4F4F4',
@@ -359,14 +359,14 @@ export default function PoolsPage() {
         gap: 6
       }}>
         <div style={{width: 8, height: 8, background: '#767676', borderRadius: '50%'}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Draft</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Draft</div>
       </div>
     </div>
 
     {/* Pool Amount */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
-      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>$350 000</div>
     </div>
 
     {/* Details Grid */}
@@ -378,20 +378,20 @@ export default function PoolsPage() {
       height: 'auto'
     }}>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>01/05/2025</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Equity pool</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Equity pool</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
 
@@ -405,7 +405,7 @@ export default function PoolsPage() {
       gap: 4,
       cursor: 'pointer'
     }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
@@ -425,7 +425,7 @@ export default function PoolsPage() {
   }}>
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
       <div style={{
         padding: '4px 10px',
         background: '#F7E6D6',
@@ -435,14 +435,14 @@ export default function PoolsPage() {
         gap: 6
       }}>
         <div style={{width: 8, height: 8, background: '#DBAC7E', borderRadius: '50%'}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>System Pending</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>System Pending</div>
       </div>
     </div>
 
     {/* Pool Amount */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
-      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>$350 000</div>
     </div>
 
     {/* Details Grid */}
@@ -454,20 +454,20 @@ export default function PoolsPage() {
       height: 'auto'
     }}>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>01/05/2025</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Refinancing</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Refinancing</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
 
@@ -481,7 +481,7 @@ export default function PoolsPage() {
       gap: 4,
       cursor: 'pointer'
     }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
@@ -501,7 +501,7 @@ export default function PoolsPage() {
   }}>
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
       <div style={{
         padding: '4px 10px',
         background: '#D6E0ED',
@@ -511,14 +511,14 @@ export default function PoolsPage() {
         gap: 6
       }}>
         <div style={{width: 8, height: 8, background: '#6592CC', borderRadius: '50%'}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Awaiting Investors</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Awaiting Investors</div>
       </div>
     </div>
 
     {/* Pool Amount */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
-      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>$350 000</div>
     </div>
 
     {/* Details Grid */}
@@ -530,20 +530,20 @@ export default function PoolsPage() {
       height: 'auto'
     }}>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>01/05/2025</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Equity pool</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Equity pool</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
 
@@ -557,7 +557,7 @@ export default function PoolsPage() {
       gap: 4,
       cursor: 'pointer'
     }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
@@ -577,7 +577,7 @@ export default function PoolsPage() {
   }}>
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
       <div style={{
         padding: '4px 10px',
         background: '#DECBEF',
@@ -587,14 +587,14 @@ export default function PoolsPage() {
         gap: 6
       }}>
         <div style={{width: 8, height: 8, background: '#9A65CC', borderRadius: '50%'}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Funded</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Funded</div>
       </div>
     </div>
 
     {/* Pool Amount */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
-      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>$350 000</div>
     </div>
 
     {/* Details Grid */}
@@ -606,20 +606,20 @@ export default function PoolsPage() {
       height: 'auto'
     }}>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>01/05/2025</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Refinancing</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Refinancing</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
 
@@ -633,7 +633,7 @@ export default function PoolsPage() {
       gap: 4,
       cursor: 'pointer'
     }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
@@ -653,7 +653,7 @@ export default function PoolsPage() {
   }}>
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
       <div style={{
         padding: '4px 10px',
         background: '#D6D6D6',
@@ -663,14 +663,14 @@ export default function PoolsPage() {
         gap: 6
       }}>
         <div style={{width: 8, height: 8, background: '#784B1B', borderRadius: '50%'}} />
-        <div style={{color: '#767676', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Closed</div>
+        <div style={{color: '#767676', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Closed</div>
       </div>
     </div>
 
     {/* Pool Amount */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
-      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>$350 000</div>
     </div>
 
     {/* Details Grid */}
@@ -682,20 +682,20 @@ export default function PoolsPage() {
       height: 'auto'
     }}>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>01/05/2025</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Refinancing</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Refinancing</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
 
@@ -709,7 +709,7 @@ export default function PoolsPage() {
       gap: 4,
       cursor: 'pointer'
     }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
@@ -729,7 +729,7 @@ export default function PoolsPage() {
   }}>
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
       <div style={{
         padding: '4px 10px',
         background: '#E7D8D8',
@@ -739,14 +739,14 @@ export default function PoolsPage() {
         gap: 6
       }}>
         <div style={{width: 8, height: 8, background: '#CC4747', borderRadius: '50%'}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Rejected</div>
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Rejected</div>
       </div>
     </div>
 
     {/* Pool Amount */}
     <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
-      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>$350 000</div>
     </div>
 
     {/* Details Grid */}
@@ -758,20 +758,20 @@ export default function PoolsPage() {
       height: 'auto'
     }}>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>01/05/2025</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Refinancing</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Refinancing</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
 
@@ -785,7 +785,7 @@ export default function PoolsPage() {
       gap: 4,
       cursor: 'pointer'
     }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
       <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
       </svg>
