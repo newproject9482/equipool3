@@ -60,6 +60,7 @@ export default function Home() {
   const [roleBorrowerHover, setRoleBorrowerHover] = useState(false);
   const [roleInvestorHover, setRoleInvestorHover] = useState(false);
   const [howItWorksView, setHowItWorksView] = useState<'borrower' | 'investor'>('borrower');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1002,10 +1003,51 @@ export default function Home() {
             <div style={{alignSelf: 'stretch', paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 4, background: '#F4F4F4', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                 <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
                     <div style={{alignSelf: 'stretch', borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                        <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Enter your email</div>
+                        <input
+                          type="email"
+                          value={newsletterEmail}
+                          onChange={(e) => setNewsletterEmail(e.target.value)}
+                          placeholder="Enter your email"
+                          style={{
+                            width: '100%',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            outline: 'none',
+                            color: '#767676',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500'
+                          }}
+                        />
                     </div>
                 </div>
-                <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 6, paddingBottom: 6, background: '#113D7B', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', borderRadius: 12, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 6, display: 'flex'}}>
+                <div 
+                  style={{
+                    alignSelf: 'stretch', 
+                    paddingLeft: 12, 
+                    paddingRight: 12, 
+                    paddingTop: 6, 
+                    paddingBottom: 6, 
+                    background: '#113D7B', 
+                    boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
+                    borderRadius: 12, 
+                    outline: '1px #E5E7EB solid', 
+                    outlineOffset: '-1px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: 6, 
+                    display: 'flex',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    if (newsletterEmail.trim()) {
+                      showSuccess('Successfully subscribed to newsletter!');
+                      setNewsletterEmail('');
+                    } else {
+                      showError('Please enter a valid email address');
+                    }
+                  }}
+                >
                     <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit</div>
                 </div>
             </div>
