@@ -1858,13 +1858,13 @@ export default function Home() {
                               style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.zip? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
                             />
                           </div>
-                          <div data-righticon="false" data-state={formData.country? 'focus':'default'} style={{width:111.2, height:45, padding:'12px 16px', background:'#F4F4F4', borderRadius:8, outline:'1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset:'-1px', display:'flex', alignItems:'center', gap:16, flex:'0 0 auto'}}>
+                          <div data-righticon="false" data-state="disabled" style={{width:111.2, height:45, padding:'12px 16px', background:'#E5E7EB', borderRadius:8, outline:'1px #D1D5DB solid', outlineOffset:'-1px', display:'flex', alignItems:'center', gap:16, flex:'0 0 auto', cursor:'not-allowed'}}>
                             <input
                               type="text"
-                              placeholder="United States"
-                              value={formData.country}
-                              onChange={(e)=>handleInputChange('country', e.target.value)}
-                              style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.country? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}
+                              value="United States"
+                              readOnly
+                              disabled
+                              style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: '#6B7280', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, cursor:'not-allowed'}}
                             />
                           </div>
                         </div>
