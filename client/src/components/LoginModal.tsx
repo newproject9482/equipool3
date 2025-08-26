@@ -26,13 +26,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
     setSubmitting(true);
     try {
       const endpoint = role === 'borrower' ? '/api/borrowers/login' : '/api/investors/login';
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}${endpoint}`, {
+      const fullUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}${endpoint}`;
+      console.log('[DEBUG] Login URL:', fullUrl);
+      console.log('[DEBUG] Login payload:', { email, role });
+      
+      const res = await fetch(fullUrl, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         credentials: 'include',
         body: JSON.stringify({ email, password })
       });
+      
+      console.log('[DEBUG] Login response status:', res.status);
       const data = await res.json().catch(()=>({}));
+      console.log('[DEBUG] Login response data:', data);
+      
       if(!res.ok){
         showError(data.error || 'Login failed');
       } else {
@@ -42,6 +50,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
         onClose();
       }
     } catch (e: unknown){
+      console.error('[DEBUG] Login error:', e);
       const errorMessage = e instanceof Error ? e.message : 'Network error';
       showError(errorMessage);
     } finally {

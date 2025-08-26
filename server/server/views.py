@@ -64,10 +64,13 @@ def borrower_signup(request: HttpRequest):
 
 @csrf_exempt
 def borrower_login(request: HttpRequest):
+    print(f"[DEBUG] Login request received: {request.method}")
+    print(f"[DEBUG] Headers: {dict(request.headers)}")
     if request.method != 'POST':
         return JsonResponse({'error':'Method not allowed'}, status=405)
     try:
         data = json.loads(request.body.decode('utf-8'))
+        print(f"[DEBUG] Login data: {data}")
     except json.JSONDecodeError:
         return JsonResponse({'error':'Invalid JSON'}, status=400)
     email = data.get('email','').lower().strip()
@@ -83,6 +86,7 @@ def borrower_login(request: HttpRequest):
     # Establish session
     request.session['borrower_id'] = b.id
     request.session['role'] = 'borrower'
+    print(f"[DEBUG] Session established for borrower: {b.id}")
     return JsonResponse({'id': b.id,'fullName': b.full_name,'email': b.email,'role':'borrower'}, status=200)
 
 @csrf_exempt
@@ -93,8 +97,10 @@ def auth_logout(request: HttpRequest):
     return JsonResponse({'success': True})
 
 def auth_me(request: HttpRequest):
+    print(f"[DEBUG] Auth check - session data: {dict(request.session)}")
     borrower_id = request.session.get('borrower_id')
     investor_id = request.session.get('investor_id')
+    print(f"[DEBUG] Borrower ID: {borrower_id}, Investor ID: {investor_id}")
     
     if borrower_id:
         try:

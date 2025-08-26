@@ -48,10 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'server',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -166,3 +168,35 @@ if 'RAILWAY_ENVIRONMENT' in os.environ:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+# CORS settings for frontend integration
+CORS_ALLOWED_ORIGINS = [
+    "https://equipool3.vercel.app",
+    "https://equipool3-git-main-newproject9482s-projects.vercel.app",  # Git branch URL
+    "https://equipool3-newproject9482s-projects.vercel.app",  # Alternative URL format
+    "http://localhost:3000",  # For local development
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Temporarily allow all origins for debugging (remove in production)
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Additional CORS settings
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Session settings for cross-origin
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True  # Required for SameSite=None
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
