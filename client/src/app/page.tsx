@@ -47,7 +47,7 @@ export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Toaster hook
-  const { toasts, removeToast, showInfo, showWarning } = useToaster();
+  const { toasts, removeToast, showInfo, showWarning, showSuccess, showError } = useToaster();
 
   // Hover states for buttons
   const [borrowerHover, setBorrowerHover] = useState(false);
@@ -187,11 +187,12 @@ export default function Home() {
         });
         if(!res.ok){
           const err = await res.json().catch(()=>({error:'Signup failed'}));
-          alert(err.error || 'Signup failed');
+          showError(err.error || 'Signup failed');
           return;
         }
         // On success mark authenticated and continue to verification
         setIsAuthenticated(true);
+        showSuccess('Account created successfully! Welcome to EquiPool!');
         // Persist simple flag (session cookie is real auth)
         if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
   // Borrower flow: go straight to email verification step
@@ -227,11 +228,12 @@ export default function Home() {
         });
         if(!res.ok){
           const err = await res.json().catch(()=>({error:'Signup failed'}));
-          alert(err.error || 'Signup failed');
+          showError(err.error || 'Signup failed');
           return;
         }
         // On success mark authenticated and continue to verification
         setIsAuthenticated(true);
+        showSuccess('Investor account created successfully! Welcome to EquiPool!');
         // Persist simple flag (session cookie is real auth)
         if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
         // Investor flow: go to combined contact verification first
@@ -268,19 +270,20 @@ export default function Home() {
       });
       if(!res.ok){
         const err = await res.json().catch(()=>({error:'Signup failed'}));
-        alert(err.error || 'Signup failed');
+        showError(err.error || 'Signup failed');
         return;
       }
       // On success mark authenticated and continue to verification
       setSelectedRole('investor');
       setIsAuthenticated(true);
+      showSuccess('Investor account created successfully! Welcome to EquiPool!');
       // Persist simple flag (session cookie is real auth)
       if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
       // Investor flow: go to combined contact verification first
       setModalStep('verifyContact');
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : 'Network error';
-      alert(errorMessage);
+      showError(errorMessage);
     }
   };
 
@@ -292,6 +295,7 @@ export default function Home() {
     }
     setIsAuthenticated(false);
     setShowProfileMenu(false);
+    showSuccess('You have been logged out successfully!');
     if (typeof window !== 'undefined') localStorage.removeItem('ep-auth');
   };
 
@@ -984,6 +988,8 @@ export default function Home() {
           onClose={()=> setShowLoginModal(false)}
           onSwitchToSignUp={()=> { setShowLoginModal(false); setShowSignUpModal(true); setModalStep('roleSelection'); }}
           onSuccess={(role)=> { setIsAuthenticated(true); setSelectedRole(role); }}
+          showSuccess={showSuccess}
+          showError={showError}
         />
       )}
 

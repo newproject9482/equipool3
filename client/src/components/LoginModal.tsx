@@ -6,9 +6,11 @@ interface LoginModalProps {
   onClose: () => void;
   onSwitchToSignUp: () => void;
   onSuccess: (role: 'borrower' | 'investor') => void;
+  showSuccess: (message: string) => void;
+  showError: (message: string) => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSuccess }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSuccess, showSuccess, showError }) => {
   const [role, setRole] = useState<'borrower' | 'investor'>('borrower');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,15 +33,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
       });
       const data = await res.json().catch(()=>({}));
       if(!res.ok){
-        alert(data.error || 'Login failed');
+        showError(data.error || 'Login failed');
       } else {
         if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+        showSuccess(`Welcome back! You have successfully logged in as ${role}.`);
         onSuccess(role);
         onClose();
       }
     } catch (e: unknown){
       const errorMessage = e instanceof Error ? e.message : 'Network error';
-      alert(errorMessage);
+      showError(errorMessage);
     } finally {
       setSubmitting(false);
     }
