@@ -233,9 +233,9 @@ export default function PoolsPage() {
     </div>
     <div style={{paddingTop: 8, paddingLeft: 16, paddingRight: 16, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
       <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>View Pool</div>
-      <div style={{width: 12, height: 12, position: 'relative'}}>
-        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'black'}} />
-      </div>
+      <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
+      </svg>
     </div>
   </div>
   <div style={{
@@ -330,9 +330,9 @@ export default function PoolsPage() {
       cursor: 'pointer'
     }}>
       <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
-      <div style={{width: 12, height: 12, position: 'relative'}}>
-        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'black'}} />
-      </div>
+      <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
+      </svg>
     </div>
   </div>
   <div style={{
@@ -406,9 +406,9 @@ export default function PoolsPage() {
       cursor: 'pointer'
     }}>
       <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
-      <div style={{width: 12, height: 12, position: 'relative'}}>
-        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'black'}} />
-      </div>
+      <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
+      </svg>
     </div>
   </div>
   <div style={{
@@ -482,9 +482,9 @@ export default function PoolsPage() {
       cursor: 'pointer'
     }}>
       <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
-      <div style={{width: 12, height: 12, position: 'relative'}}>
-        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'black'}} />
-      </div>
+      <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
+      </svg>
     </div>
   </div>
   <div style={{width: 350, height: 355, paddingTop: 32, paddingBottom: 12, paddingLeft: 32, paddingRight: 32, background: 'var(--White, white)', overflow: 'hidden', borderRadius: 24, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
