@@ -59,6 +59,7 @@ export default function Home() {
   const [investorType, setInvestorType] = useState<'individual' | 'company'>('individual');
   const [roleBorrowerHover, setRoleBorrowerHover] = useState(false);
   const [roleInvestorHover, setRoleInvestorHover] = useState(false);
+  const [howItWorksView, setHowItWorksView] = useState<'borrower' | 'investor'>('borrower');
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -700,13 +701,13 @@ export default function Home() {
       </div>
       {/* Value proposition - 20px below Trusted by */}
       <div style={{marginTop: 160}}>
-        <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'inline-flex', boxSizing: 'border-box'}}>
-          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+        <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex', boxSizing: 'border-box'}}>
+          <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
             <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Value proposition</div>
           </div>
-          <div style={{width: 566, color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Fair Capital for Real People</div>
-          <div style={{width: 698, color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We eliminate middlemen, confusing terms, and bias. Whether you&apos;re a homeowner seeking refinancing or an investor looking for real-world returns.</div>
-          <div style={{height: 460, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'inline-flex'}}>
+          <div style={{textAlign: 'center', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Fair Capital for Real People</div>
+          <div style={{textAlign: 'center', maxWidth: 698, color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We eliminate middlemen, confusing terms, and bias. Whether you&apos;re a homeowner seeking refinancing or an investor looking for real-world returns.</div>
+          <div style={{height: 460, justifyContent: 'center', alignItems: 'flex-start', gap: 20, display: 'inline-flex', width: '100%'}}>
             <div style={{width: 350, alignSelf: 'stretch', padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
               <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                 <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Investors</div>
@@ -738,11 +739,39 @@ export default function Home() {
   </div>
   <div style={{width: 1090, paddingTop: 32, paddingBottom: 64, paddingLeft: 56, paddingRight: 56, background: '#F4F4F4', borderRadius: 40, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 80, display: 'flex'}}>
     <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 8, paddingBottom: 8, background: 'white', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-      <div style={{height: 64, paddingLeft: 20, paddingRight: 20, background: '#F4F4F4', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-        <div style={{textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</div>
+      <div 
+        onClick={() => setHowItWorksView('borrower')}
+        style={{
+          height: 64, 
+          paddingLeft: 20, 
+          paddingRight: 20, 
+          background: howItWorksView === 'borrower' ? '#F4F4F4' : 'transparent', 
+          borderRadius: 24, 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          gap: 10, 
+          display: 'flex',
+          cursor: 'pointer'
+        }}
+      >
+        <div style={{textAlign: 'center', color: howItWorksView === 'borrower' ? 'black' : '#B2B2B2', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</div>
       </div>
-      <div style={{height: 64, paddingLeft: 10, paddingRight: 10, borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-        <div style={{textAlign: 'center', color: '#B2B2B2', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Investor</div>
+      <div 
+        onClick={() => setHowItWorksView('investor')}
+        style={{
+          height: 64, 
+          paddingLeft: 20, 
+          paddingRight: 20, 
+          background: howItWorksView === 'investor' ? '#F4F4F4' : 'transparent', 
+          borderRadius: 24, 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          gap: 10, 
+          display: 'flex',
+          cursor: 'pointer'
+        }}
+      >
+        <div style={{textAlign: 'center', color: howItWorksView === 'investor' ? 'black' : '#B2B2B2', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Investor</div>
       </div>
     </div>
     
@@ -805,7 +834,7 @@ export default function Home() {
           <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Can I use Flowbite in open-source projects?</div>
         </div>
         <div style={{width: 20, height: 20, position: 'relative'}}>
-          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 5.83, position: 'absolute', background: '#101828'}} />
+          <Image src="/angle-down.svg" alt="Expand FAQ" width={20} height={20} />
         </div>
       </div>
       <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
@@ -817,7 +846,7 @@ export default function Home() {
           <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
         </div>
         <div style={{width: 20, height: 20, position: 'relative'}}>
-          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+          <Image src="/angle-down.svg" alt="Expand FAQ" width={20} height={20} />
         </div>
       </div>
       <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
@@ -825,7 +854,7 @@ export default function Home() {
           <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
         </div>
         <div style={{width: 20, height: 20, position: 'relative'}}>
-          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+          <Image src="/angle-down.svg" alt="Expand FAQ" width={20} height={20} />
         </div>
       </div>
       <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
@@ -833,7 +862,7 @@ export default function Home() {
           <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
         </div>
         <div style={{width: 20, height: 20, position: 'relative'}}>
-          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+          <Image src="/angle-down.svg" alt="Expand FAQ" width={20} height={20} />
         </div>
       </div>
       <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
@@ -841,7 +870,7 @@ export default function Home() {
           <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Can I contribute to the Flowbite project?</div>
         </div>
         <div style={{width: 20, height: 20, position: 'relative'}}>
-          <div style={{width: 13.33, height: 7.50, left: 3.33, top: 6.67, position: 'absolute', background: '#4A5565'}} />
+          <Image src="/angle-down.svg" alt="Expand FAQ" width={20} height={20} />
         </div>
       </div>
     </div>
