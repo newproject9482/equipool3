@@ -101,32 +101,63 @@ export default function PoolsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 py-12">
-        <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'inline-flex'}}>
-          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'flex'}}>
-            <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-              <div style={{textAlign: 'center', color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>
-                {selectedRole === 'investor' ? 'Investment Pools' : 'Loan Pools'}
+      <main style={{width: 1440, height: 515}}>
+        <div style={{width: '100%', height: '100%', paddingTop: 120, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{color: 'var(--Black, black)', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Pools & Dashboard /</div>
+            </div>
+            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'Avenir', fontWeight: '800', wordWrap: 'break-word'}}>Overview</div>
+            </div>
+            <div style={{width: 1090, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', height: 280, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Total Borrowed</div>
+                </div>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 48, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>$1 285 000</div>
+                </div>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>(i) Total amount you've received across all funded pools.</div>
+                </div>
+              </div>
+              <div style={{flex: '1 1 0', height: 280, padding: 32, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Next Payment</div>
+                </div>
+                <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>July 12</div>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 48, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>$7843.32</div>
+                </div>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>(i) Your upcoming repayment amount and due date.</div>
+                </div>
+              </div>
+              <div style={{height: 280, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Active pools</div>
+                </div>
+                <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 48, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>2</div>
+                </div>
+                <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>(i) Number of currently running loans.</div>
+                </div>
               </div>
             </div>
-            <div style={{width: 566, textAlign: 'center'}}>
-              <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 400, wordWrap: 'break-word'}}>
-                {selectedRole === 'investor' ? 'Your Investment ' : 'Your Loan '}
-              </span>
-              <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Dashboard</span>
-            </div>
-            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>
-              {selectedRole === 'investor' 
-                ? 'Track your investments, view returns, and discover new opportunities.'
-                : 'Manage your loan applications, view funding progress, and track repayments.'
-              }
-            </div>
-          </div>
-
-          {/* Placeholder content - you can replace this with your actual pools content */}
-          <div style={{width: '100%', minHeight: 400, background: '#F4F4F4', borderRadius: 24, padding: 40, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <div style={{textAlign: 'center', color: '#4A5565', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>
-              Pools content will be added here
+            <div style={{alignSelf: 'stretch', paddingLeft: 40, paddingRight: 40, paddingTop: 24, paddingBottom: 24, background: '#E4EFFF', overflow: 'hidden', borderRadius: 24, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+              <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                <div style={{flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Create a pool</div>
+                </div>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                  <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Start a new funding request backed by your property.<br/>Define your loan amount, term, and target return — we'll guide you from there.</div>
+                </div>
+              </div>
+              <div data-icon="ic:x" style={{width: 40, height: 40, position: 'relative', background: 'white', overflow: 'hidden', borderRadius: 40}}>
+                <div style={{width: 25, height: 25, left: 7.50, top: 7.50, position: 'absolute', background: 'var(--Black, black)'}} />
+              </div>
             </div>
           </div>
         </div>
