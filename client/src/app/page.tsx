@@ -47,7 +47,7 @@ export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Toaster hook
-  const { toasts, removeToast, showInfo, showWarning, showSuccess, showError } = useToaster();
+  const { toasts, removeToast, showInfo, showSuccess, showError } = useToaster();
 
   // Hover states for buttons
   const [borrowerHover, setBorrowerHover] = useState(false);

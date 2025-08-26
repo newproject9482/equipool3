@@ -9,7 +9,6 @@ const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: f
 
 export default function PoolsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -26,7 +25,6 @@ export default function PoolsPage() {
         if (response.ok) {
           const data = await response.json();
           setIsAuthenticated(true);
-          setSelectedRole(data.role);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -43,7 +41,6 @@ export default function PoolsPage() {
         credentials: 'include'
       });
       setIsAuthenticated(false);
-      setSelectedRole(null);
       setShowProfileMenu(false);
       // Redirect to home page after logout
       window.location.href = '/';
@@ -122,7 +119,7 @@ export default function PoolsPage() {
                   <div style={{alignSelf: 'stretch', color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$1 285 000</div>
                 </div>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Total amount you've received across all funded pools.</div>
+                  <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Total amount you&apos;ve received across all funded pools.</div>
                 </div>
               </div>
               <div style={{flex: '1 1 0', height: 280, padding: 32, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
@@ -155,7 +152,7 @@ export default function PoolsPage() {
                   <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Create a pool</div>
                 </div>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                  <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start a new funding request backed by your property.<br/>Define your loan amount, term, and target return — we'll guide you from there.</div>
+                  <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start a new funding request backed by your property.<br/>Define your loan amount, term, and target return — we&apos;ll guide you from there.</div>
                 </div>
               </div>
               <div style={{width: 40, height: 40, position: 'relative', background: 'white', overflow: 'hidden', borderRadius: 40, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -964,7 +961,7 @@ export default function PoolsPage() {
         <LoginModal 
           onClose={() => setShowLoginModal(false)}
           onSwitchToSignUp={() => { setShowLoginModal(false); window.location.href = '/'; }}
-          onSuccess={(role) => { setIsAuthenticated(true); setSelectedRole(role); setShowLoginModal(false); }}
+          onSuccess={(role) => { setIsAuthenticated(true); setShowLoginModal(false); }}
           showSuccess={showSuccess}
           showError={showError}
         />
