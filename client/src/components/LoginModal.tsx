@@ -26,9 +26,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
     setSubmitting(true);
     try {
       const endpoint = role === 'borrower' ? '/api/borrowers/login' : '/api/investors/login';
-      const res = await fetch(endpoint, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}${endpoint}`, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
       const data = await res.json().catch(()=>({}));

@@ -185,9 +185,10 @@ export default function Home() {
           email: formData.email,
           password: formData.password,
         };
-        const res = await fetch('/api/borrowers/signup', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/borrowers/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload),
         });
         if(!res.ok){
@@ -226,9 +227,10 @@ export default function Home() {
           country: formData.country,
           password: formData.password,
         };
-        const res = await fetch('/api/investors/signup', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/investors/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(payload),
         });
         if(!res.ok){
@@ -268,9 +270,10 @@ export default function Home() {
         password: formData.password,
       };
       console.log('Sending investor signup payload:', payload);
-      const res = await fetch('/api/investors/signup', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/investors/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
       if(!res.ok){
@@ -294,7 +297,10 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method:'POST' });
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, { 
+        method:'POST',
+        credentials: 'include'
+      });
     } catch {
       // Ignore logout errors
     }
