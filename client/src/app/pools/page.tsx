@@ -335,77 +335,155 @@ export default function PoolsPage() {
       </div>
     </div>
   </div>
-  <div style={{width: 350, height: 355, paddingTop: 32, paddingBottom: 12, paddingLeft: 32, paddingRight: 32, background: 'var(--White, white)', overflow: 'hidden', borderRadius: 24, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-    <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-      <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 20, wordWrap: 'break-word'}}>#EP010525</div>
-      <div data-property-1="draft" style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-        <div style={{width: 8, height: 8, background: 'var(--Grey, #767676)', borderRadius: 9999}} />
-        <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Draft</div>
+  <div style={{
+    width: 350,
+    height: 355,
+    padding: 32,
+    paddingBottom: 12,
+    background: 'white',
+    borderRadius: 24,
+    border: '1px solid #E5E7EB',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between'
+  }}>
+    {/* Header */}
+    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{
+        padding: '4px 10px',
+        background: '#F4F4F4',
+        borderRadius: 50,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6
+      }}>
+        <div style={{width: 8, height: 8, background: '#767676', borderRadius: '50%'}} />
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Draft</div>
       </div>
     </div>
-    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pool Amount</div>
-      <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$350 000</div>
+
+    {/* Pool Amount */}
+    <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
     </div>
-    <div style={{alignSelf: 'stretch', height: 97, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>01/05/2025</div>
+
+    {/* Details Grid */}
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gridTemplateRows: '1fr 1fr',
+      gap: 16,
+      height: 'auto'
+    }}>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
       </div>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Type</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity pool</div>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Equity pool</div>
       </div>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>12% / 24 Months</div>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{alignSelf: 'stretch', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Repayment</div>
-        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Flexible</div>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
-    <div data-left-icon="true" data-state="secondary" style={{paddingTop: 8, paddingLeft: 16, paddingRight: 16, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-      <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>View Pool</div>
-      <div data-icon="ic:arrowright" style={{width: 12, height: 12, position: 'relative', overflow: 'hidden'}}>
-        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'var(--Black, black)'}} />
+
+    {/* View Pool Button */}
+    <div style={{
+      padding: '8px 16px',
+      borderRadius: 12,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 4,
+      cursor: 'pointer'
+    }}>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{width: 12, height: 12, position: 'relative'}}>
+        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'black'}} />
       </div>
     </div>
   </div>
-  <div style={{width: 350, height: 355, paddingTop: 32, paddingBottom: 12, paddingLeft: 32, paddingRight: 32, background: 'var(--White, white)', overflow: 'hidden', borderRadius: 24, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-    <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-      <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 20, wordWrap: 'break-word'}}>#EP010525</div>
-      <div data-property-1="system pending" style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: '#F7E6D6', borderRadius: 50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-        <div style={{width: 8, height: 8, background: '#DBAC7E', borderRadius: 9999}} />
-        <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>System Pending</div>
+  <div style={{
+    width: 350,
+    height: 355,
+    padding: 32,
+    paddingBottom: 12,
+    background: 'white',
+    borderRadius: 24,
+    border: '1px solid #E5E7EB',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between'
+  }}>
+    {/* Header */}
+    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+      <div style={{
+        padding: '4px 10px',
+        background: '#F7E6D6',
+        borderRadius: 50,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6
+      }}>
+        <div style={{width: 8, height: 8, background: '#DBAC7E', borderRadius: '50%'}} />
+        <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>System Pending</div>
       </div>
     </div>
-    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pool Amount</div>
-      <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$350 000</div>
+
+    {/* Pool Amount */}
+    <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Pool Amount</div>
+      <div style={{color: 'black', fontSize: 32, fontFamily: 'Avenir', fontWeight: '500'}}>$350 000</div>
     </div>
-    <div style={{alignSelf: 'stretch', height: 97, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Date Created</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>01/05/2025</div>
+
+    {/* Details Grid */}
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gridTemplateRows: '1fr 1fr',
+      gap: 16,
+      height: 'auto'
+    }}>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Date Created</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>01/05/2025</div>
       </div>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Type</div>
-        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Refinancing</div>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Type</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Refinancing</div>
       </div>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Terms</div>
-        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>12% / 24 Months</div>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Terms</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>12% / 24 Months</div>
       </div>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-        <div style={{alignSelf: 'stretch', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Repayment</div>
-        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Flexible</div>
+      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>Repayment</div>
+        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500'}}>Flexible</div>
       </div>
     </div>
-    <div data-left-icon="true" data-state="secondary" style={{paddingTop: 8, paddingLeft: 16, paddingRight: 16, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-      <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>View Pool</div>
-      <div data-icon="ic:arrowright" style={{width: 12, height: 12, position: 'relative', overflow: 'hidden'}}>
-        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'var(--Black, black)'}} />
+
+    {/* View Pool Button */}
+    <div style={{
+      padding: '8px 16px',
+      borderRadius: 12,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 4,
+      cursor: 'pointer'
+    }}>
+      <div style={{color: 'black', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500'}}>View Pool</div>
+      <div style={{width: 12, height: 12, position: 'relative'}}>
+        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'black'}} />
       </div>
     </div>
   </div>
