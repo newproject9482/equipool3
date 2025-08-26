@@ -525,8 +525,10 @@ export default function Home() {
         <nav className="hidden md:flex items-center gap-6">
           <a className="ep-nav-link">About Us</a>
           <a className="ep-nav-link">Security</a>
-          <a className="ep-nav-link">Learn</a>
-          <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+          <div className="flex items-center gap-2">
+            <a className="ep-nav-link">Learn</a>
+            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+          </div>
         </nav>
 
         {/* Auth Section */}
@@ -604,7 +606,7 @@ export default function Home() {
         </div>
         <div style={{width: 566, textAlign: 'center'}}>
           <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 400, wordWrap: 'break-word'}}>Your Property. Your Terms. </span>
-          <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Your Capital.</span>
+          <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, fontStyle: 'italic', wordWrap: 'break-word'}}>Your Capital.</span>
         </div>
         <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>
           Access fair, fast, and community-powered loans backed by real assets. Whether you’re borrowing or investing — our AI-powered platform gives you control, clarity, and confidence.
