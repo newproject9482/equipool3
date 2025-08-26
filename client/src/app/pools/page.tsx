@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { Toaster, useToaster } from '../../components/Toaster';
 
 const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
 
@@ -11,6 +12,9 @@ export default function PoolsPage() {
   const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  
+  const { toasts, removeToast, showSuccess, showError } = useToaster();
 
   useEffect(() => {
     // Check authentication status
@@ -54,18 +58,20 @@ export default function PoolsPage() {
       <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-          <a href="/" className="ep-nav-brand" style={{ textDecoration: 'none' }}>EquiPool</a>
+          <span className="ep-nav-brand">EquiPool</span>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
           <a className="ep-nav-link">About Us</a>
           <a className="ep-nav-link">Security</a>
-          <a className="ep-nav-link">Learn</a>
-          <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+          <div className="flex items-center gap-2">
+            <a className="ep-nav-link">Learn</a>
+            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+          </div>
         </nav>
 
         {/* Auth Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4" style={{position:'relative'}}>
           {isAuthenticated ? (
             <>
               {/* Notifications Icon */}
@@ -900,10 +906,51 @@ export default function PoolsPage() {
                 <div style={{alignSelf: 'stretch', paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 4, background: '#F4F4F4', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                     <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
                         <div style={{alignSelf: 'stretch', borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                            <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Enter your email</div>
+                            <input
+                              type="email"
+                              value={newsletterEmail}
+                              onChange={(e) => setNewsletterEmail(e.target.value)}
+                              placeholder="Enter your email"
+                              style={{
+                                width: '100%',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                outline: 'none',
+                                color: '#767676',
+                                fontSize: 14,
+                                fontFamily: 'var(--ep-font-avenir)',
+                                fontWeight: '500'
+                              }}
+                            />
                         </div>
                     </div>
-                    <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 6, paddingBottom: 6, background: '#113D7B', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', borderRadius: 12, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 6, display: 'flex'}}>
+                    <div 
+                      style={{
+                        alignSelf: 'stretch', 
+                        paddingLeft: 12, 
+                        paddingRight: 12, 
+                        paddingTop: 6, 
+                        paddingBottom: 6, 
+                        background: '#113D7B', 
+                        boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
+                        borderRadius: 12, 
+                        outline: '1px #E5E7EB solid', 
+                        outlineOffset: '-1px', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 6, 
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => {
+                        if (newsletterEmail.trim()) {
+                          showSuccess('Successfully subscribed to newsletter!');
+                          setNewsletterEmail('');
+                        } else {
+                          showError('Please enter a valid email address');
+                        }
+                      }}
+                    >
                         <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit</div>
                     </div>
                 </div>
@@ -918,8 +965,12 @@ export default function PoolsPage() {
           onClose={() => setShowLoginModal(false)}
           onSwitchToSignUp={() => { setShowLoginModal(false); window.location.href = '/'; }}
           onSuccess={(role) => { setIsAuthenticated(true); setSelectedRole(role); setShowLoginModal(false); }}
+          showSuccess={showSuccess}
+          showError={showError}
         />
       )}
+      
+      <Toaster toasts={toasts} onRemoveToast={removeToast} />
     </div>
   );
 }
