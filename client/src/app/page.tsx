@@ -116,6 +116,37 @@ export default function Home() {
   };
   const goBackToRoleSelection = () => setModalStep('roleSelection');
 
+  // Handler functions for the main CTA buttons
+  const handleBorrowerButtonClick = () => {
+    if (isAuthenticated && selectedRole === 'borrower') {
+      // User is already authenticated as borrower, do nothing
+      return;
+    }
+    if (isAuthenticated && selectedRole === 'investor') {
+      // User is authenticated as investor, do nothing
+      return;
+    }
+    // User is not authenticated, open signup modal for borrower
+    setSelectedRole('borrower');
+    setModalStep('borrowerSignUp');
+    setShowSignUpModal(true);
+  };
+
+  const handleInvestorButtonClick = () => {
+    if (isAuthenticated && selectedRole === 'investor') {
+      // User is already authenticated as investor, do nothing
+      return;
+    }
+    if (isAuthenticated && selectedRole === 'borrower') {
+      // User is authenticated as borrower, do nothing
+      return;
+    }
+    // User is not authenticated, open signup modal for investor
+    setSelectedRole('investor');
+    setModalStep('investorSignUp');
+    setShowSignUpModal(true);
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -253,10 +284,15 @@ export default function Home() {
     let cancelled = false;
     (async()=>{
       try {
-        const res = await fetch('/api/auth/me');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, {
+          credentials: 'include'
+        });
         if (res.ok) {
           const data = await res.json();
-            if(!cancelled && data.authenticated) setIsAuthenticated(true);
+            if(!cancelled && data.authenticated) {
+              setIsAuthenticated(true);
+              setSelectedRole(data.role);
+            }
             return;
         }
       } catch {
@@ -522,13 +558,23 @@ export default function Home() {
           Access fair, fast, and community-powered loans backed by real assets. Whether you’re borrowing or investing — our AI-powered platform gives you control, clarity, and confidence.
         </div>
         <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-          <div data-left-icon={true} data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
+          <div 
+            data-left-icon={true} 
+            data-state="default" 
+            style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+            onClick={handleBorrowerButtonClick}
+          >
             <Image src="/icons.svg" alt="Handshake icon" width={24} height={24} />
-            <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>Button</div>
+            <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I need funding</div>
           </div>
-          <div data-left-icon={true} data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
+          <div 
+            data-left-icon={true} 
+            data-state="default" 
+            style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+            onClick={handleInvestorButtonClick}
+          >
             <Image src="/invest.svg" alt="Investment icon" width={24} height={24} />
-            <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>Button</div>
+            <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I want to invest</div>
           </div>
         </div>
       </div>
@@ -721,13 +767,23 @@ export default function Home() {
   <div style={{width: 1090, height: 422, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 32, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex'}}>
     <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start building your wealth today</div>
     <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-      <div data-left-icon="true" data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
+      <div 
+        data-left-icon="true" 
+        data-state="default" 
+        style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+        onClick={handleBorrowerButtonClick}
+      >
         <Image src="/icons.svg" alt="Handshake icon" width={24} height={24} />
-        <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Button</div>
+        <div style={{color: 'white', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I need funding</div>
       </div>
-      <div data-left-icon="true" data-state="default" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
+      <div 
+        data-left-icon="true" 
+        data-state="default" 
+        style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+        onClick={handleInvestorButtonClick}
+      >
         <Image src="/invest.svg" alt="Investment icon" width={24} height={24} />
-        <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Button</div>
+        <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I want to invest</div>
       </div>
     </div>
   </div>
