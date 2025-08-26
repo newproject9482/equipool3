@@ -57,6 +57,8 @@ export default function Home() {
   const [ctaBorrowerHover, setCtaBorrowerHover] = useState(false);
   const [ctaInvestorHover, setCtaInvestorHover] = useState(false);
   const [investorType, setInvestorType] = useState<'individual' | 'company'>('individual');
+  const [roleBorrowerHover, setRoleBorrowerHover] = useState(false);
+  const [roleInvestorHover, setRoleInvestorHover] = useState(false);
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1028,7 +1030,28 @@ export default function Home() {
                       <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>You can&apos;t switch roles later, but you can register a second account using a different email if needed.</div>
                     </div>
                     <div style={{width: 452, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                      <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={goToBorrowerSignUp}>
+                      <div 
+                        style={{
+                          width: 220, 
+                          height: 200, 
+                          padding: 24, 
+                          background: 'white', 
+                          borderRadius: 24, 
+                          outline: '1px #E5E7EB solid', 
+                          outlineOffset: '-1px', 
+                          flexDirection: 'column', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'flex-start', 
+                          display: 'inline-flex', 
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          transform: roleBorrowerHover ? 'translateY(-2px)' : 'translateY(0)',
+                          boxShadow: roleBorrowerHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
+                        }} 
+                        onClick={goToBorrowerSignUp}
+                        onMouseEnter={() => setRoleBorrowerHover(true)}
+                        onMouseLeave={() => setRoleBorrowerHover(false)}
+                      >
                         <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                           <Image src="/vaadin-handshake.svg" alt="Borrow icon" width={32} height={32} />
                         </div>
@@ -1037,7 +1060,28 @@ export default function Home() {
                           <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Access community-powered capital using your real estate as collateral.</div>
                         </div>
                       </div>
-                      <div style={{width: 220, height: 200, padding: 24, background: 'white', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', cursor: 'pointer'}} onClick={goToInvestorSignUp}>
+                      <div 
+                        style={{
+                          width: 220, 
+                          height: 200, 
+                          padding: 24, 
+                          background: 'white', 
+                          borderRadius: 24, 
+                          outline: '1px #E5E7EB solid', 
+                          outlineOffset: '-1px', 
+                          flexDirection: 'column', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'flex-start', 
+                          display: 'inline-flex', 
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          transform: roleInvestorHover ? 'translateY(-2px)' : 'translateY(0)',
+                          boxShadow: roleInvestorHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
+                        }} 
+                        onClick={goToInvestorSignUp}
+                        onMouseEnter={() => setRoleInvestorHover(true)}
+                        onMouseLeave={() => setRoleInvestorHover(false)}
+                      >
                         <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                           <Image src="/invest.svg" alt="Invest icon" width={32} height={32} />
                         </div>
