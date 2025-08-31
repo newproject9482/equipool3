@@ -20,6 +20,26 @@ export default function PoolsPage() {
   const [equityHover, setEquityHover] = useState(false);
   const [refinanceHover, setRefinanceHover] = useState(false);
 
+  // Modal step and pool type selection
+  const [modalStep, setModalStep] = useState<'poolType' | 'propertyInfo'>('poolType');
+  const [selectedPoolType, setSelectedPoolType] = useState<'equity' | 'refinance' | null>(null);
+
+  const handlePoolTypeSelect = (poolType: 'equity' | 'refinance') => {
+    setSelectedPoolType(poolType);
+    setModalStep('propertyInfo');
+  };
+
+  const handleBackToPoolType = () => {
+    setModalStep('poolType');
+    setSelectedPoolType(null);
+  };
+
+  const handleCloseModal = () => {
+    setShowCreatePoolModal(false);
+    setModalStep('poolType');
+    setSelectedPoolType(null);
+  };
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -1024,124 +1044,265 @@ export default function PoolsPage() {
               display: 'flex',
               overflow: 'auto'
             }}>
-              {/* Header Section */}
-              <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
-                      <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
-                          <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.2, wordWrap: 'break-word'}}>Creating a Pool</div>
+              {modalStep === 'poolType' && (
+                <>
+                  {/* Header Section */}
+                  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+                              <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.2, wordWrap: 'break-word'}}>Creating a Pool</div>
+                          </div>
+                          <div 
+                            style={{width: 32, height: 32, position: 'relative', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                            onClick={handleCloseModal}
+                          >
+                              <div style={{width: 18.67, height: 18.67, background: 'black'}} />
+                          </div>
                       </div>
-                      <div 
-                        style={{width: 32, height: 32, position: 'relative', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
-                        onClick={() => setShowCreatePoolModal(false)}
-                      >
-                          <div style={{width: 18.67, height: 18.67, background: 'black'}} />
+                      
+                      {/* Progress Steps - Made Responsive */}
+                      <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: 8}}>
+                          <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
+                              <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, outline: '1px #113D7B solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                                  <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>1</div>
+                              </div>
+                              <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Pool Type</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
+                          <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
+                              <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                                  <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>2</div>
+                              </div>
+                              <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Property Info</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
+                          <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
+                              <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                                  <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>3</div>
+                              </div>
+                              <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Pool Terms</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
+                          <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
+                              <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                                  <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>4</div>
+                              </div>
+                              <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Documents</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
+                          <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
+                              <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                                  <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>5</div>
+                              </div>
+                              <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Liability & Credit Info</div>
+                          </div>
                       </div>
                   </div>
                   
-                  {/* Progress Steps - Made Responsive */}
-                  <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: 8}}>
-                      <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                          <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, outline: '1px #113D7B solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                              <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>1</div>
+                  {/* Pool Type Cards */}
+                  <div style={{alignSelf: 'stretch', flex: '1 1 0', paddingLeft: 8, paddingRight: 8, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
+                      <div style={{width: 480, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                          <div 
+                            style={{
+                              width: 229, 
+                              height: 245, 
+                              padding: 24, 
+                              background: 'white', 
+                              borderRadius: 24, 
+                              outline: '1px #E5E7EB solid', 
+                              outlineOffset: '-1px', 
+                              flexDirection: 'column', 
+                              justifyContent: 'space-between', 
+                              alignItems: 'flex-start', 
+                              display: 'inline-flex', 
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              transform: equityHover ? 'translateY(-2px)' : 'translateY(0)',
+                              boxShadow: equityHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
+                            }}
+                            onClick={() => handlePoolTypeSelect('equity')}
+                            onMouseEnter={() => setEquityHover(true)}
+                            onMouseLeave={() => setEquityHover(false)}
+                          >
+                            <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                              <Image src="/window.svg" alt="Equity Pool icon" width={32} height={32} />
+                            </div>
+                            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                              <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity Pool</div>
+                              <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Borrowing against home value</div>
+                              <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home's value for cash.</div>
+                            </div>
                           </div>
-                          <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Pool Type</div>
-                      </div>
-                      <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
-                      <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                          <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                              <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>2</div>
+                          <div 
+                            style={{
+                              width: 229, 
+                              height: 245, 
+                              padding: 24, 
+                              background: 'white', 
+                              borderRadius: 24, 
+                              outline: '1px #E5E7EB solid', 
+                              outlineOffset: '-1px', 
+                              flexDirection: 'column', 
+                              justifyContent: 'space-between', 
+                              alignItems: 'flex-start', 
+                              display: 'inline-flex', 
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              transform: refinanceHover ? 'translateY(-2px)' : 'translateY(0)',
+                              boxShadow: refinanceHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
+                            }}
+                            onClick={() => handlePoolTypeSelect('refinance')}
+                            onMouseEnter={() => setRefinanceHover(true)}
+                            onMouseLeave={() => setRefinanceHover(false)}
+                          >
+                            <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                              <Image src="/invest.svg" alt="Refinance Pool icon" width={32} height={32} />
+                            </div>
+                            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                              <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Refinance Pool</div>
+                              <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Pay off existing mortgage or debt</div>
+                              <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Refinance pools help you replace high-interest loans with smarter terms.</div>
+                            </div>
                           </div>
-                          <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Property Info</div>
-                      </div>
-                      <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
-                      <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                          <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                              <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>3</div>
-                          </div>
-                          <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Pool Terms</div>
-                      </div>
-                      <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
-                      <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                          <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                              <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>4</div>
-                          </div>
-                          <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Documents</div>
-                      </div>
-                      <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{'>'}</div>
-                      <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                          <div style={{width: 24, height: 24, background: '#F4F4F4', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                              <div style={{textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1, wordWrap: 'break-word'}}>5</div>
-                          </div>
-                          <div style={{color: 'black', fontSize: 11, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.2, wordWrap: 'break-word'}}>Liability & Credit Info</div>
                       </div>
                   </div>
-              </div>
-              
-              {/* Pool Type Cards */}
-              <div style={{alignSelf: 'stretch', flex: '1 1 0', paddingLeft: 8, paddingRight: 8, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{width: 480, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                      <div 
-                        style={{
-                          width: 229, 
-                          height: 245, 
-                          padding: 24, 
-                          background: 'white', 
-                          borderRadius: 24, 
-                          outline: '1px #E5E7EB solid', 
-                          outlineOffset: '-1px', 
-                          flexDirection: 'column', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'flex-start', 
-                          display: 'inline-flex', 
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          transform: equityHover ? 'translateY(-2px)' : 'translateY(0)',
-                          boxShadow: equityHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
-                        }}
-                        onMouseEnter={() => setEquityHover(true)}
-                        onMouseLeave={() => setEquityHover(false)}
-                      >
-                        <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                          <Image src="/window.svg" alt="Equity Pool icon" width={32} height={32} />
-                        </div>
-                        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                          <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity Pool</div>
-                          <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Borrowing against home value</div>
-                          <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home's value for cash.</div>
-                        </div>
-                      </div>
-                      <div 
-                        style={{
-                          width: 229, 
-                          height: 245, 
-                          padding: 24, 
-                          background: 'white', 
-                          borderRadius: 24, 
-                          outline: '1px #E5E7EB solid', 
-                          outlineOffset: '-1px', 
-                          flexDirection: 'column', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'flex-start', 
-                          display: 'inline-flex', 
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          transform: refinanceHover ? 'translateY(-2px)' : 'translateY(0)',
-                          boxShadow: refinanceHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
-                        }}
-                        onMouseEnter={() => setRefinanceHover(true)}
-                        onMouseLeave={() => setRefinanceHover(false)}
-                      >
-                        <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                          <Image src="/invest.svg" alt="Refinance Pool icon" width={32} height={32} />
-                        </div>
-                        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                          <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Refinance Pool</div>
-                          <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Pay off existing mortgage or debt</div>
-                          <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Refinance pools help you replace high-interest loans with smarter terms.</div>
-                        </div>
-                      </div>
-                  </div>
-              </div>
+                </>
+              )}
+
+        {modalStep === 'propertyInfo' && (
+        <div style={{width: '100%', height: '100%', paddingLeft: 32, paddingRight: 32, paddingTop: 24, paddingBottom: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 24, display: 'inline-flex'}}>
+        <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Creating a Pool</div>
+      </div>
+      <div style={{width: 32, height: 32, position: 'relative', overflow: 'hidden'}}>
+        <div style={{width: 18.67, height: 18.67, left: 6.67, top: 6.67, position: 'absolute', background: 'black'}} />
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+      <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+        <div style={{width: 24, height: 24, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>1</div>
+        </div>
+        <div style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Pool Type</div>
+      </div>
+  <div style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>{'>'}</div>
+      <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+        <div style={{width: 24, height: 24, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px #113D7B solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>2</div>
+        </div>
+        <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 2, wordWrap: 'break-word'}}>Property Info</div>
+      </div>
+  <div style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>{'>'}</div>
+      <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+        <div style={{width: 24, height: 24, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>3</div>
+        </div>
+        <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Pool Terms</div>
+      </div>
+  <div style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>{'>'}</div>
+      <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+        <div style={{width: 24, height: 24, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>4</div>
+        </div>
+        <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Documents</div>
+      </div>
+  <div style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>{'>'}</div>
+      <div style={{opacity: 0.50, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+        <div style={{width: 24, height: 24, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>5</div>
+        </div>
+        <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Liability & Credit Info</div>
+      </div>
+    </div>
+  </div>
+  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+    <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Address</div>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+          <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+            <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Address Line</div>
+          </div>
+        </div>
+        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>City</div>
+            </div>
+            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>State</div>
+            </div>
+          </div>
+          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Zip Code</div>
+            </div>
+            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+              <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>United States</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{flex: '1 1 0', borderRadius: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Ownership</div>
+        </div>
+        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>If you own less than 100%, please list the name(s) of any co-owners. Separate multiple names with a comma.</div>
+        <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>% Owned</div>
+            <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+          </div>
+          <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Co owner (Optional)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property value</div>
+          <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+        </div>
+        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Enter your best estimate of the property's current market value. This helps us validate and underwrite your loan faster.</div>
+        <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+          <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>e.g. 100 000</div>
+        </div>
+      </div>
+      <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property link</div>
+          <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+        </div>
+        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>If no link is provided or the URL doesn’t lead to a valid listing, we may request a formal appraisal document in the next step to verify your property’s value.</div>
+        <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+          <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>e.g. Zillow, Redfin etc.</div>
+        </div>
+      </div>
+    </div>
+    <div style={{width: 658, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+      <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 2, display: 'inline-flex'}}>
+        <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Total mortgage balance</div>
+        <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+      </div>
+      <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Enter your best estimate of the property's current market value. This helps us validate and underwrite your loan faster.</div>
+      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+        <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+        <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>e.g. 100 000</div>
+      </div>
+    </div>
+  </div>
+  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+    <div style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Inactive-Blue, #B8C5D7)', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
+      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+    </div>
+  </div>
+</div>
+        )}
             </div>
           </div>
         </div>
