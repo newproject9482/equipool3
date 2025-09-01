@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Toaster, useToaster } from '../../components/Toaster';
 
@@ -19,10 +20,16 @@ export default function PoolsPage() {
   const [selectedPoolType, setSelectedPoolType] = useState<'equity' | 'refinance' | null>(null);
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
+  const router = useRouter();
 
   // Hover states for pool type cards
   const [equityHover, setEquityHover] = useState(false);
   const [refinanceHover, setRefinanceHover] = useState(false);
+
+  const handlePoolClick = (poolId: string) => {
+    // Navigate to the pool detail page
+    router.push(`/pools/${poolId}`);
+  };
 
   const handlePoolTypeSelect = (poolType: 'equity' | 'refinance') => {
     setSelectedPoolType(poolType);
@@ -145,6 +152,10 @@ export default function PoolsPage() {
       <main style={{width: '100%', maxWidth: 1440, height: 515, margin: '0 auto'}}>
         <div style={{width: '100%', height: '100%', paddingTop: 120, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
           <div style={{alignSelf: 'stretch', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+            {/* Breadcrumb Navigation */}
+            <div style={{width: '100%', height: '100%', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+              <div style={{color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pools & Dashboard /</div>
+            </div>
             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
               <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Overview</div>
             </div>
@@ -229,18 +240,31 @@ export default function PoolsPage() {
             </div>
         </div>
   <div style={{width: '100%', maxWidth: 1122, height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'center', alignItems: 'start', margin: '24px auto 0 auto'}}>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-1')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -326,18 +350,31 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-2')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -423,18 +460,31 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-3')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -499,18 +549,31 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-4')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -575,18 +638,31 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-5')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -651,18 +727,31 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-6')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -727,18 +816,31 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-7')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -803,18 +905,31 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+  <div 
+    style={{
+      width: 350,
+      height: 355,
+      padding: 32,
+      paddingBottom: 12,
+      background: 'white',
+      borderRadius: 24,
+      border: '1px solid #E5E7EB',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+    }}
+    onClick={() => handlePoolClick('EP010525-8')}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -1276,8 +1391,8 @@ export default function PoolsPage() {
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                         }}
-                        onMouseEnter={(e) => e.target.style.background = '#0f3469'}
-                        onMouseLeave={(e) => e.target.style.background = '#113D7B'}
+                        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.background = '#0f3469'}
+                        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.background = '#113D7B'}
                       >
                         Continue
                       </button>
@@ -1322,8 +1437,8 @@ export default function PoolsPage() {
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                         }}
-                        onMouseEnter={(e) => e.target.style.background = '#0f3469'}
-                        onMouseLeave={(e) => e.target.style.background = '#113D7B'}
+                        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.background = '#0f3469'}
+                        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.background = '#113D7B'}
                       >
                         Continue
                       </button>
@@ -1368,8 +1483,8 @@ export default function PoolsPage() {
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                         }}
-                        onMouseEnter={(e) => e.target.style.background = '#0f3469'}
-                        onMouseLeave={(e) => e.target.style.background = '#113D7B'}
+                        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.background = '#0f3469'}
+                        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.background = '#113D7B'}
                       >
                         Continue
                       </button>
@@ -1414,8 +1529,8 @@ export default function PoolsPage() {
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
                         }}
-                        onMouseEnter={(e) => e.target.style.background = '#16A34A'}
-                        onMouseLeave={(e) => e.target.style.background = '#22C55E'}
+                        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.background = '#16A34A'}
+                        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.background = '#22C55E'}
                       >
                         Complete
                       </button>
