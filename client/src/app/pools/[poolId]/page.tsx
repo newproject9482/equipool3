@@ -10,7 +10,6 @@ export default function PoolDetailPage() {
   const poolId = params.poolId as string;
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'documents'>('overview');
 
   const handleLogout = () => {
@@ -25,7 +24,7 @@ export default function PoolDetailPage() {
 
   // Close profile menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = () => {
       if (showProfileMenu) {
         setShowProfileMenu(false);
       }
@@ -89,7 +88,7 @@ export default function PoolDetailPage() {
             </>
           ) : (
             <>
-              <button className="ep-nav-login" onClick={() => setShowLoginModal(true)} style={{cursor: 'pointer'}}>Login</button>
+              <button className="ep-nav-login" onClick={() => alert('Login functionality coming soon!')} style={{cursor: 'pointer'}}>Login</button>
               <button className="ep-cta-join" onClick={() => router.push('/')} style={{cursor: 'pointer'}}>Join Equipool</button>
             </>
           )}

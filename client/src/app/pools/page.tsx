@@ -17,7 +17,6 @@ export default function PoolsPage() {
   
   // Modal step management
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedPoolType, setSelectedPoolType] = useState<'equity' | 'refinance' | null>(null);
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
   const router = useRouter();
@@ -32,7 +31,6 @@ export default function PoolsPage() {
   };
 
   const handlePoolTypeSelect = (poolType: 'equity' | 'refinance') => {
-    setSelectedPoolType(poolType);
     setCurrentStep(2);
   };
 
@@ -43,14 +41,12 @@ export default function PoolsPage() {
       // Final step - close modal or handle completion
       setShowCreatePoolModal(false);
       setCurrentStep(1);
-      setSelectedPoolType(null);
     }
   };
 
   const handleCloseModal = () => {
     setShowCreatePoolModal(false);
     setCurrentStep(1);
-    setSelectedPoolType(null);
   };
 
   useEffect(() => {
@@ -67,7 +63,7 @@ export default function PoolsPage() {
           }
           return;
         }
-      } catch (error) {
+      } catch {
         // Ignore auth check errors
       }
       // Fallback to localStorage
@@ -1117,7 +1113,7 @@ export default function PoolsPage() {
         <LoginModal 
           onClose={() => setShowLoginModal(false)}
           onSwitchToSignUp={() => { setShowLoginModal(false); window.location.href = '/'; }}
-          onSuccess={(role) => { setIsAuthenticated(true); setShowLoginModal(false); }}
+          onSuccess={() => { setIsAuthenticated(true); setShowLoginModal(false); }}
           showSuccess={showSuccess}
           showError={showError}
         />
@@ -1316,7 +1312,7 @@ export default function PoolsPage() {
                           <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
                             <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity Pool</div>
                             <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Borrowing against home value</div>
-                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home's value for cash.</div>
+                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home&apos;s value for cash.</div>
                           </div>
                         </div>
                         <div 
