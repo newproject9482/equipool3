@@ -192,7 +192,7 @@ export default function PoolsPage() {
               </div>
             </div>
             <div 
-              style={{alignSelf: 'stretch', paddingLeft: 40, paddingRight: 40, paddingTop: 24, paddingBottom: 24, background: '#E4EFFF', overflow: 'hidden', borderRadius: 24, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
+              style={{width: '100%', height: '100%', paddingLeft: 40, paddingRight: 40, paddingTop: 24, paddingBottom: 24, background: '#E4EFFF', overflow: 'hidden', borderRadius: 24, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
               onClick={() => setShowCreatePoolModal(true)}
             >
               <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
@@ -1171,7 +1171,7 @@ export default function PoolsPage() {
                         style={{width: 32, height: 32, position: 'relative', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
                         onClick={handleCloseModal}
                       >
-                          <div style={{width: 18.67, height: 18.67, background: 'black'}} />
+                          <Image src="/material-symbols-close.svg" alt="Close" width={32} height={32} />
                       </div>
                   </div>
                   
