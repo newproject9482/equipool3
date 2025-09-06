@@ -91,6 +91,7 @@ export default function PoolsPage() {
   const [propertyValue, setPropertyValue] = useState('');
   const [mortgageBalance, setMortgageBalance] = useState('');
   const [propertyLink, setPropertyLink] = useState('');
+  const [poolAmount, setPoolAmount] = useState('');
   const [roiRate, setRoiRate] = useState('');
   const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
 
@@ -2291,10 +2292,12 @@ export default function PoolsPage() {
                         <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
                         <input
                           type="text"
+                          value={poolAmount}
+                          onChange={(e) => setPoolAmount(e.target.value)}
                           placeholder="e.g. 350 000"
                           style={{
                             flex: '1 1 0',
-                            color: '#B2B2B2',
+                            color: poolAmount ? 'black' : '#B2B2B2',
                             fontSize: 14,
                             fontFamily: 'var(--ep-font-avenir)',
                             fontWeight: '500',
@@ -2440,9 +2443,56 @@ export default function PoolsPage() {
                   
                   {/* Continue Button */}
                   <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                    <div style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Inactive-Blue, #B8C5D7)', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
+                    <div 
+                      style={{
+                        paddingLeft: 16, 
+                        paddingRight: 16, 
+                        paddingTop: 10, 
+                        paddingBottom: 10, 
+                        background: (poolAmount && roiRate) ? '#113D7B' : 'var(--Inactive-Blue, #B8C5D7)', 
+                        boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
+                        borderRadius: 12, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 6, 
+                        display: 'inline-flex',
+                        cursor: (poolAmount && roiRate) ? 'pointer' : 'not-allowed',
+                        opacity: (poolAmount && roiRate) ? 1 : 0.6
+                      }}
+                      onClick={() => {
+                        if (poolAmount && roiRate) {
+                          setCurrentStep(4);
+                        }
+                      }}
+                    >
                       <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 4 && (
+                /* Documents Step - Blank Placeholder */
+                <div style={{
+                  alignSelf: 'stretch', 
+                  flex: '1 1 0', 
+                  padding: '24px 32px', 
+                  flexDirection: 'column', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  gap: 24, 
+                  display: 'flex',
+                  overflow: 'auto'
+                }}>
+                  <div style={{
+                    textAlign: 'center',
+                    color: '#767676',
+                    fontSize: 16,
+                    fontFamily: 'var(--ep-font-avenir)',
+                    fontWeight: '400',
+                    wordWrap: 'break-word'
+                  }}>
+                    Documents step - Content to be added
                   </div>
                 </div>
               )}
