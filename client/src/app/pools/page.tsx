@@ -3163,6 +3163,326 @@ export default function PoolsPage() {
                     </div>
 
                   </div>
+                  
+                  {/* Continue Button */}
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 24}}>
+                    <div 
+                      style={{
+                        paddingLeft: 16, 
+                        paddingRight: 16, 
+                        paddingTop: 10, 
+                        paddingBottom: 10, 
+                        background: '#113D7B', 
+                        boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
+                        borderRadius: 12, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 6, 
+                        display: 'inline-flex',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => setCurrentStep(6)}
+                    >
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 6 && (
+                /* Review & Submit Step */
+                <div style={{
+                  alignSelf: 'stretch', 
+                  flex: '1 1 0', 
+                  padding: '24px 32px', 
+                  flexDirection: 'column', 
+                  justifyContent: 'flex-start', 
+                  alignItems: 'flex-start', 
+                  gap: 24, 
+                  display: 'flex',
+                  overflow: 'auto'
+                }}>
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                    
+                    {/* Header Section */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: 'black',
+                        fontSize: 18,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>Review your pool details</div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        wordWrap: 'break-word'
+                      }}>Please review all information before submitting your pool request.</div>
+                    </div>
+
+                    {/* Pool Type Summary */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      padding: 16,
+                      background: '#F9FAFB',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: 'black',
+                        fontSize: 14,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>Pool Type</div>
+                      <div style={{
+                        color: '#4B5563',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        wordWrap: 'break-word'
+                      }}>{selectedPoolType === 'equity' ? 'Equity Pool' : 'Refinance Pool'}</div>
+                    </div>
+
+                    {/* Property Information Summary */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      padding: 16,
+                      background: '#F9FAFB',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: 'black',
+                        fontSize: 14,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>Property Information</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 8,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#6B7280',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Address:</div>
+                          <div style={{
+                            color: '#4B5563',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>{addressLine}, {city}, {state} {zipCode}</div>
+                        </div>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#6B7280',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Ownership:</div>
+                          <div style={{
+                            color: '#4B5563',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>{percentOwned}%{coOwner ? ` (Co-owner: ${coOwner})` : ''}</div>
+                        </div>
+                        {propertyValue && (
+                          <div style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: '100%',
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              color: '#6B7280',
+                              fontSize: 12,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '400',
+                              wordWrap: 'break-word'
+                            }}>Property Value:</div>
+                            <div style={{
+                              color: '#4B5563',
+                              fontSize: 12,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>${propertyValue}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Pool Terms Summary */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      padding: 16,
+                      background: '#F9FAFB',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: 'black',
+                        fontSize: 14,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>Pool Terms</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 8,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#6B7280',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Amount Requested:</div>
+                          <div style={{
+                            color: '#4B5563',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>${poolAmount}</div>
+                        </div>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#6B7280',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Interest Rate:</div>
+                          <div style={{
+                            color: '#4B5563',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>{roiRate}%</div>
+                        </div>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#6B7280',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Term:</div>
+                          <div style={{
+                            color: '#4B5563',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>{selectedTerm === 'custom' ? 'Custom' : `${selectedTerm} Months`}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  
+                  {/* Submit Button */}
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 24}}>
+                    <div 
+                      style={{
+                        paddingLeft: 24, 
+                        paddingRight: 24, 
+                        paddingTop: 12, 
+                        paddingBottom: 12, 
+                        background: '#10B981', 
+                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', 
+                        borderRadius: 12, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 8, 
+                        display: 'inline-flex',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => {
+                        // Handle pool submission here
+                        showSuccess('Pool request submitted successfully!');
+                        setShowCreatePoolModal(false);
+                        setCurrentStep(1); // Reset for next use
+                      }}
+                    >
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Submit Pool Request</div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
