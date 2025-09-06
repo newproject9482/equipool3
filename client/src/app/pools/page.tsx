@@ -2859,6 +2859,310 @@ export default function PoolsPage() {
                     </div>
 
                   </div>
+                  
+                  {/* Continue Button */}
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 24}}>
+                    <div 
+                      style={{
+                        paddingLeft: 16, 
+                        paddingRight: 16, 
+                        paddingTop: 10, 
+                        paddingBottom: 10, 
+                        background: '#113D7B', 
+                        boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
+                        borderRadius: 12, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 6, 
+                        display: 'inline-flex',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => setCurrentStep(5)}
+                    >
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 5 && (
+                /* Liability & Credit Info Step */
+                <div style={{
+                  alignSelf: 'stretch', 
+                  flex: '1 1 0', 
+                  padding: '24px 32px', 
+                  flexDirection: 'column', 
+                  justifyContent: 'flex-start', 
+                  alignItems: 'flex-start', 
+                  gap: 24, 
+                  display: 'flex',
+                  overflow: 'auto'
+                }}>
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                    
+                    {/* Header Section */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: 'black',
+                        fontSize: 16,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>Other existing liabilities</div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        wordWrap: 'break-word'
+                      }}>Give us a picture of your current financial obligations.</div>
+                    </div>
+
+                    {/* Other Property-Secured Loans */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Other property-secured loans</div>
+                        <div style={{
+                          color: '#767676',
+                          fontSize: 12,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '400',
+                          wordWrap: 'break-word'
+                        }}>(Optional)</div>
+                      </div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        lineHeight: 1.4,
+                        wordWrap: 'break-word'
+                      }}>Include any outstanding loans backed by real estate you own.</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        height: 39,
+                        paddingLeft: 12,
+                        paddingRight: 12,
+                        paddingTop: 10,
+                        paddingBottom: 10,
+                        background: '#F4F4F4',
+                        borderRadius: 10,
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 10,
+                        display: 'inline-flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>$</div>
+                        <input
+                          type="text"
+                          placeholder="e.g. 100 000"
+                          style={{
+                            flex: '1 1 0',
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word',
+                            border: 'none',
+                            background: 'transparent',
+                            outline: 'none',
+                            width: '100%'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Credit Card Debt / Consumer Loans */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Credit card debt / consumer loans</div>
+                        <div style={{
+                          color: '#767676',
+                          fontSize: 12,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '400',
+                          wordWrap: 'break-word'
+                        }}>(Optional)</div>
+                      </div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        lineHeight: 1.4,
+                        wordWrap: 'break-word'
+                      }}>Include credit card balances, personal loans, car loans, or buy-now-pay-later programs.</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        height: 39,
+                        paddingLeft: 12,
+                        paddingRight: 12,
+                        paddingTop: 10,
+                        paddingBottom: 10,
+                        background: '#F4F4F4',
+                        borderRadius: 10,
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 10,
+                        display: 'inline-flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>$</div>
+                        <input
+                          type="text"
+                          placeholder="e.g. 100 000"
+                          style={{
+                            flex: '1 1 0',
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word',
+                            border: 'none',
+                            background: 'transparent',
+                            outline: 'none',
+                            width: '100%'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Monthly Debt Payments */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Monthly debt payments</div>
+                        <div style={{
+                          color: '#767676',
+                          fontSize: 12,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '400',
+                          wordWrap: 'break-word'
+                        }}>(Optional)</div>
+                      </div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        lineHeight: 1.4,
+                        wordWrap: 'break-word'
+                      }}>Estimate your total monthly debt payments across all loans and credit.</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        height: 39,
+                        paddingLeft: 12,
+                        paddingRight: 12,
+                        paddingTop: 10,
+                        paddingBottom: 10,
+                        background: '#F4F4F4',
+                        borderRadius: 10,
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 10,
+                        display: 'inline-flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Monthly</div>
+                        <input
+                          type="text"
+                          placeholder="e.g. 100 000"
+                          style={{
+                            flex: '1 1 0',
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word',
+                            border: 'none',
+                            background: 'transparent',
+                            outline: 'none',
+                            width: '100%'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
               )}
             </div>
