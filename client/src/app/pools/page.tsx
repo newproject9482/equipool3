@@ -91,6 +91,8 @@ export default function PoolsPage() {
   const [propertyValue, setPropertyValue] = useState('');
   const [mortgageBalance, setMortgageBalance] = useState('');
   const [propertyLink, setPropertyLink] = useState('');
+  const [roiRate, setRoiRate] = useState('');
+  const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
 
   useEffect(() => {
     let cancelled = false;
@@ -2317,8 +2319,26 @@ export default function PoolsPage() {
                         </div>
                         <div style={{color: '#767676', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>What return are you offering to your investor?</div>
                       </div>
-                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: '#F4F4F4', borderRadius: 10, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: '#F4F4F4', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                         <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>%</div>
+                        <input
+                          type="text"
+                          value={roiRate}
+                          onChange={(e) => setRoiRate(e.target.value)}
+                          placeholder="e.g. 8.5"
+                          style={{
+                            flex: '1 1 0',
+                            color: roiRate ? 'black' : '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word',
+                            border: 'none',
+                            background: 'transparent',
+                            outline: 'none',
+                            width: '100%'
+                          }}
+                        />
                         <div style={{width: 16, height: 16, position: 'relative'}}>
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M8 0L9.79 5.52L16 4.64L11.36 8L16 11.36L9.79 10.48L8 16L6.21 10.48L0 11.36L4.64 8L0 4.64L6.21 5.52L8 0Z" fill="#B2B2B2"/>
@@ -2336,41 +2356,93 @@ export default function PoolsPage() {
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
                         
                         {/* 6 Months Option */}
-                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
+                          onClick={() => setSelectedTerm('6')}
+                        >
                           <div style={{width: 16, height: 16, position: 'relative'}}>
-                            <div style={{width: 16, height: 16, border: '1.5px #B2B2B2 solid', borderRadius: 50}} />
+                            {selectedTerm === '6' ? (
+                              <>
+                                <div style={{width: 16, height: 16, background: '#113D7B', borderRadius: 50}} />
+                                <div style={{width: 6, height: 6, background: 'white', borderRadius: 50, position: 'absolute', top: 5, left: 5}} />
+                              </>
+                            ) : (
+                              <div style={{width: 16, height: 16, border: '1.5px #B2B2B2 solid', borderRadius: 50}} />
+                            )}
                           </div>
                           <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>6 Months</div>
                         </div>
 
-                        {/* 12 Months Option (Selected) */}
-                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                        {/* 12 Months Option */}
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
+                          onClick={() => setSelectedTerm('12')}
+                        >
                           <div style={{width: 16, height: 16, position: 'relative'}}>
-                            <div style={{width: 16, height: 16, background: '#113D7B', borderRadius: 50}} />
-                            <div style={{width: 6, height: 6, background: 'white', borderRadius: 50, position: 'absolute', top: 5, left: 5}} />
+                            {selectedTerm === '12' ? (
+                              <>
+                                <div style={{width: 16, height: 16, background: '#113D7B', borderRadius: 50}} />
+                                <div style={{width: 6, height: 6, background: 'white', borderRadius: 50, position: 'absolute', top: 5, left: 5}} />
+                              </>
+                            ) : (
+                              <div style={{width: 16, height: 16, border: '1.5px #B2B2B2 solid', borderRadius: 50}} />
+                            )}
                           </div>
                           <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>12 Months</div>
                         </div>
 
                         {/* 24 Months Option */}
-                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
+                          onClick={() => setSelectedTerm('24')}
+                        >
                           <div style={{width: 16, height: 16, position: 'relative'}}>
-                            <div style={{width: 16, height: 16, border: '1.5px #B2B2B2 solid', borderRadius: 50}} />
+                            {selectedTerm === '24' ? (
+                              <>
+                                <div style={{width: 16, height: 16, background: '#113D7B', borderRadius: 50}} />
+                                <div style={{width: 6, height: 6, background: 'white', borderRadius: 50, position: 'absolute', top: 5, left: 5}} />
+                              </>
+                            ) : (
+                              <div style={{width: 16, height: 16, border: '1.5px #B2B2B2 solid', borderRadius: 50}} />
+                            )}
                           </div>
                           <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>24 Months</div>
                         </div>
 
                         {/* Or Custom */}
-                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
+                          onClick={() => setSelectedTerm('custom')}
+                        >
                           <div style={{color: '#767676', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>or</div>
-                          <div style={{padding: '4px 8px', background: '#F4F4F4', borderRadius: 6, justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
-                            <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Custom</div>
+                          <div style={{
+                            padding: '4px 8px', 
+                            background: selectedTerm === 'custom' ? '#113D7B' : '#F4F4F4', 
+                            borderRadius: 6, 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            display: 'inline-flex'
+                          }}>
+                            <div style={{
+                              color: selectedTerm === 'custom' ? 'white' : 'black', 
+                              fontSize: 12, 
+                              fontFamily: 'var(--ep-font-avenir)', 
+                              fontWeight: '500', 
+                              wordWrap: 'break-word'
+                            }}>Custom</div>
                           </div>
                         </div>
 
                       </div>
                     </div>
 
+                  </div>
+                  
+                  {/* Continue Button */}
+                  <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                    <div style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Inactive-Blue, #B8C5D7)', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                    </div>
                   </div>
                 </div>
               )}
