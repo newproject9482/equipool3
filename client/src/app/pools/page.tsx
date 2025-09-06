@@ -2465,34 +2465,399 @@ export default function PoolsPage() {
                         }
                       }}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                     </div>
                   </div>
                 </div>
               )}
 
               {currentStep === 4 && (
-                /* Documents Step - Blank Placeholder */
+                /* Documents Step - 2x2 Grid Layout */
                 <div style={{
                   alignSelf: 'stretch', 
                   flex: '1 1 0', 
                   padding: '24px 32px', 
                   flexDirection: 'column', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
+                  justifyContent: 'flex-start', 
+                  alignItems: 'flex-start', 
                   gap: 24, 
                   display: 'flex',
                   overflow: 'auto'
                 }}>
+                  {/* 2x2 Grid Container */}
                   <div style={{
-                    textAlign: 'center',
-                    color: '#767676',
-                    fontSize: 16,
-                    fontFamily: 'var(--ep-font-avenir)',
-                    fontWeight: '400',
-                    wordWrap: 'break-word'
+                    width: '100%',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateRows: '1fr 1fr',
+                    gap: 20,
+                    height: '100%'
                   }}>
-                    Documents step - Content to be added
+                    
+                    {/* Top Left - Home Insurance PDF */}
+                    <div style={{
+                      padding: 20,
+                      background: 'white',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 4,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Home insurance (PDF)</div>
+                      </div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        lineHeight: 1.4,
+                        wordWrap: 'break-word'
+                      }}>Add your most recent home insurance policy. Boosts credibility and reduces approval friction.</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flex: '1 1 0',
+                        padding: 16,
+                        background: '#F9F9F9',
+                        borderRadius: 8,
+                        border: '2px dashed #D1D5DB',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 4,
+                          display: 'flex'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                        <div style={{
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 2,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>Upload a file</div>
+                          <div style={{
+                            color: '#767676',
+                            fontSize: 10,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Drag and drop or click to upload</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Top Right - Recent Tax Return PDF */}
+                    <div style={{
+                      padding: 20,
+                      background: 'white',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 4,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Recent tax return (PDF)</div>
+                      </div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        lineHeight: 1.4,
+                        wordWrap: 'break-word'
+                      }}>Upload a recent tax return to strengthen your financial profile. Helps validate your repayment capacity.</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flex: '1 1 0',
+                        padding: 16,
+                        background: '#F9F9F9',
+                        borderRadius: 8,
+                        border: '2px dashed #D1D5DB',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 4,
+                          display: 'flex'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                        <div style={{
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 2,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>Upload a file</div>
+                          <div style={{
+                            color: '#767676',
+                            fontSize: 10,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Drag and drop or click to upload</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Left - Appraisal PDF (Optional) */}
+                    <div style={{
+                      padding: 20,
+                      background: 'white',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Appraisal PDF</div>
+                        <div style={{
+                          color: '#767676',
+                          fontSize: 10,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '400',
+                          wordWrap: 'break-word'
+                        }}>(Optional)</div>
+                      </div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        lineHeight: 1.4,
+                        wordWrap: 'break-word'
+                      }}>The most recent appraisal can increase investor confidence.</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flex: '1 1 0',
+                        padding: 16,
+                        background: '#F9F9F9',
+                        borderRadius: 8,
+                        border: '2px dashed #D1D5DB',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 4,
+                          display: 'flex'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                        <div style={{
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 2,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>Upload a file</div>
+                          <div style={{
+                            color: '#767676',
+                            fontSize: 10,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Drag and drop or click to upload</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Right - Property Photos */}
+                    <div style={{
+                      padding: 20,
+                      background: 'white',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 4,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: 'black',
+                          fontSize: 14,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>Property photos</div>
+                      </div>
+                      <div style={{
+                        color: '#767676',
+                        fontSize: 12,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '400',
+                        lineHeight: 1.4,
+                        wordWrap: 'break-word'
+                      }}>Upload clear exterior and interior photos (2–10). Transparency improves your chances of funding.</div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flex: '1 1 0',
+                        padding: 16,
+                        background: '#F9F9F9',
+                        borderRadius: 8,
+                        border: '2px dashed #D1D5DB',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}>
+                        <div style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 4,
+                          display: 'flex'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="12" height="12" rx="1.33" ry="1.33" stroke="#9CA3AF" strokeWidth="1.33"/>
+                            <circle cx="5.67" cy="5.67" r="1" stroke="#9CA3AF" strokeWidth="1.33"/>
+                            <polyline points="14,10 10.67,6.67 3.33,14" stroke="#9CA3AF" strokeWidth="1.33"/>
+                          </svg>
+                        </div>
+                        <div style={{
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 2,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 12,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>Upload images</div>
+                          <div style={{
+                            color: '#767676',
+                            fontSize: 10,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '400',
+                            wordWrap: 'break-word'
+                          }}>Drag and drop or click to upload</div>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               )}
