@@ -88,6 +88,9 @@ export default function PoolsPage() {
   const [zipCode, setZipCode] = useState('');
   const [percentOwned, setPercentOwned] = useState('');
   const [coOwner, setCoOwner] = useState('');
+  const [propertyValue, setPropertyValue] = useState('');
+  const [mortgageBalance, setMortgageBalance] = useState('');
+  const [propertyLink, setPropertyLink] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -2151,7 +2154,24 @@ export default function PoolsPage() {
                           <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Enter your best estimate of the property's current market value. This helps us validate and underwrite your loan faster.</div>
                           <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                               <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>e.g. 100 000</div>
+                              <input
+                                type="text"
+                                value={propertyValue}
+                                onChange={(e) => setPropertyValue(e.target.value)}
+                                placeholder="e.g. 100 000"
+                                style={{
+                                  flex: '1 1 0',
+                                  color: propertyValue ? 'var(--Black, black)' : 'var(--Mid-Grey, #B2B2B2)',
+                                  fontSize: 14,
+                                  fontFamily: 'var(--ep-font-avenir)',
+                                  fontWeight: '500',
+                                  wordWrap: 'break-word',
+                                  border: 'none',
+                                  background: 'transparent',
+                                  outline: 'none',
+                                  width: '100%'
+                                }}
+                              />
                           </div>
                       </div>
                       <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
@@ -2161,7 +2181,24 @@ export default function PoolsPage() {
                           </div>
                           <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>If no link is provided or the URL doesn't lead to a valid listing, we may request a formal appraisal document in the next step to verify your property's value.</div>
                           <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>e.g. Zillow, Redfin etc.</div>
+                              <input
+                                type="text"
+                                value={propertyLink}
+                                onChange={(e) => setPropertyLink(e.target.value)}
+                                placeholder="e.g. Zillow, Redfin etc."
+                                style={{
+                                  flex: '1 1 0',
+                                  color: propertyLink ? 'var(--Black, black)' : 'var(--Mid-Grey, #B2B2B2)',
+                                  fontSize: 14,
+                                  fontFamily: 'var(--ep-font-avenir)',
+                                  fontWeight: '500',
+                                  wordWrap: 'break-word',
+                                  border: 'none',
+                                  background: 'transparent',
+                                  outline: 'none',
+                                  width: '100%'
+                                }}
+                              />
                           </div>
                       </div>
                   </div>
@@ -2174,8 +2211,166 @@ export default function PoolsPage() {
                       <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Enter your best estimate of the property's current market value. This helps us validate and underwrite your loan faster.</div>
                       <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                           <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                          <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>e.g. 100 000</div>
+                          <input
+                            type="text"
+                            value={mortgageBalance}
+                            onChange={(e) => setMortgageBalance(e.target.value)}
+                            placeholder="e.g. 100 000"
+                            style={{
+                              flex: '1 1 0',
+                              color: mortgageBalance ? 'var(--Black, black)' : 'var(--Mid-Grey, #B2B2B2)',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word',
+                              border: 'none',
+                              background: 'transparent',
+                              outline: 'none',
+                              width: '100%'
+                            }}
+                          />
                       </div>
+                  </div>
+                  
+                  {/* Footer Component */}
+                  <div style={{alignSelf: 'stretch', marginTop: 24, display: 'flex', justifyContent: 'center'}}>
+                      <div 
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 4,
+                          padding: '6px 12px',
+                          background: (addressLine && city && state && zipCode && percentOwned) ? '#113D7B' : '#B2B2B2',
+                          borderRadius: 6,
+                          cursor: (addressLine && city && state && zipCode && percentOwned) ? 'pointer' : 'not-allowed',
+                          width: 'auto',
+                          opacity: (addressLine && city && state && zipCode && percentOwned) ? 1 : 0.6
+                        }}
+                        onClick={() => {
+                          if (addressLine && city && state && zipCode && percentOwned) {
+                            setCurrentStep(3);
+                          }
+                        }}
+                      >
+                          <div style={{
+                              color: 'white',
+                              fontSize: 11,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500'
+                          }}>Continue</div>
+                      </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 3 && (
+                /* Pool Terms - Form Content */
+                <div style={{
+                  alignSelf: 'stretch', 
+                  flex: '1 1 0', 
+                  padding: '24px 32px', 
+                  flexDirection: 'column', 
+                  justifyContent: 'flex-start', 
+                  alignItems: 'flex-start', 
+                  gap: 24, 
+                  display: 'flex',
+                  overflow: 'auto'
+                }}>
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                    
+                    {/* Amount Input */}
+                    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Amount</div>
+                        <div style={{color: '#767676', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>How much are you requesting?</div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: '#F4F4F4', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                        <input
+                          type="text"
+                          placeholder="e.g. 350 000"
+                          style={{
+                            flex: '1 1 0',
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word',
+                            border: 'none',
+                            background: 'transparent',
+                            outline: 'none',
+                            width: '100%'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Pool ROI / Interest Rate Input */}
+                    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 2, display: 'flex'}}>
+                          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pool ROI / Interest rate</div>
+                          <div style={{padding: '2px 8px', background: '#E7F3FF', borderRadius: 4, justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+                            <div style={{color: '#0066CC', fontSize: 10, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>Recommended range: 6% – 12%</div>
+                          </div>
+                        </div>
+                        <div style={{color: '#767676', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>What return are you offering to your investor?</div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: '#F4F4F4', borderRadius: 10, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>%</div>
+                        <div style={{width: 16, height: 16, position: 'relative'}}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 0L9.79 5.52L16 4.64L11.36 8L16 11.36L9.79 10.48L8 16L6.21 10.48L0 11.36L4.64 8L0 4.64L6.21 5.52L8 0Z" fill="#B2B2B2"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Term Selection */}
+                    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Term</div>
+                        <div style={{color: '#767676', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>How long will you need to repay the loan?</div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
+                        
+                        {/* 6 Months Option */}
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                          <div style={{width: 16, height: 16, position: 'relative'}}>
+                            <div style={{width: 16, height: 16, border: '1.5px #B2B2B2 solid', borderRadius: 50}} />
+                          </div>
+                          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>6 Months</div>
+                        </div>
+
+                        {/* 12 Months Option (Selected) */}
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                          <div style={{width: 16, height: 16, position: 'relative'}}>
+                            <div style={{width: 16, height: 16, background: '#113D7B', borderRadius: 50}} />
+                            <div style={{width: 6, height: 6, background: 'white', borderRadius: 50, position: 'absolute', top: 5, left: 5}} />
+                          </div>
+                          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>12 Months</div>
+                        </div>
+
+                        {/* 24 Months Option */}
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                          <div style={{width: 16, height: 16, position: 'relative'}}>
+                            <div style={{width: 16, height: 16, border: '1.5px #B2B2B2 solid', borderRadius: 50}} />
+                          </div>
+                          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>24 Months</div>
+                        </div>
+
+                        {/* Or Custom */}
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                          <div style={{color: '#767676', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>or</div>
+                          <div style={{padding: '4px 8px', background: '#F4F4F4', borderRadius: 6, justifyContent: 'center', alignItems: 'center', display: 'inline-flex'}}>
+                            <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Custom</div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               )}
