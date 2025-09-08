@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { Toaster, useToaster } from '../../components/Toaster';
 
 const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
 
 export default function PoolsPage() {
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -185,7 +187,7 @@ export default function PoolsPage() {
                 <Image src="/profile.svg" alt="Profile" width={16} height={16} />
                 {showProfileMenu && (
                   <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Pools & Dashboard</button>
+                    <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => window.location.href = '/pools'}>Pools & Dashboard</button>
                     <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
                     <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
                   </div>
@@ -205,6 +207,12 @@ export default function PoolsPage() {
       <main style={{width: '100%', maxWidth: 1440, height: 515, margin: '0 auto'}}>
         <div style={{width: '100%', height: '100%', paddingTop: 120, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
           <div style={{alignSelf: 'stretch', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+            {/* Breadcrumb */}
+            <div style={{alignSelf: 'stretch', paddingBottom: 16}}>
+              <div>
+                <span style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pools & Dashboard</span>
+              </div>
+            </div>
             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
               <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Overview</div>
             </div>
@@ -367,8 +375,20 @@ export default function PoolsPage() {
     border: '1px solid #E5E7EB',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between'
-  }}>
+    justifyContent: 'space-between',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  }}
+  onClick={() => router.push('/pools/EP010525')}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = 'translateY(-2px)';
+    e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = 'translateY(0)';
+    e.currentTarget.style.boxShadow = 'none';
+  }}
+  >
     {/* Header */}
     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
       <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
@@ -2879,7 +2899,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(5)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                     </div>
                   </div>
                 </div>
@@ -3183,7 +3203,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(6)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                     </div>
                   </div>
                 </div>
@@ -3480,7 +3500,7 @@ export default function PoolsPage() {
                         setCurrentStep(1); // Reset for next use
                       }}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Submit Pool Request</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit Pool Request</div>
                     </div>
                   </div>
                 </div>
