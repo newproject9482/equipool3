@@ -1249,6 +1249,164 @@ export default function PoolDetailPage() {
                 </div>
               </>
             )}
+
+            {/* Recent Activity Section - Common to both tabs */}
+            <div style={{
+              width: '100%',
+              padding: 32,
+              background: 'white',
+              borderRadius: 24,
+              border: '1px solid #E5E7EB',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              gap: 24,
+              display: 'flex',
+              marginTop: 24
+            }}>
+              {/* Recent Activity Header */}
+              <div style={{
+                alignSelf: 'stretch',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                display: 'flex'
+              }}>
+                <div style={{
+                  color: 'black',
+                  fontSize: 20,
+                  fontFamily: 'var(--ep-font-avenir)',
+                  fontWeight: '500',
+                  wordWrap: 'break-word'
+                }}>
+                  Recent activity
+                </div>
+                <div style={{
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 16,
+                  display: 'flex'
+                }}>
+                  <div style={{
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: 8,
+                    display: 'flex'
+                  }}>
+                    <div style={{
+                      color: '#767676',
+                      fontSize: 14,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '500',
+                      wordWrap: 'break-word'
+                    }}>
+                      Filters
+                    </div>
+                    <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3.88889 4H10.1111C10.2143 4 10.3132 4.04162 10.3861 4.11571C10.459 4.1898 10.5 4.29028 10.5 4.39506V5.02162C10.5 5.12638 10.459 5.22685 10.3861 5.30092L7.89172 7.83482C7.81879 7.90889 7.7778 8.00935 7.77778 8.11412V10.605C7.77778 10.665 7.7643 10.7243 7.73837 10.7782C7.71244 10.8322 7.67474 10.8794 7.62814 10.9164C7.58154 10.9533 7.52726 10.979 7.46942 10.9914C7.41159 11.0039 7.35173 11.0028 7.29439 10.9882L6.51661 10.7906C6.43252 10.7692 6.35787 10.7199 6.30453 10.6505C6.2512 10.581 6.22222 10.4955 6.22222 10.4074V8.11412C6.2222 8.00935 6.18121 7.90889 6.10828 7.83482L3.61394 5.30092C3.54101 5.22685 3.50002 5.12638 3.5 5.02162V4.39506C3.5 4.29028 3.54097 4.1898 3.6139 4.11571C3.68683 4.04162 3.78575 4 3.88889 4Z" stroke="#767676" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div style={{
+                    paddingLeft: 12,
+                    paddingRight: 12,
+                    paddingTop: 8,
+                    paddingBottom: 8,
+                    borderRadius: 12,
+                    border: '1px solid #E5E7EB',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 8,
+                    display: 'flex',
+                    cursor: 'pointer'
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12.6667 2.66667H3.33333C2.59695 2.66667 2 3.26362 2 4V12C2 12.7364 2.59695 13.3333 3.33333 13.3333H12.6667C13.403 13.3333 14 12.7364 14 12V4C14 3.26362 13.403 2.66667 12.6667 2.66667Z" stroke="black" strokeWidth="1.5"/>
+                      <path d="M2 5.33333H14" stroke="black" strokeWidth="1.5"/>
+                      <path d="M5.33594 1.33333V4" stroke="black" strokeWidth="1.5" strokeLinecap="round"/>
+                      <path d="M10.6641 1.33333V4" stroke="black" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    <div style={{
+                      color: 'black',
+                      fontSize: 14,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '500',
+                      wordWrap: 'break-word'
+                    }}>
+                      Date
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Activity Item */}
+              <div style={{
+                alignSelf: 'stretch',
+                padding: 20,
+                background: '#F9F9F9',
+                borderRadius: 16,
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                display: 'flex'
+              }}>
+                <div style={{
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 16,
+                  display: 'flex'
+                }}>
+                  <div style={{
+                    width: 40,
+                    height: 40,
+                    background: '#E4EFFF',
+                    borderRadius: 20,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex'
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16.25 6.875L8.125 15L3.75 10.625" stroke="#113D7B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div style={{
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    gap: 4,
+                    display: 'flex'
+                  }}>
+                    <div style={{
+                      color: 'black',
+                      fontSize: 16,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '500',
+                      wordWrap: 'break-word'
+                    }}>
+                      Your pool was submitted successfully
+                    </div>
+                    <div style={{
+                      maxWidth: 500,
+                      color: '#767676',
+                      fontSize: 14,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '400',
+                      lineHeight: '20px',
+                      wordWrap: 'break-word'
+                    }}>
+                      Our system is now reviewing your data for eligibility and compliance.<br/>
+                      You'll be notified once it's ready to share with investors.
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  color: '#767676',
+                  fontSize: 14,
+                  fontFamily: 'var(--ep-font-avenir)',
+                  fontWeight: '500',
+                  wordWrap: 'break-word'
+                }}>
+                  12/05/2024
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
