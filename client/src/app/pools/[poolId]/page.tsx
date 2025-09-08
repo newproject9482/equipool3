@@ -10,6 +10,7 @@ export default function PoolDetailPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [activeTab, setActiveTab] = useState<'overview' | 'documents'>('overview');
 
   useEffect(() => {
     let cancelled = false;
@@ -117,11 +118,68 @@ export default function PoolDetailPage() {
                 <span style={{color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> &gt; Pool #{poolId}</span>
               </div>
             </div>
-            
-            {/* Pool Content - Overview Section */}
-            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-              <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Pool Details</div>
+
+            {/* Navigation Tabs */}
+            <div style={{
+              alignSelf: 'stretch',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              gap: 32,
+              display: 'flex',
+              paddingBottom: 24,
+              borderBottom: '1px solid #E5E7EB'
+            }}>
+              <div style={{
+                color: activeTab === 'overview' ? '#113D7B' : '#767676',
+                fontSize: 18,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '600',
+                wordWrap: 'break-word',
+                paddingBottom: 8,
+                borderBottom: activeTab === 'overview' ? '2px solid #113D7B' : 'none',
+                cursor: 'pointer',
+                transition: 'color 0.2s ease'
+              }}
+              onClick={() => setActiveTab('overview')}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'overview') e.currentTarget.style.color = '#113D7B';
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'overview') e.currentTarget.style.color = '#767676';
+              }}
+              >
+                Overview
+              </div>
+              <div style={{
+                color: activeTab === 'documents' ? '#113D7B' : '#767676',
+                fontSize: 18,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '600',
+                wordWrap: 'break-word',
+                paddingBottom: 8,
+                borderBottom: activeTab === 'documents' ? '2px solid #113D7B' : 'none',
+                cursor: 'pointer',
+                transition: 'color 0.2s ease'
+              }}
+              onClick={() => setActiveTab('documents')}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'documents') e.currentTarget.style.color = '#113D7B';
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'documents') e.currentTarget.style.color = '#767676';
+              }}
+              >
+                Assigned Documents
+              </div>
             </div>
+            
+            {/* Tab Content */}
+            {activeTab === 'overview' && (
+              <>
+                {/* Pool Content - Overview Section */}
+                <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                  <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Pool Details</div>
+                </div>
             
             {/* Pool Overview Card */}
             <div style={{
@@ -786,6 +844,411 @@ export default function PoolDetailPage() {
                 </div>
               </div>
             </div>
+              </>
+            )}
+
+            {/* Assigned Documents Tab Content */}
+            {activeTab === 'documents' && (
+              <>
+                {/* Documents Section Header */}
+                <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                  <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Assigned Documents</div>
+                </div>
+
+                {/* Documents Card */}
+                <div style={{
+                  width: '100%',
+                  padding: 32,
+                  background: 'white',
+                  borderRadius: 24,
+                  border: '1px solid #E5E7EB',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  gap: 32,
+                  display: 'flex'
+                }}>
+                  {/* Header Section */}
+                  <div style={{
+                    alignSelf: 'stretch',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    display: 'flex'
+                  }}>
+                    <div style={{
+                      color: 'black',
+                      fontSize: 24,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '500',
+                      wordWrap: 'break-word'
+                    }}>
+                      Pool #{poolId} - Assigned Documents
+                    </div>
+                    <div style={{
+                      padding: '8px 16px',
+                      background: '#F7E6D6',
+                      borderRadius: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        width: 8,
+                        height: 8,
+                        background: '#DBAC7E',
+                        borderRadius: '50%'
+                      }} />
+                      <div style={{
+                        color: 'black',
+                        fontSize: 14,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>
+                        System Pending
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Document Items */}
+                  <div style={{
+                    alignSelf: 'stretch',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    gap: 24,
+                    display: 'flex'
+                  }}>
+                    {/* Home Insurance Document */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: '#B2B2B2',
+                        fontSize: 16,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>
+                        Home Insurance
+                      </div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        padding: 16,
+                        background: '#F9F9F9',
+                        borderRadius: 12,
+                        border: '1px dashed #E5E7EB',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: 12,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            width: 40,
+                            height: 40,
+                            background: '#E4EFFF',
+                            borderRadius: 8,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            display: 'flex'
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6 2V6H2L8 12L14 6H10V2H6Z" fill="#113D7B"/>
+                            </svg>
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            filename01222.pdf
+                          </div>
+                        </div>
+                        <div style={{
+                          width: 32,
+                          height: 32,
+                          background: '#F4F4F4',
+                          borderRadius: 8,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          display: 'flex',
+                          cursor: 'pointer'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6L8 10L4 6" stroke="#767676" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Recent Tax Return Document */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: '#B2B2B2',
+                        fontSize: 16,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>
+                        Recent tax return
+                      </div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        padding: 16,
+                        background: '#F9F9F9',
+                        borderRadius: 12,
+                        border: '1px dashed #E5E7EB',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: 12,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            width: 40,
+                            height: 40,
+                            background: '#E4EFFF',
+                            borderRadius: 8,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            display: 'flex'
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6 2V6H2L8 12L14 6H10V2H6Z" fill="#113D7B"/>
+                            </svg>
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            filename01222.pdf
+                          </div>
+                        </div>
+                        <div style={{
+                          width: 32,
+                          height: 32,
+                          background: '#F4F4F4',
+                          borderRadius: 8,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          display: 'flex',
+                          cursor: 'pointer'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6L8 10L4 6" stroke="#767676" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Appraisal Report Document */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        color: '#B2B2B2',
+                        fontSize: 16,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>
+                        Appraisal Report
+                      </div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        padding: 16,
+                        background: '#F9F9F9',
+                        borderRadius: 12,
+                        border: '1px dashed #E5E7EB',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: 12,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            width: 40,
+                            height: 40,
+                            background: '#E4EFFF',
+                            borderRadius: 8,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            display: 'flex'
+                          }}>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6 2V6H2L8 12L14 6H10V2H6Z" fill="#113D7B"/>
+                            </svg>
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            filename01222.pdf
+                          </div>
+                        </div>
+                        <div style={{
+                          width: 32,
+                          height: 32,
+                          background: '#F4F4F4',
+                          borderRadius: 8,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          display: 'flex',
+                          cursor: 'pointer'
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6L8 10L4 6" stroke="#767676" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Property Images Section */}
+                  <div style={{
+                    alignSelf: 'stretch',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    gap: 16,
+                    display: 'flex'
+                  }}>
+                    <div style={{
+                      color: '#B2B2B2',
+                      fontSize: 16,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '500',
+                      wordWrap: 'break-word'
+                    }}>
+                      Property Images
+                    </div>
+                    <div style={{
+                      alignSelf: 'stretch',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(7, 1fr)',
+                      gap: 12
+                    }}>
+                      {Array.from({length: 7}, (_, index) => (
+                        <div key={index} style={{
+                          width: '100%',
+                          height: 80,
+                          background: '#F4F4F4',
+                          borderRadius: 8,
+                          border: '1px solid #E5E7EB',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          cursor: 'pointer'
+                        }}>
+                          <div style={{
+                            width: '100%',
+                            height: '100%',
+                            background: 'linear-gradient(135deg, #E4EFFF 0%, #F4F4F4 100%)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                          }}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="#B2B2B2"/>
+                            </svg>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{
+                    alignSelf: 'stretch',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: 16,
+                    display: 'flex'
+                  }}>
+                    <button style={{
+                      padding: '12px 24px',
+                      background: 'white',
+                      borderRadius: 12,
+                      border: '1px solid #E5E7EB',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 8,
+                      display: 'flex',
+                      cursor: 'pointer'
+                    }}>
+                      <div style={{
+                        color: 'black',
+                        fontSize: 14,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>
+                        Edit
+                      </div>
+                    </button>
+                    <button style={{
+                      padding: '12px 24px',
+                      background: '#CC4747',
+                      borderRadius: 12,
+                      border: 'none',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 8,
+                      display: 'flex',
+                      cursor: 'pointer'
+                    }}>
+                      <div style={{
+                        color: 'white',
+                        fontSize: 14,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>
+                        Abort pool request
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </main>
