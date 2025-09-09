@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import Frame1116607621 from './Frame1116607621';
@@ -114,9 +114,9 @@ export default function PoolsPage() {
   const summaryStats = calculateSummaryStats();
 
   // Function to fetch pools from backend
-  const fetchPools = async () => {
+  const fetchPools = useCallback(async () => {
     if (!isAuthenticated) return;
-    
+
     setLoadingPools(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools`, {
@@ -125,7 +125,7 @@ export default function PoolsPage() {
       });
 
       if (response.ok) {
-        const result = await response.json();
+      const result = await response.json();
         setRealPools(result.pools || []);
       } else {
         console.error('Failed to fetch pools');
@@ -137,14 +137,14 @@ export default function PoolsPage() {
     } finally {
       setLoadingPools(false);
     }
-  };
+  }, [isAuthenticated]);
 
   // Fetch pools when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       fetchPools();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchPools]);
 
   // Function to create pool
   const createPool = async () => {
@@ -233,7 +233,7 @@ export default function PoolsPage() {
           }
           return;
         }
-      } catch (error) {
+      } catch {
         // Ignore auth check errors
       }
       // Fallback to localStorage
@@ -510,7 +510,7 @@ export default function PoolsPage() {
     )}
 
     {/* Dynamic pool cards */}
-    {!loadingPools && realPools.map((pool, index) => {
+  {!loadingPools && realPools.map((pool) => {
       // human-friendly display id (EP000123), keep for UI only
       const displayId = `EP${String(pool.id).padStart(6, '0')}`;
       const statusConfig: { [key: string]: { color: string; bgColor: string; label: string } } = {
@@ -801,7 +801,7 @@ export default function PoolsPage() {
         <LoginModal 
           onClose={() => setShowLoginModal(false)}
           onSwitchToSignUp={() => { setShowLoginModal(false); window.location.href = '/'; }}
-          onSuccess={(role) => { setIsAuthenticated(true); setShowLoginModal(false); }}
+          onSuccess={() => { setIsAuthenticated(true); setShowLoginModal(false); }}
           showSuccess={showSuccess}
           showError={showError}
         />
@@ -911,7 +911,7 @@ export default function PoolsPage() {
                           <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
                             <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity Pool</div>
                             <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Borrowing against home value</div>
-                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home's value for cash.</div>
+                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home&apos;s value for cash.</div>
                           </div>
                         </div>
                         <div 
@@ -1113,7 +1113,7 @@ export default function PoolsPage() {
                               <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property value</div>
                               <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                           </div>
-                          <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Enter your best estimate of the property's current market value. This helps us validate and underwrite your loan faster.</div>
+                          <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Enter your best estimate of the property&apos;s current market value. This helps us validate and underwrite your loan faster.</div>
                           <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                               <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
                               <input
@@ -1141,7 +1141,7 @@ export default function PoolsPage() {
                               <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property link</div>
                               <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                           </div>
-                          <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>If no link is provided or the URL doesn't lead to a valid listing, we may request a formal appraisal document in the next step to verify your property's value.</div>
+                          <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>If no link is provided or the URL doesn&apos;t lead to a valid listing, we may request a formal appraisal document in the next step to verify your property&apos;s value.</div>
                           <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                               <input
                                 type="text"
@@ -1170,7 +1170,7 @@ export default function PoolsPage() {
                           <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Total mortgage balance</div>
                           <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                       </div>
-                      <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Enter your best estimate of the property's current market value. This helps us validate and underwrite your loan faster.</div>
+                      <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Enter your best estimate of the property&apos;s current market value. This helps us validate and underwrite your loan faster.</div>
                       <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                           <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
                           <input

@@ -59,7 +59,7 @@ export default function PoolDetailPage() {
           }
           return;
         }
-      } catch (error) {
+      } catch {
         // Ignore auth check errors
       }
       // Fallback to localStorage
@@ -897,7 +897,7 @@ export default function PoolDetailPage() {
                       wordWrap: 'break-word'
                     }}>
                       Our system is now reviewing your data for eligibility and compliance.<br/>
-                      You'll be notified once it's ready to share with investors.
+                      You&apos;ll be notified once it&apos;s ready to share with investors.
                     </div>
                   </div>
                 </div>
@@ -1460,7 +1460,7 @@ export default function PoolDetailPage() {
                       wordWrap: 'break-word'
                     }}>
                       Our system is now reviewing your data for eligibility and compliance.<br/>
-                      You'll be notified once it's ready to share with investors.
+                      You&apos;ll be notified once it&apos;s ready to share with investors.
                     </div>
                   </div>
                 </div>
