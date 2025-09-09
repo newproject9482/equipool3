@@ -1,0 +1,14 @@
+.frameParent { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; justify-content: flex-start; width: 100%; overflow-x: auto; }
+.frameGroup { display: flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; }
+.textWrapper, .textWrapper4 { width: 20px; height: 20px; background: #F4F4F4; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: 1px #E5E7EB solid; outline-offset: -1px; }
+.textWrapper4 { /* slight variant for final step if needed */ box-shadow: none; }
+.text { font-size: 12px; font-family: var(--ep-font-avenir); color: black; line-height: 1; }
+.investorsCardDescription { font-size: 12px; font-family: var(--ep-font-avenir); color: black; line-height: 1.2; white-space: nowrap; }
+.div { font-size: 12px; }
+.active { outline: 1px #113D7B solid !important; }
+.fitAll { gap: 4px; justify-content: space-between; overflow-x: visible; }
+.fitAll .frameGroup { gap: 6px; flex: 1 1 auto; justify-content: center; }
+.fitAll .textWrapper, .fitAll .textWrapper4 { width: 18px; height: 18px; }
+.fitAll .investorsCardDescription { font-size: 11px; white-space: nowrap; }
+
+/* toggle removed - header always minimized */

@@ -175,7 +175,7 @@ export default function PoolDetailPage() {
       {/* Main Content */}
       <main style={{width: '100%', maxWidth: 1440, margin: '0 auto', padding: '40px 20px'}}>
         <div style={{width: '100%', height: '100%', paddingTop: 120, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
-          <div style={{alignSelf: 'stretch', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+          <div style={{alignSelf: 'stretch', paddingLeft: 140, paddingRight: 140, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
             {/* Breadcrumb */}
             <div style={{alignSelf: 'stretch', paddingBottom: 16}}>
               <div>
