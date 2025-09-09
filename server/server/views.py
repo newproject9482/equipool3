@@ -1,10 +1,11 @@
 import json
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from .models import Borrower, Investor
+from .models import Borrower, Investor, Pool
 from django.contrib.auth.hashers import check_password
 
 REQUIRED_FIELDS = {"fullName", "email", "dateOfBirth", "password"}
@@ -245,4 +246,224 @@ def investor_login(request: HttpRequest):
         'fullName': i.full_name,
         'email': i.email,
         'role': 'investor'
+    }, status=200)
+
+def _require_borrower_auth(request):
+    """Helper function to check if user is authenticated as borrower"""
+    borrower_id = request.session.get('borrower_id')
+    if not borrower_id:
+        return None, JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        borrower = Borrower.objects.get(id=borrower_id)
+        return borrower, None
+    except Borrower.DoesNotExist:
+        return None, JsonResponse({'error': 'Invalid session'}, status=401)
+
+def _safe_decimal(value, default=None):
+    """Safely convert value to Decimal, return default if invalid"""
+    if value is None or value == '':
+        return default
+    try:
+        # Remove currency symbols and commas
+        if isinstance(value, str):
+            value = value.replace('$', '').replace(',', '').strip()
+        return Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return default
+
+@csrf_exempt
+def create_pool(request: HttpRequest):
+    """Create a new pool"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    borrower, auth_error = _require_borrower_auth(request)
+    if auth_error:
+        return auth_error
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    # Required fields validation
+    required_fields = {
+        'poolType', 'addressLine', 'city', 'state', 'zipCode', 
+        'percentOwned', 'amount', 'roiRate'
+    }
+    missing = required_fields - set(data.keys())
+    if missing:
+        return JsonResponse({'error': f'Missing fields: {", ".join(sorted(missing))}'}, status=400)
+    
+    # Validate required field values
+    pool_type = data.get('poolType', '').strip()
+    if pool_type not in ['equity', 'refinance']:
+        return JsonResponse({'error': 'Invalid pool type'}, status=400)
+    
+    address_line = data.get('addressLine', '').strip()
+    city = data.get('city', '').strip()
+    state = data.get('state', '').strip()
+    zip_code = data.get('zipCode', '').strip()
+    
+    if not all([address_line, city, state, zip_code]):
+        return JsonResponse({'error': 'Address information is required'}, status=400)
+    
+    # Convert and validate numeric fields
+    percent_owned = _safe_decimal(data.get('percentOwned'))
+    amount = _safe_decimal(data.get('amount'))
+    roi_rate = _safe_decimal(data.get('roiRate'))
+    
+    if percent_owned is None or percent_owned <= 0 or percent_owned > 100:
+        return JsonResponse({'error': 'Valid percent owned is required (1-100)'}, status=400)
+    
+    if amount is None or amount <= 0:
+        return JsonResponse({'error': 'Valid amount is required'}, status=400)
+    
+    if roi_rate is None or roi_rate <= 0:
+        return JsonResponse({'error': 'Valid ROI rate is required'}, status=400)
+    
+    # Optional fields
+    co_owner = data.get('coOwner')
+    co_owner = co_owner.strip() if co_owner else None
+    co_owner = co_owner or None  # Convert empty string to None
+    
+    property_value = _safe_decimal(data.get('propertyValue'))
+    
+    property_link = data.get('propertyLink')
+    property_link = property_link.strip() if property_link else None
+    property_link = property_link or None  # Convert empty string to None
+    
+    mortgage_balance = _safe_decimal(data.get('mortgageBalance'))
+    term = data.get('term', '12')
+    custom_term_months = None
+    
+    if term == 'custom':
+        custom_term_months = data.get('customTermMonths')
+        if custom_term_months is None:
+            return JsonResponse({'error': 'Custom term months required when term is custom'}, status=400)
+    
+    # Optional liability fields
+    other_property_loans = _safe_decimal(data.get('otherPropertyLoans'))
+    credit_card_debt = _safe_decimal(data.get('creditCardDebt'))
+    monthly_debt_payments = _safe_decimal(data.get('monthlyDebtPayments'))
+    
+    try:
+        pool = Pool.objects.create(
+            borrower=borrower,
+            pool_type=pool_type,
+            address_line=address_line,
+            city=city,
+            state=state,
+            zip_code=zip_code,
+            percent_owned=percent_owned,
+            co_owner=co_owner,
+            property_value=property_value,
+            property_link=property_link,
+            mortgage_balance=mortgage_balance,
+            amount=amount,
+            roi_rate=roi_rate,
+            term=term,
+            custom_term_months=custom_term_months,
+            other_property_loans=other_property_loans,
+            credit_card_debt=credit_card_debt,
+            monthly_debt_payments=monthly_debt_payments,
+            status='active'  # Set as active when created
+        )
+        
+        return JsonResponse({
+            'id': pool.id,
+            'poolType': pool.pool_type,
+            'amount': str(pool.amount),
+            'roiRate': str(pool.roi_rate),
+            'term': pool.term,
+            'status': pool.status,
+            'createdAt': pool.created_at.isoformat(),
+            'address': f"{pool.address_line}, {pool.city}, {pool.state} {pool.zip_code}"
+        }, status=201)
+        
+    except Exception as e:
+        return JsonResponse({'error': f'Failed to create pool: {str(e)}'}, status=500)
+
+def get_pools(request: HttpRequest):
+    """Get all pools for the authenticated borrower"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    borrower, auth_error = _require_borrower_auth(request)
+    if auth_error:
+        return auth_error
+    
+    pools = Pool.objects.filter(borrower=borrower).order_by('-created_at')
+    
+    pools_data = []
+    for pool in pools:
+        pools_data.append({
+            'id': pool.id,
+            'poolType': pool.pool_type,
+            'amount': str(pool.amount),
+            'roiRate': str(pool.roi_rate),
+            'term': pool.term,
+            'termMonths': pool.term_months,
+            'status': pool.status,
+            'fundingProgress': pool.funding_progress,
+            'createdAt': pool.created_at.isoformat(),
+            'address': f"{pool.address_line}, {pool.city}, {pool.state} {pool.zip_code}",
+            'propertyValue': str(pool.property_value) if pool.property_value else None,
+            'mortgageBalance': str(pool.mortgage_balance) if pool.mortgage_balance else None,
+        })
+    
+    return JsonResponse({'pools': pools_data}, status=200)
+
+def get_pool_detail(request: HttpRequest, pool_id: int):
+    """Get detailed information for a specific pool"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    borrower, auth_error = _require_borrower_auth(request)
+    if auth_error:
+        return auth_error
+    
+    try:
+        pool = Pool.objects.get(id=pool_id, borrower=borrower)
+    except Pool.DoesNotExist:
+        return JsonResponse({'error': 'Pool not found'}, status=404)
+    
+    return JsonResponse({
+        'id': pool.id,
+        'poolType': pool.pool_type,
+        'status': pool.status,
+        'amount': str(pool.amount),
+        'roiRate': str(pool.roi_rate),
+        'term': pool.term,
+        'termMonths': pool.term_months,
+        'customTermMonths': pool.custom_term_months,
+        'fundingProgress': pool.funding_progress,
+        'createdAt': pool.created_at.isoformat(),
+        'updatedAt': pool.updated_at.isoformat(),
+        
+        # Property details
+        'addressLine': pool.address_line,
+        'city': pool.city,
+        'state': pool.state,
+        'zipCode': pool.zip_code,
+        'percentOwned': str(pool.percent_owned),
+        'coOwner': pool.co_owner,
+        'propertyValue': str(pool.property_value) if pool.property_value else None,
+        'propertyLink': pool.property_link,
+        'mortgageBalance': str(pool.mortgage_balance) if pool.mortgage_balance else None,
+        
+        # Liability information
+        'otherPropertyLoans': str(pool.other_property_loans) if pool.other_property_loans else None,
+        'creditCardDebt': str(pool.credit_card_debt) if pool.credit_card_debt else None,
+        'monthlyDebtPayments': str(pool.monthly_debt_payments) if pool.monthly_debt_payments else None,
+        
+        # Documents
+        'homeInsuranceDoc': pool.home_insurance_doc,
+        'taxReturnDoc': pool.tax_return_doc,
+        'appraisalDoc': pool.appraisal_doc,
+        'propertyPhotos': pool.property_photos,
     }, status=200)

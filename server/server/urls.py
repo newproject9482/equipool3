@@ -26,4 +26,7 @@ urlpatterns = [
     path('api/investors/login', views.investor_login, name='investor-login'),
     path('api/auth/logout', views.auth_logout, name='auth-logout'),
     path('api/auth/me', views.auth_me, name='auth-me'),
+    path('api/pools/create', views.create_pool, name='create-pool'),
+    path('api/pools', views.get_pools, name='get-pools'),
+    path('api/pools/<int:pool_id>', views.get_pool_detail, name='get-pool-detail'),
 ]

@@ -8,6 +8,22 @@ import { Toaster, useToaster } from '../../components/Toaster';
 
 const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
 
+// Pool interface
+interface Pool {
+  id: number;
+  poolType: string;
+  amount: string;
+  roiRate: string;
+  term: string;
+  termMonths: number;
+  status: string;
+  fundingProgress: number;
+  createdAt: string;
+  address?: string;
+  propertyValue?: string;
+  mortgageBalance?: string;
+}
+
 export default function PoolsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -96,6 +112,158 @@ export default function PoolsPage() {
   const [poolAmount, setPoolAmount] = useState('');
   const [roiRate, setRoiRate] = useState('');
   const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
+
+  // Submitting state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Real pools data
+  const [realPools, setRealPools] = useState<Pool[]>([]);
+  const [loadingPools, setLoadingPools] = useState(false);
+
+  // Calculate dynamic summary statistics
+  const calculateSummaryStats = () => {
+    if (realPools.length === 0) {
+      return {
+        totalBorrowed: '$0',
+        nextPaymentDate: '--',
+        nextPaymentAmount: '$0',
+        activePools: '0'
+      };
+    }
+
+    const totalAmount = realPools.reduce((sum, pool) => sum + parseFloat(pool.amount), 0);
+    const activePoolsCount = realPools.filter(pool => pool.status === 'active').length;
+    
+    // For demo purposes, calculate a next payment based on the most recent active pool
+    const activePool = realPools.find(pool => pool.status === 'active');
+    let nextPayment = { date: '--', amount: '$0' };
+    
+    if (activePool) {
+      const createdDate = new Date(activePool.createdAt);
+      const nextPaymentDate = new Date(createdDate);
+      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
+      
+      const monthlyPayment = (parseFloat(activePool.amount) * (parseFloat(activePool.roiRate) / 100)) / 12;
+      
+      nextPayment = {
+        date: nextPaymentDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
+        amount: `$${monthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      };
+    }
+
+    return {
+      totalBorrowed: `$${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+      nextPaymentDate: nextPayment.date,
+      nextPaymentAmount: nextPayment.amount,
+      activePools: activePoolsCount.toString()
+    };
+  };
+
+  const summaryStats = calculateSummaryStats();
+
+  // Function to fetch pools from backend
+  const fetchPools = async () => {
+    if (!isAuthenticated) return;
+    
+    setLoadingPools(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setRealPools(result.pools || []);
+      } else {
+        console.error('Failed to fetch pools');
+        setRealPools([]);
+      }
+    } catch (error) {
+      console.error('Error fetching pools:', error);
+      setRealPools([]);
+    } finally {
+      setLoadingPools(false);
+    }
+  };
+
+  // Fetch pools when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchPools();
+    }
+  }, [isAuthenticated]);
+
+  // Function to create pool
+  const createPool = async () => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      const poolData = {
+        poolType: selectedPoolType,
+        addressLine: addressLine,
+        city: city,
+        state: state,
+        zipCode: zipCode,
+        percentOwned: parseFloat(percentOwned) || 0,
+        coOwner: coOwner || null,
+        propertyValue: propertyValue ? parseFloat(propertyValue.replace(/[,$]/g, '')) : null,
+        propertyLink: propertyLink || null,
+        mortgageBalance: mortgageBalance ? parseFloat(mortgageBalance.replace(/[,$]/g, '')) : null,
+        amount: parseFloat(poolAmount.replace(/[,$]/g, '')) || 0,
+        roiRate: parseFloat(roiRate) || 0,
+        term: selectedTerm,
+        customTermMonths: selectedTerm === 'custom' ? null : null, // Add custom term handling if needed
+        otherPropertyLoans: null, // Add these fields to the form if needed
+        creditCardDebt: null,
+        monthlyDebtPayments: null
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(poolData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showSuccess('Pool created successfully! It will appear in your pools list.');
+        setShowCreatePoolModal(false);
+        setCurrentStep(1);
+        
+        // Reset form
+        setSelectedPoolType('');
+        setAddressLine('');
+        setCity('');
+        setState('');
+        setZipCode('');
+        setPercentOwned('');
+        setCoOwner('');
+        setPropertyValue('');
+        setPropertyLink('');
+        setMortgageBalance('');
+        setPoolAmount('');
+        setRoiRate('');
+        setSelectedTerm('12');
+        
+        // Refresh the pools list
+        await fetchPools();
+      } else {
+        showError(result.error || 'Failed to create pool. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating pool:', error);
+      showError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -222,24 +390,16 @@ export default function PoolsPage() {
                   <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Total Borrowed</div>
                 </div>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                  <input
-                    value={totalBorrowed}
-                    onChange={(e) => setTotalBorrowed(e.target.value)}
-                    style={{
-                      alignSelf: 'stretch',
-                      color: 'black',
-                      fontSize: 48,
-                      fontFamily: 'var(--ep-font-avenir)',
-                      fontWeight: '500',
-                      wordWrap: 'break-word',
-                      border: 'none',
-                      background: 'transparent',
-                      outline: 'none',
-                      padding: 0,
-                      margin: 0,
-                      width: '100%'
-                    }}
-                  />
+                  <div style={{
+                    alignSelf: 'stretch',
+                    color: 'black',
+                    fontSize: 48,
+                    fontFamily: 'var(--ep-font-avenir)',
+                    fontWeight: '500',
+                    wordWrap: 'break-word'
+                  }}>
+                    {summaryStats.totalBorrowed}
+                  </div>
                 </div>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                   <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Total amount you&apos;ve received across all funded pools.</div>
@@ -250,42 +410,26 @@ export default function PoolsPage() {
                   <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Next Payment</div>
                 </div>
                 <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
-                  <input
-                    value={nextPaymentDate}
-                    onChange={(e) => setNextPaymentDate(e.target.value)}
-                    style={{
-                      alignSelf: 'stretch',
-                      color: 'var(--Black, black)',
-                      fontSize: 24,
-                      fontFamily: 'var(--ep-font-avenir)',
-                      fontWeight: '500',
-                      wordWrap: 'break-word',
-                      border: 'none',
-                      background: 'transparent',
-                      outline: 'none',
-                      padding: 0,
-                      margin: 0,
-                      width: '100%'
-                    }}
-                  />
-                  <input
-                    value={nextPaymentAmount}
-                    onChange={(e) => setNextPaymentAmount(e.target.value)}
-                    style={{
-                      alignSelf: 'stretch',
-                      color: 'black',
-                      fontSize: 48,
-                      fontFamily: 'var(--ep-font-avenir)',
-                      fontWeight: '500',
-                      wordWrap: 'break-word',
-                      border: 'none',
-                      background: 'transparent',
-                      outline: 'none',
-                      padding: 0,
-                      margin: 0,
-                      width: '100%'
-                    }}
-                  />
+                  <div style={{
+                    alignSelf: 'stretch',
+                    color: 'var(--Black, black)',
+                    fontSize: 24,
+                    fontFamily: 'var(--ep-font-avenir)',
+                    fontWeight: '500',
+                    wordWrap: 'break-word'
+                  }}>
+                    {summaryStats.nextPaymentDate}
+                  </div>
+                  <div style={{
+                    alignSelf: 'stretch',
+                    color: 'black',
+                    fontSize: 48,
+                    fontFamily: 'var(--ep-font-avenir)',
+                    fontWeight: '500',
+                    wordWrap: 'break-word'
+                  }}>
+                    {summaryStats.nextPaymentAmount}
+                  </div>
                 </div>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                   <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Your upcoming repayment amount and due date.</div>
@@ -296,24 +440,16 @@ export default function PoolsPage() {
                   <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Active pools</div>
                 </div>
                 <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', display: 'flex'}}>
-                  <input
-                    value={activePools}
-                    onChange={(e) => setActivePools(e.target.value)}
-                    style={{
-                      alignSelf: 'stretch',
-                      color: 'black',
-                      fontSize: 48,
-                      fontFamily: 'var(--ep-font-avenir)',
-                      fontWeight: '500',
-                      wordWrap: 'break-word',
-                      border: 'none',
-                      background: 'transparent',
-                      outline: 'none',
-                      padding: 0,
-                      margin: 0,
-                      width: '100%'
-                    }}
-                  />
+                  <div style={{
+                    alignSelf: 'stretch',
+                    color: 'black',
+                    fontSize: 48,
+                    fontFamily: 'var(--ep-font-avenir)',
+                    fontWeight: '500',
+                    wordWrap: 'break-word'
+                  }}>
+                    {summaryStats.activePools}
+                  </div>
                 </div>
                 <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                   <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Number of currently running loans.</div>
@@ -365,206 +501,216 @@ export default function PoolsPage() {
             </div>
         </div>
   <div style={{width: '100%', maxWidth: 1122, height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'center', alignItems: 'start', margin: '24px auto 0 auto'}}>
-  <div style={{
-    width: 350,
-    height: 355,
-    padding: 32,
-    paddingBottom: 12,
-    background: 'white',
-    borderRadius: 24,
-    border: '1px solid #E5E7EB',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease'
-  }}
-  onClick={() => router.push('/pools/EP010525')}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = 'translateY(-2px)';
-    e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = 'translateY(0)';
-    e.currentTarget.style.boxShadow = 'none';
-  }}
-  >
-    {/* Header */}
-    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-      <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#EP010525</div>
+    {/* Loading state */}
+    {loadingPools && (
       <div style={{
-        padding: '4px 10px',
-        background: '#DDF4E6',
-        borderRadius: 50,
+        gridColumn: '1 / -1',
         display: 'flex',
+        justifyContent: 'center',
         alignItems: 'center',
-        gap: 6
+        padding: 40,
+        color: '#767676',
+        fontSize: 16,
+        fontFamily: 'var(--ep-font-avenir)',
+        fontWeight: '500'
       }}>
-        <div style={{width: 8, height: 8, background: '#65CC8E', borderRadius: '50%'}} />
-        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Active Liability</div>
+        Loading pools...
       </div>
-    </div>
+    )}
 
-    {/* Pool Amount */}
-    <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
-      <input
-        value={pool1Amount}
-        onChange={(e) => setPool1Amount(e.target.value)}
-        style={{
-          color: 'black',
-          fontSize: 32,
+    {/* No pools state */}
+    {!loadingPools && realPools.length === 0 && (
+      <div style={{
+        gridColumn: '1 / -1',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 40,
+        gap: 16
+      }}>
+        <div style={{
+          color: '#767676',
+          fontSize: 18,
           fontFamily: 'var(--ep-font-avenir)',
           fontWeight: '500',
-          border: 'none',
-          background: 'transparent',
-          outline: 'none',
-          padding: 0,
-          margin: 0,
-          width: '100%'
+          textAlign: 'center'
+        }}>
+          No pools yet
+        </div>
+        <div style={{
+          color: '#B2B2B2',
+          fontSize: 14,
+          fontFamily: 'var(--ep-font-avenir)',
+          fontWeight: '400',
+          textAlign: 'center'
+        }}>
+          Create your first pool to get started with raising capital
+        </div>
+      </div>
+    )}
+
+    {/* Dynamic pool cards */}
+    {!loadingPools && realPools.map((pool, index) => {
+      const poolId = `EP${String(pool.id).padStart(6, '0')}`;
+      const statusConfig: { [key: string]: { color: string; bgColor: string; label: string } } = {
+        'active': { color: '#65CC8E', bgColor: '#DDF4E6', label: 'Active' },
+        'draft': { color: '#F59E0B', bgColor: '#FEF3C7', label: 'Draft' },
+        'funded': { color: '#3B82F6', bgColor: '#DBEAFE', label: 'Funded' },
+        'completed': { color: '#10B981', bgColor: '#D1FAE5', label: 'Completed' },
+        'cancelled': { color: '#EF4444', bgColor: '#FEE2E2', label: 'Cancelled' }
+      };
+      const status = statusConfig[pool.status] || statusConfig['draft'];
+      
+      return (
+        <div key={pool.id} style={{
+          width: 350,
+          height: 355,
+          padding: 32,
+          paddingBottom: 12,
+          background: 'white',
+          borderRadius: 24,
+          border: '1px solid #E5E7EB',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease'
         }}
-      />
-    </div>
+        onClick={() => router.push(`/pools/${poolId}`)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+        >
+          {/* Header */}
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#{poolId}</div>
+            <div style={{
+              padding: '4px 10px',
+              background: status.bgColor,
+              borderRadius: 50,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
+            }}>
+              <div style={{width: 8, height: 8, background: status.color, borderRadius: '50%'}} />
+              <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>{status.label}</div>
+            </div>
+          </div>
 
-    {/* Progress Bar Section */}
-    <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>
-        <input
-          value={pool1Progress}
-          onChange={(e) => setPool1Progress(e.target.value)}
-          style={{
-            color: 'black',
-            fontSize: 14,
-            fontFamily: 'var(--ep-font-avenir)',
-            fontWeight: '500',
-            border: 'none',
-            background: 'transparent',
-            outline: 'none',
-            padding: 0,
-            margin: 0,
-            width: '30px'
-          }}
-        />% Paid
-      </div>
-      <div style={{position: 'relative', height: 8, width: '100%'}}>
-        <div style={{
-          width: '100%',
-          height: 8,
-          background: '#E5E7EB',
-          borderRadius: 50,
-          position: 'absolute'
-        }} />
-        <div style={{
-          width: `${pool1Progress}%`,
-          height: 8,
-          background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)',
-          borderRadius: 50,
-          position: 'absolute'
-        }} />
-      </div>
-    </div>
+          {/* Pool Amount */}
+          <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+            <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool Amount</div>
+            <div style={{
+              color: 'black',
+              fontSize: 32,
+              fontFamily: 'var(--ep-font-avenir)',
+              fontWeight: '500'
+            }}>
+              ${parseFloat(pool.amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </div>
+          </div>
 
-    {/* Details Grid */}
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gridTemplateRows: '1fr 1fr',
-      gap: 16,
-      height: 'auto'
-    }}>
-      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
-        <input
-          value={pool1Date}
-          onChange={(e) => setPool1Date(e.target.value)}
-          style={{
-            color: 'black',
-            fontSize: 16,
-            fontFamily: 'var(--ep-font-avenir)',
-            fontWeight: '500',
-            border: 'none',
-            background: 'transparent',
-            outline: 'none',
-            padding: 0,
-            margin: 0,
-            width: '100%'
-          }}
-        />
-      </div>
-      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
-        <input
-          value={pool1Type}
-          onChange={(e) => setPool1Type(e.target.value)}
-          style={{
-            color: 'black',
-            fontSize: 16,
-            fontFamily: 'var(--ep-font-avenir)',
-            fontWeight: '500',
-            border: 'none',
-            background: 'transparent',
-            outline: 'none',
-            padding: 0,
-            margin: 0,
-            width: '100%'
-          }}
-        />
-      </div>
-      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
-        <input
-          value={pool1Terms}
-          onChange={(e) => setPool1Terms(e.target.value)}
-          style={{
-            color: 'black',
-            fontSize: 16,
-            fontFamily: 'var(--ep-font-avenir)',
-            fontWeight: '500',
-            border: 'none',
-            background: 'transparent',
-            outline: 'none',
-            padding: 0,
-            margin: 0,
-            width: '100%'
-          }}
-        />
-      </div>
-      <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
-        <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
-        <input
-          value={pool1Repayment}
-          onChange={(e) => setPool1Repayment(e.target.value)}
-          style={{
-            color: 'black',
-            fontSize: 16,
-            fontFamily: 'var(--ep-font-avenir)',
-            fontWeight: '500',
-            border: 'none',
-            background: 'transparent',
-            outline: 'none',
-            padding: 0,
-            margin: 0,
-            width: '100%'
-          }}
-        />
-      </div>
-    </div>
+          {/* Progress Bar Section */}
+          <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+            <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>
+              {pool.fundingProgress}% Funded
+            </div>
+            <div style={{position: 'relative', height: 8, width: '100%'}}>
+              <div style={{
+                width: '100%',
+                height: 8,
+                background: '#E5E7EB',
+                borderRadius: 50,
+                position: 'absolute'
+              }} />
+              <div style={{
+                width: `${pool.fundingProgress}%`,
+                height: 8,
+                background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)',
+                borderRadius: 50,
+                position: 'absolute'
+              }} />
+            </div>
+          </div>
 
-    {/* View Pool Button */}
-    <div style={{
-      padding: '8px 16px',
-      borderRadius: 12,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: 4,
-      cursor: 'pointer'
-    }}>
-      <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
-      <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
-      </svg>
-    </div>
+          {/* Details Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gridTemplateRows: '1fr 1fr',
+            gap: 16,
+            height: 'auto'
+          }}>
+            <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+              <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Date Created</div>
+              <div style={{
+                color: 'black',
+                fontSize: 16,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '500'
+              }}>
+                {new Date(pool.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
+              </div>
+            </div>
+            <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+              <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Type</div>
+              <div style={{
+                color: 'black',
+                fontSize: 16,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '500'
+              }}>
+                {pool.poolType === 'equity' ? 'Equity pool' : 'Refinancing'}
+              </div>
+            </div>
+            <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+              <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Terms</div>
+              <div style={{
+                color: 'black',
+                fontSize: 16,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '500'
+              }}>
+                {pool.roiRate}% / {pool.termMonths} Months
+              </div>
+            </div>
+            <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+              <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Repayment</div>
+              <div style={{
+                color: 'black',
+                fontSize: 16,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '500'
+              }}>
+                Flexible
+              </div>
+            </div>
+          </div>
+
+          {/* View Pool Button */}
+          <div style={{
+            padding: '8px 16px',
+            borderRadius: 12,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 4,
+            cursor: 'pointer'
+          }}>
+            <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
+            <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fillRule="evenodd" clipRule="evenodd" d="M15.6819 13.2777L9.53617 19.5L8 17.9447L13.3777 12.5L8 7.05531L9.53617 5.5L15.6819 11.7223C15.8856 11.9286 16 12.2083 16 12.5C16 12.7917 15.8856 13.0714 15.6819 13.2777Z" fill="black"/>
+            </svg>
+          </div>
+        </div>
+      );
+    })}
   </div>
   <div style={{
     width: 350,
@@ -1715,7 +1861,6 @@ export default function PoolsPage() {
       </svg>
     </div>
   </div>
-</div>
       </div>
 
       {/* Footer */}
@@ -3484,23 +3629,23 @@ export default function PoolsPage() {
                         paddingRight: 24, 
                         paddingTop: 12, 
                         paddingBottom: 12, 
-                        background: '#10B981', 
+                        background: isSubmitting ? '#9CA3AF' : '#10B981', 
                         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', 
                         borderRadius: 12, 
                         justifyContent: 'center', 
                         alignItems: 'center', 
                         gap: 8, 
                         display: 'inline-flex',
-                        cursor: 'pointer'
+                        cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                        opacity: isSubmitting ? 0.7 : 1
                       }}
                       onClick={() => {
-                        // Handle pool submission here
-                        showSuccess('Pool request submitted successfully!');
-                        setShowCreatePoolModal(false);
-                        setCurrentStep(1); // Reset for next use
+                        createPool();
                       }}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit Pool Request</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                        {isSubmitting ? 'Creating Pool...' : 'Submit Pool Request'}
+                      </div>
                     </div>
                   </div>
                 </div>
