@@ -1445,17 +1445,16 @@ export default function PoolsPage() {
                     width: '100%',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gridTemplateRows: '1fr 1fr',
+                    gridTemplateRows: 'auto auto',
+                    gridAutoRows: 'minmax(80px, auto)',
                     gap: 20,
-                    height: '100%'
+                    height: 'auto'
                   }}>
                     
                     {/* Top Left - Home Insurance PDF */}
                     <div style={{
                       padding: 20,
                       background: 'white',
-                      borderRadius: 12,
-                      border: '1px solid #E5E7EB',
                       flexDirection: 'column',
                       justifyContent: 'flex-start',
                       alignItems: 'flex-start',
@@ -1485,57 +1484,14 @@ export default function PoolsPage() {
                         lineHeight: 1.4,
                         wordWrap: 'break-word'
                       }}>Add your most recent home insurance policy. Boosts credibility and reduces approval friction.</div>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        flex: '1 1 0',
-                        padding: 16,
-                        background: '#F9F9F9',
-                        borderRadius: 8,
-                        border: '2px dashed #D1D5DB',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: 8,
-                        display: 'flex',
-                        cursor: 'pointer'
-                      }}>
-                        <div style={{
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: 4,
-                          display: 'flex'
-                        }}>
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
-                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9.33 1.33H4C3.27 1.33 2.67 1.93 2.67 2.67V13.33C2.67 14.07 3.26 14.67 3.99 14.67H12C12.73 14.67 13.33 14.07 13.33 13.33V5.33L9.33 1.33Z" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
-                            <polyline points="9.33,1.33 9.33,5.33 13.33,5.33" stroke="#9CA3AF" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                      <div data-property-1="Dropzone/File upload" style={{width: '100%', height: 56, padding: '12px 20px', background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'flex'}}>
+                        <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                            <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
                         </div>
-                        <div style={{
-                          flexDirection: 'column',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: 2,
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 12,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>Upload a file</div>
-                          <div style={{
-                            color: '#767676',
-                            fontSize: 10,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '400',
-                            wordWrap: 'break-word'
-                          }}>Drag and drop or click to upload</div>
+                        <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 2, display: 'flex'}}>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
+                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
                         </div>
                       </div>
                     </div>
@@ -1544,8 +1500,6 @@ export default function PoolsPage() {
                     <div style={{
                       padding: 20,
                       background: 'white',
-                      borderRadius: 12,
-                      border: '1px solid #E5E7EB',
                       flexDirection: 'column',
                       justifyContent: 'flex-start',
                       alignItems: 'flex-start',
@@ -1580,8 +1534,6 @@ export default function PoolsPage() {
                         flex: '1 1 0',
                         padding: 16,
                         background: '#F9F9F9',
-                        borderRadius: 8,
-                        border: '2px dashed #D1D5DB',
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -1635,7 +1587,6 @@ export default function PoolsPage() {
                       padding: 20,
                       background: 'white',
                       borderRadius: 12,
-                      border: '1px solid #E5E7EB',
                       flexDirection: 'column',
                       justifyContent: 'flex-start',
                       alignItems: 'flex-start',
@@ -1678,7 +1629,6 @@ export default function PoolsPage() {
                         padding: 16,
                         background: '#F9F9F9',
                         borderRadius: 8,
-                        border: '2px dashed #D1D5DB',
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -1732,7 +1682,6 @@ export default function PoolsPage() {
                       padding: 20,
                       background: 'white',
                       borderRadius: 12,
-                      border: '1px solid #E5E7EB',
                       flexDirection: 'column',
                       justifyContent: 'flex-start',
                       alignItems: 'flex-start',
@@ -1768,7 +1717,6 @@ export default function PoolsPage() {
                         padding: 16,
                         background: '#F9F9F9',
                         borderRadius: 8,
-                        border: '2px dashed #D1D5DB',
                         flexDirection: 'column',
                         justifyContent: 'center',
                         alignItems: 'center',
