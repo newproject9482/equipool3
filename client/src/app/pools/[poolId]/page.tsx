@@ -11,6 +11,39 @@ export default function PoolDetailPage() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'documents'>('overview');
+  // Pool detail state
+  interface PoolDetail {
+    id: number;
+    poolType: string;
+    status: string;
+    amount: string;
+    roiRate?: string;
+    term?: string;
+    termMonths?: number;
+    customTermMonths?: number | null;
+    fundingProgress?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    addressLine?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    percentOwned?: string;
+    coOwner?: string | null;
+    propertyValue?: string | null;
+    propertyLink?: string | null;
+    mortgageBalance?: string | null;
+    otherPropertyLoans?: string | null;
+    creditCardDebt?: string | null;
+    monthlyDebtPayments?: string | null;
+    homeInsuranceDoc?: string | null;
+    taxReturnDoc?: string | null;
+    appraisalDoc?: string | null;
+    propertyPhotos?: string[];
+  }
+  const [poolData, setPoolData] = useState<PoolDetail | null>(null);
+  const [loadingPool, setLoadingPool] = useState(false);
+  const [poolError, setPoolError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +69,38 @@ export default function PoolDetailPage() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // Fetch pool detail by numeric id (accepts EP000123 or numeric id)
+  useEffect(() => {
+    let cancelled = false;
+    const fetchPool = async () => {
+      if (!poolId) return;
+      const numericMatch = poolId.match(/(\d+)/);
+      const numericId = numericMatch ? numericMatch[0] : poolId;
+      setLoadingPool(true);
+      setPoolError(null);
+      try {
+        const resp = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools/${numericId}`, { credentials: 'include' });
+        if (!resp.ok) {
+          setPoolError(`Failed to load pool (status ${resp.status})`);
+          setPoolData(null);
+        } else {
+          const data = await resp.json();
+          if (!cancelled) setPoolData(data);
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          const e = err as Error;
+          setPoolError(e?.message || 'Network error');
+        }
+        setPoolData(null);
+      } finally {
+        if (!cancelled) setLoadingPool(false);
+      }
+    };
+    fetchPool();
+    return () => { cancelled = true; };
+  }, [poolId]);
 
   const handleLogout = async () => {
     try {
@@ -262,7 +327,8 @@ export default function PoolDetailPage() {
                   fontWeight: '500',
                   wordWrap: 'break-word'
                 }}>
-                  $350 000
+                  {loadingPool ? 'Loading...' : poolError ? poolError : poolData ?
+                    `$${Number(poolData.amount).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}` : '--'}
                 </div>
               </div>
 
@@ -391,7 +457,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      $350 000
+                      {poolData ? `$${Number(poolData.amount).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}` : '--'}
                     </div>
                   </div>
                   <div style={{
@@ -417,7 +483,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      12% / 24 Months
+                      {poolData ? `${Number(poolData.roiRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2})}% / ${poolData.termMonths ?? poolData.term ?? '--'} Months` : '--'}
                     </div>
                   </div>
                   <div style={{
@@ -443,7 +509,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      Equity pool
+                      {poolData ? (poolData.poolType === 'equity' ? 'Equity pool' : 'Refinancing') : '--'}
                     </div>
                   </div>
                 </div>
@@ -496,7 +562,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      123 Main Street, San Diego, CA, USA
+                      {poolData ? `${poolData.addressLine ?? ''}${poolData.city ? ', ' + poolData.city : ''}${poolData.state ? ', ' + poolData.state : ''}${poolData.zipCode ? ', ' + poolData.zipCode : ''}` : '--'}
                     </div>
                   </div>
                   <div style={{
@@ -522,7 +588,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      Jane Hudson
+                      {poolData && poolData.coOwner ? poolData.coOwner : '--'}
                     </div>
                   </div>
                   <div style={{
@@ -548,9 +614,11 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word',
                       textDecoration: 'underline',
-                      cursor: 'pointer'
+                      cursor: poolData && poolData.propertyLink ? 'pointer' : 'default'
+                    }} onClick={() => {
+                      if (poolData && poolData.propertyLink) window.open(poolData.propertyLink, '_blank');
                     }}>
-                      https://www.zillow.com/asdadasss...
+                      {poolData && poolData.propertyLink ? poolData.propertyLink : '--'}
                     </div>
                   </div>
                   <div style={{
@@ -576,7 +644,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      $ 350 000
+                      {poolData && poolData.propertyValue ? `$ ${Number(poolData.propertyValue).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}` : '--'}
                     </div>
                   </div>
                   <div style={{
@@ -602,7 +670,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      $ 150 000
+                      {poolData && poolData.mortgageBalance ? `$ ${Number(poolData.mortgageBalance).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}` : '--'}
                     </div>
                   </div>
                   <div style={{
@@ -628,7 +696,7 @@ export default function PoolDetailPage() {
                       fontWeight: '500',
                       wordWrap: 'break-word'
                     }}>
-                      70% Owned
+                      {poolData && poolData.percentOwned ? `${Number(poolData.percentOwned).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2})}% Owned` : '--'}
                     </div>
                   </div>
                 </div>

@@ -499,7 +499,8 @@ export default function PoolsPage() {
 
     {/* Dynamic pool cards */}
     {!loadingPools && realPools.map((pool, index) => {
-      const poolId = `EP${String(pool.id).padStart(6, '0')}`;
+      // human-friendly display id (EP000123), keep for UI only
+      const displayId = `EP${String(pool.id).padStart(6, '0')}`;
       const statusConfig: { [key: string]: { color: string; bgColor: string; label: string } } = {
         'active': { color: '#65CC8E', bgColor: '#DDF4E6', label: 'Active' },
         'draft': { color: '#F59E0B', bgColor: '#FEF3C7', label: 'Draft' },
@@ -509,7 +510,7 @@ export default function PoolsPage() {
       };
       const status = statusConfig[pool.status] || statusConfig['draft'];
       
-      return (
+  return (
         <div key={pool.id} style={{
           width: 350,
           height: 355,
@@ -524,7 +525,8 @@ export default function PoolsPage() {
           cursor: 'pointer',
           transition: 'all 0.2s ease'
         }}
-        onClick={() => router.push(`/pools/${poolId}`)}
+  // navigate to numeric pool id so backend/detail routing can use the integer id
+  onClick={() => router.push(`/pools/${pool.id}`)}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-2px)';
           e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
@@ -536,7 +538,7 @@ export default function PoolsPage() {
         >
           {/* Header */}
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#{poolId}</div>
+            <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#{displayId}</div>
             <div style={{
               padding: '4px 10px',
               background: status.bgColor,
