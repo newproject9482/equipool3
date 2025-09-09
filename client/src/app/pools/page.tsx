@@ -515,7 +515,8 @@ export default function PoolsPage() {
           width: 350,
           height: 355,
           padding: 32,
-          paddingBottom: 12,
+          paddingBottom: 56, // leave space for the bottom action
+          position: 'relative',
           background: 'white',
           borderRadius: 24,
           border: '1px solid #E5E7EB',
@@ -644,13 +645,18 @@ export default function PoolsPage() {
 
           {/* View Pool Button */}
           <div style={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 12,
             padding: '8px 16px',
             borderRadius: 12,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             gap: 4,
-            cursor: 'pointer'
+            cursor: 'pointer',
+            background: 'transparent'
           }}>
             <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>View Pool</div>
             <svg width="12" height="12" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
