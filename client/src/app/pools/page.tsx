@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import Frame1116607621 from './Frame1116607621';
+import PoolSubmittedForm from './Form';
+import Button from './Button';
 import { useRouter } from 'next/navigation';
 import { Toaster, useToaster } from '../../components/Toaster';
 
@@ -36,6 +38,7 @@ export default function PoolsPage() {
   // Pool creation states
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedPoolType, setSelectedPoolType] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false);
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
 
@@ -183,9 +186,10 @@ export default function PoolsPage() {
 
       if (response.ok) {
         showSuccess('Pool created successfully! It will appear in your pools list.');
-        setShowCreatePoolModal(false);
+        // Keep the modal open and show a confirmation screen
+        setShowConfirmation(true);
         setCurrentStep(1);
-        
+
         // Reset form
         setSelectedPoolType('');
         setAddressLine('');
@@ -199,9 +203,9 @@ export default function PoolsPage() {
         setMortgageBalance('');
         setPoolAmount('');
         setRoiRate('');
-  setSelectedTerm('12');
-  setCustomTermMonths('');
-        
+        setSelectedTerm('12');
+        setCustomTermMonths('');
+
         // Refresh the pools list
         await fetchPools();
       } else {
@@ -265,6 +269,7 @@ export default function PoolsPage() {
     setShowCreatePoolModal(false);
     setCurrentStep(1);
     setSelectedPoolType('');
+  setShowConfirmation(false);
   };
 
   return (
@@ -865,7 +870,16 @@ export default function PoolsPage() {
               </div>
               
               {/* Step Content */}
-              {currentStep === 1 && (
+              {showConfirmation ? (
+                <div style={{alignSelf: 'stretch', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 24}}>
+                  <div style={{width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 12}}>
+                    <PoolSubmittedForm />
+                    <div style={{marginTop: 8}}>
+                      <Button onClick={() => { setShowConfirmation(false); setShowCreatePoolModal(false); }} />
+                    </div>
+                  </div>
+                </div>
+              ) : currentStep === 1 && (
                 /* Pool Type Cards */
                 <div style={{alignSelf: 'stretch', flex: '1 1 0', paddingLeft: 8, paddingRight: 8, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
                     <div style={{width: 480, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
