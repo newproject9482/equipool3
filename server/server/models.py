@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+from datetime import timedelta
 
 class Borrower(models.Model):
     full_name = models.CharField(max_length=255)
@@ -34,6 +36,38 @@ class Investor(models.Model):
 
     def __str__(self):
         return f"Investor({self.email})"
+
+class AuthToken(models.Model):
+    """Simple authentication token for cross-origin requests"""
+    token = models.CharField(max_length=255, unique=True)
+    borrower = models.ForeignKey(Borrower, null=True, blank=True, on_delete=models.CASCADE)
+    investor = models.ForeignKey(Investor, null=True, blank=True, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(days=7)  # Token valid for 7 days
+        super().save(*args, **kwargs)
+    
+    def is_valid(self):
+        return timezone.now() < self.expires_at
+    
+    @property
+    def user(self):
+        return self.borrower or self.investor
+    
+    @property
+    def role(self):
+        if self.borrower:
+            return 'borrower'
+        elif self.investor:
+            return 'investor'
+        return None
+    
+    def __str__(self):
+        user = self.borrower or self.investor
+        return f"AuthToken({user.email if user else 'None'})"
 
 class Pool(models.Model):
     POOL_TYPE_CHOICES = [

@@ -44,7 +44,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
       if(!res.ok){
         showError(data.error || 'Login failed');
       } else {
-        if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ep-auth','1');
+          // Store the authentication token for cross-origin requests
+          if (data.token) {
+            localStorage.setItem('ep-auth-token', data.token);
+          }
+        }
         showSuccess(`Welcome back! You have successfully logged in as ${role}.`);
         onSuccess(role);
         onClose();

@@ -1,15 +1,68 @@
 import json
-from datetime import datetime
+import uuid
+from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from .models import Borrower, Investor, Pool
+from django.utils import timezone
+from .models import Borrower, Investor, Pool, AuthToken
 from django.contrib.auth.hashers import check_password
 
 REQUIRED_FIELDS = {"fullName", "email", "dateOfBirth", "password"}
 REQUIRED_INVESTOR_FIELDS = {"fullName", "email", "dateOfBirth", "phone", "ssn", "address1", "city", "state", "zip", "country", "password"}
+
+def _create_auth_token(user, role):
+    """Create a new authentication token for a user"""
+    # Clean up any existing tokens for this user
+    if role == 'borrower':
+        AuthToken.objects.filter(borrower=user).delete()
+        token = AuthToken.objects.create(
+            token=str(uuid.uuid4()),
+            borrower=user
+        )
+    else:  # investor
+        AuthToken.objects.filter(investor=user).delete()
+        token = AuthToken.objects.create(
+            token=str(uuid.uuid4()),
+            investor=user
+        )
+    return token.token
+
+def _get_user_from_request(request):
+    """Extract user from request using token or session"""
+    # Try token-based auth first (for cross-origin requests)
+    auth_header = request.headers.get('Authorization', '')
+    if auth_header.startswith('Bearer '):
+        token_value = auth_header.split(' ', 1)[1]
+        try:
+            auth_token = AuthToken.objects.get(token=token_value)
+            if auth_token.is_valid():
+                return auth_token.user, auth_token.role
+            else:
+                auth_token.delete()  # Clean up expired token
+        except AuthToken.DoesNotExist:
+            pass
+    
+    # Fallback to session-based auth (for same-origin requests)
+    borrower_id = request.session.get('borrower_id')
+    if borrower_id:
+        try:
+            borrower = Borrower.objects.get(id=borrower_id)
+            return borrower, 'borrower'
+        except Borrower.DoesNotExist:
+            pass
+    
+    investor_id = request.session.get('investor_id')
+    if investor_id:
+        try:
+            investor = Investor.objects.get(id=investor_id)
+            return investor, 'investor'
+        except Investor.DoesNotExist:
+            pass
+    
+    return None, None
 
 def _parse_date(date_str: str):
     for fmt in ("%Y-%m-%d", "%b %d %Y", "%B %d %Y"):  # allow multiple formats
@@ -84,20 +137,26 @@ def borrower_login(request: HttpRequest):
         return JsonResponse({'error':'Invalid credentials'}, status=401)
     if not check_password(password, b.password_hash):
         return JsonResponse({'error':'Invalid credentials'}, status=401)
-    # Establish session
+    # Establish session (for same-origin requests)
     request.session['borrower_id'] = b.id
     request.session['role'] = 'borrower'
     request.session.save()  # Force save the session
+    
+    # Create auth token (for cross-origin requests)
+    auth_token = _create_auth_token(b, 'borrower')
+    
     print(f"[DEBUG] Session established for borrower: {b.id}")
     print(f"[DEBUG] Session data after login: {dict(request.session)}")
     print(f"[DEBUG] Session key: {request.session.session_key}")
-    print(f"[DEBUG] Session modified: {request.session.modified}")
+    print(f"[DEBUG] Auth token created: {auth_token}")
     
-    response = JsonResponse({'id': b.id,'fullName': b.full_name,'email': b.email,'role':'borrower'}, status=200)
-    
-    # Debug session cookie
-    if hasattr(request.session, 'session_key') and request.session.session_key:
-        print(f"[DEBUG] Setting session cookie with key: {request.session.session_key}")
+    response = JsonResponse({
+        'id': b.id,
+        'fullName': b.full_name,
+        'email': b.email,
+        'role': 'borrower',
+        'token': auth_token  # Include token for cross-origin requests
+    }, status=200)
     
     return response
 
@@ -114,36 +173,20 @@ def auth_me(request: HttpRequest):
     print(f"[DEBUG] Auth check - cookies: {request.COOKIES}")
     print(f"[DEBUG] Auth check - headers: {dict(request.headers)}")
     
-    borrower_id = request.session.get('borrower_id')
-    investor_id = request.session.get('investor_id')
-    print(f"[DEBUG] Borrower ID: {borrower_id}, Investor ID: {investor_id}")
+    # Try both token-based and session-based authentication
+    user, role = _get_user_from_request(request)
     
-    if borrower_id:
-        try:
-            b = Borrower.objects.get(id=borrower_id)
-            return JsonResponse({
-                'authenticated': True,
-                'id': b.id,
-                'fullName': b.full_name,
-                'email': b.email,
-                'role': 'borrower'
-            })
-        except Borrower.DoesNotExist:
-            pass
+    if user and role:
+        print(f"[DEBUG] User authenticated via {'token' if 'Authorization' in request.headers else 'session'}: {user.id} ({role})")
+        return JsonResponse({
+            'authenticated': True,
+            'id': user.id,
+            'fullName': user.full_name,
+            'email': user.email,
+            'role': role
+        })
     
-    if investor_id:
-        try:
-            i = Investor.objects.get(id=investor_id)
-            return JsonResponse({
-                'authenticated': True,
-                'id': i.id,
-                'fullName': i.full_name,
-                'email': i.email,
-                'role': 'investor'
-            })
-        except Investor.DoesNotExist:
-            pass
-    
+    print(f"[DEBUG] Authentication failed - no valid session or token")
     return JsonResponse({'authenticated': False}, status=401)
 
 @csrf_exempt
@@ -252,34 +295,37 @@ def investor_login(request: HttpRequest):
     if not check_password(password, i.password_hash):
         return JsonResponse({'error':'Invalid credentials'}, status=401)
     
-    # Establish session
+    # Establish session (for same-origin requests)
     request.session['investor_id'] = i.id
     request.session['role'] = 'investor'
     request.session.save()  # Force save the session
+    
+    # Create auth token (for cross-origin requests)
+    auth_token = _create_auth_token(i, 'investor')
+    
     print(f"[DEBUG] Session established for investor: {i.id}")
     print(f"[DEBUG] Session data after login: {dict(request.session)}")
     print(f"[DEBUG] Session key: {request.session.session_key}")
+    print(f"[DEBUG] Auth token created: {auth_token}")
     
     response = JsonResponse({
         'id': i.id,
         'fullName': i.full_name,
         'email': i.email,
-        'role': 'investor'
+        'role': 'investor',
+        'token': auth_token  # Include token for cross-origin requests
     }, status=200)
     
     return response
 
 def _require_borrower_auth(request):
     """Helper function to check if user is authenticated as borrower"""
-    borrower_id = request.session.get('borrower_id')
-    if not borrower_id:
+    user, role = _get_user_from_request(request)
+    
+    if not user or role != 'borrower':
         return None, JsonResponse({'error': 'Authentication required'}, status=401)
     
-    try:
-        borrower = Borrower.objects.get(id=borrower_id)
-        return borrower, None
-    except Borrower.DoesNotExist:
-        return None, JsonResponse({'error': 'Invalid session'}, status=401)
+    return user, None
 
 def _safe_decimal(value, default=None):
     """Safely convert value to Decimal, return default if invalid"""

@@ -8,6 +8,7 @@ import PoolSubmittedForm from './Form';
 import Button from './Button';
 import { useRouter } from 'next/navigation';
 import { Toaster, useToaster } from '../../components/Toaster';
+import { getAuthenticatedFetchOptions, clearAuthData } from '../../utils/auth';
 
 const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
 
@@ -128,10 +129,9 @@ export default function PoolsPage() {
       
       console.log('[DEBUG] Fetching pools from URL:', poolsUrl);
       
-      const response = await fetch(poolsUrl, {
-        method: 'GET',
-        credentials: 'include',
-      });
+      const response = await fetch(poolsUrl, getAuthenticatedFetchOptions({
+        method: 'GET'
+      }));
 
       console.log('[DEBUG] Fetch pools response status:', response.status);
 
@@ -192,14 +192,10 @@ export default function PoolsPage() {
       console.log('[DEBUG] Pool data:', poolData);
       console.log('[DEBUG] Authentication status:', isAuthenticated);
 
-      const response = await fetch(createPoolUrl, {
+      const response = await fetch(createPoolUrl, getAuthenticatedFetchOptions({
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
         body: JSON.stringify(poolData)
-      });
+      }));
 
       console.log('[DEBUG] Pool creation response status:', response.status);
       const result = await response.json();
@@ -249,9 +245,7 @@ export default function PoolsPage() {
         
         console.log('[DEBUG] Checking authentication with URL:', authUrl);
         
-        const response = await fetch(authUrl, {
-          credentials: 'include'
-        });
+        const response = await fetch(authUrl, getAuthenticatedFetchOptions());
         
         console.log('[DEBUG] Auth check response status:', response.status);
         
@@ -279,13 +273,12 @@ export default function PoolsPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      });
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, getAuthenticatedFetchOptions({
+        method: 'POST'
+      }));
       setIsAuthenticated(false);
       setShowProfileMenu(false);
-      if (typeof window !== 'undefined') localStorage.removeItem('ep-auth');
+      clearAuthData(); // Clear both session flag and token
       // Redirect to home page after logout
       window.location.href = '/';
     } catch (error) {
