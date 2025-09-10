@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { getAuthenticatedFetchOptions, clearAuthData } from '../../../utils/auth';
@@ -156,9 +156,9 @@ export default function InvestorPoolDetailPage() {
     if (activeTab === 'investments' && isAuthenticated && userRole === 'investor') {
       fetchInvestments();
     }
-  }, [activeTab, isAuthenticated, userRole]);
+  }, [activeTab, isAuthenticated, userRole, fetchInvestments]);
 
-  const fetchInvestments = async () => {
+  const fetchInvestments = useCallback(async () => {
     setLoadingInvestments(true);
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
@@ -183,14 +183,14 @@ export default function InvestorPoolDetailPage() {
     } finally {
       setLoadingInvestments(false);
     }
-  };
+  }, [poolData]);
 
   // Check user investment status when pool data changes
   useEffect(() => {
     if (poolData && isAuthenticated && userRole === 'investor') {
       fetchInvestments();
     }
-  }, [poolData, isAuthenticated, userRole]);
+  }, [poolData, isAuthenticated, userRole, fetchInvestments]);
 
   const handleInvest = async () => {
     if (!poolData || hasInvested) return;
@@ -1050,7 +1050,7 @@ export default function InvestorPoolDetailPage() {
                     display: 'flex'
                   }}>
                     <div style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', textAlign: 'center'}}>
-                      You haven't made any investments yet.
+                      You haven&apos;t made any investments yet.
                     </div>
                     <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', textAlign: 'center'}}>
                       Browse available pools to start investing.
@@ -1243,7 +1243,7 @@ export default function InvestorPoolDetailPage() {
                       fontWeight: '500',
                       textAlign: 'center'
                     }}>
-                      You haven't made any investments yet.
+                      You haven&apos;t made any investments yet.
                     </div>
                     <div style={{
                       color: '#767676',

@@ -3,9 +3,6 @@ import styles from './Frame1116607621.module.css';
 import Component1 from './Component1';
 
 const Frame1116607621: FunctionComponent<{ currentStep: number }> = ({ currentStep }) => {
-  // header is always minimized (fit-all) by default; removed toggle
-  const fitAll = true;
-
   const stepClass = (step: number) => {
     return `${styles.textWrapper} ${currentStep >= step ? styles.active : ''}`;
   };

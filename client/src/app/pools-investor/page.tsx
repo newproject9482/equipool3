@@ -10,6 +10,60 @@ import { getPoolsUrlForRole, getSmartPoolsUrl } from '../../utils/navigation';
 
 const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
 
+interface Pool {
+  id: number;
+  poolType: string;
+  status: string;
+  amount: string;
+  roiRate: string;
+  term: string;
+  termMonths: number;
+  createdAt: string;
+  address: string;
+  propertyValue: string | null;
+  mortgageBalance: string | null;
+  borrowerName: string;
+  fundingProgress: number;
+}
+
+interface Investment {
+  id: number;
+  amount: string;
+  status: string;
+  investedAt: string;
+  pool: {
+    id: number;
+    poolType: string;
+    status: string;
+    amount: string;
+    roiRate: string;
+    term: string;
+    termMonths: number;
+    createdAt: string;
+    addressLine: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    percentOwned: string;
+    coOwner: string;
+    propertyValue: string | null;
+    propertyLink: string;
+    mortgageBalance: string | null;
+    borrowerName: string;
+    borrowerEmail: string;
+  };
+}
+
+interface DashboardData {
+  totalInvested: string;
+  currentROI: string;
+  activePools: number;
+  pendingPayouts: {
+    amount: string;
+    nextDate: string;
+  };
+}
+
 export default function InvestorPoolsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,12 +72,12 @@ export default function InvestorPoolsPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [investmentPools, setInvestmentPools] = useState<any[]>([]);
+  const [investmentPools, setInvestmentPools] = useState<Pool[]>([]);
   const [loadingPools, setLoadingPools] = useState(false);
   const [activeTab, setActiveTab] = useState<'explore' | 'investments' | 'archive'>('explore');
-  const [myInvestments, setMyInvestments] = useState<any[]>([]);
+  const [myInvestments, setMyInvestments] = useState<Investment[]>([]);
   const [loadingInvestments, setLoadingInvestments] = useState(false);
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
