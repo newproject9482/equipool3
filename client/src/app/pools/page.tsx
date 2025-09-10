@@ -115,24 +115,36 @@ export default function PoolsPage() {
 
   // Function to fetch pools from backend
   const fetchPools = useCallback(async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      console.log('[DEBUG] fetchPools called but user not authenticated');
+      return;
+    }
 
+    console.log('[DEBUG] Fetching pools...');
     setLoadingPools(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools`, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const poolsUrl = `${backendUrl}/api/pools`;
+      
+      console.log('[DEBUG] Fetching pools from URL:', poolsUrl);
+      
+      const response = await fetch(poolsUrl, {
         method: 'GET',
         credentials: 'include',
       });
 
+      console.log('[DEBUG] Fetch pools response status:', response.status);
+
       if (response.ok) {
-      const result = await response.json();
+        const result = await response.json();
+        console.log('[DEBUG] Fetch pools response data:', result);
         setRealPools(result.pools || []);
       } else {
-        console.error('Failed to fetch pools');
+        console.error('[DEBUG] Failed to fetch pools, status:', response.status);
         setRealPools([]);
       }
     } catch (error) {
-      console.error('Error fetching pools:', error);
+      console.error('[DEBUG] Error fetching pools:', error);
       setRealPools([]);
     } finally {
       setLoadingPools(false);
@@ -173,7 +185,14 @@ export default function PoolsPage() {
         monthlyDebtPayments: null
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools/create`, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const createPoolUrl = `${backendUrl}/api/pools/create`;
+      
+      console.log('[DEBUG] Creating pool with URL:', createPoolUrl);
+      console.log('[DEBUG] Pool data:', poolData);
+      console.log('[DEBUG] Authentication status:', isAuthenticated);
+
+      const response = await fetch(createPoolUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -182,7 +201,9 @@ export default function PoolsPage() {
         body: JSON.stringify(poolData)
       });
 
+      console.log('[DEBUG] Pool creation response status:', response.status);
       const result = await response.json();
+      console.log('[DEBUG] Pool creation response data:', result);
 
       if (response.ok) {
         showSuccess('Pool created successfully! It will appear in your pools list.');
@@ -223,17 +244,29 @@ export default function PoolsPage() {
     let cancelled = false;
     (async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+        const authUrl = `${backendUrl}/api/auth/me`;
+        
+        console.log('[DEBUG] Checking authentication with URL:', authUrl);
+        
+        const response = await fetch(authUrl, {
           credentials: 'include'
         });
+        
+        console.log('[DEBUG] Auth check response status:', response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('[DEBUG] Auth check response data:', data);
           if (!cancelled && data.authenticated) {
             setIsAuthenticated(true);
           }
           return;
+        } else {
+          console.log('[DEBUG] Auth check failed with status:', response.status);
         }
-      } catch {
+      } catch (error) {
+        console.error('[DEBUG] Auth check error:', error);
         // Ignore auth check errors
       }
       // Fallback to localStorage
