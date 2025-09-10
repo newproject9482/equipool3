@@ -29,6 +29,9 @@ urlpatterns = [
     path('api/pools/create', views.create_pool, name='create-pool'),
     path('api/pools', views.get_pools, name='get-pools'),
     path('api/pools/<int:pool_id>', views.get_pool_detail, name='get-pool-detail'),
+    # Investor endpoints
+    path('api/investor/pools', views.get_investment_opportunities, name='get-investment-opportunities'),
+    path('api/investor/pools/<int:pool_id>', views.get_investment_pool_detail, name='get-investment-pool-detail'),
     # Health check endpoints
     path('api/health/database', health.database_health_check, name='database-health'),
     path('api/health/users', health.list_users, name='list-users'),

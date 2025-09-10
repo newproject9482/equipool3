@@ -74,29 +74,21 @@ def _parse_date(date_str: str):
 
 @csrf_exempt  # For now; recommend enabling proper CSRF/token auth later
 def borrower_signup(request: HttpRequest):
-    print(f"[DEBUG] Borrower signup request received: {request.method}")
-    print(f"[DEBUG] Headers: {dict(request.headers)}")
-    
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     try:
         data = json.loads(request.body.decode("utf-8"))
-        print(f"[DEBUG] Signup data received: {data}")
     except json.JSONDecodeError:
-        print(f"[DEBUG] Invalid JSON in request body")
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
     missing = REQUIRED_FIELDS - set(data.keys())
     if missing:
-        print(f"[DEBUG] Missing required fields: {missing}")
         return JsonResponse({"error": f"Missing fields: {', '.join(sorted(missing))}"}, status=400)
 
     full_name = data.get("fullName", "").strip()
     email = data.get("email", "").lower().strip()
     dob_raw = data.get("dateOfBirth")
     password = data.get("password")
-
-    print(f"[DEBUG] Processing signup for email: {email}")
 
     if not full_name:
         return JsonResponse({"error": "Full name required"}, status=400)
@@ -107,29 +99,20 @@ def borrower_signup(request: HttpRequest):
     try:
         dob = _parse_date(dob_raw)
     except ValidationError as e:
-        print(f"[DEBUG] Date parsing error: {e}")
         return JsonResponse({"error": str(e)}, status=400)
 
     try:
-        print(f"[DEBUG] Creating borrower object...")
         with transaction.atomic():  # Ensure database transaction
             b = Borrower(full_name=full_name, email=email, date_of_birth=dob)
-            print(f"[DEBUG] Setting password...")
             b.set_password(password)
-            print(f"[DEBUG] Saving borrower to database...")
             b.save()
-            print(f"[DEBUG] Borrower saved successfully with ID: {b.id}")
             
             # Verify the save by querying back
-            print(f"[DEBUG] Verifying save by querying back...")
             saved_borrower = Borrower.objects.get(id=b.id)
-            print(f"[DEBUG] Verification successful: {saved_borrower.email}")
             
     except IntegrityError as e:
-        print(f"[DEBUG] Integrity error during save: {e}")
         return JsonResponse({"error": "Email already registered"}, status=409)
     except Exception as e:
-        print(f"[DEBUG] Unexpected error during save: {e}")
         return JsonResponse({"error": f"Database error: {str(e)}"}, status=500)
 
     return JsonResponse({
@@ -142,44 +125,30 @@ def borrower_signup(request: HttpRequest):
 
 @csrf_exempt
 def borrower_login(request: HttpRequest):
-    print(f"[DEBUG] Login request received: {request.method}")
-    print(f"[DEBUG] Headers: {dict(request.headers)}")
-    
     if request.method != 'POST':
         return JsonResponse({'error':'Method not allowed'}, status=405)
     try:
         data = json.loads(request.body.decode('utf-8'))
-        print(f"[DEBUG] Login data: {data}")
     except json.JSONDecodeError:
-        print(f"[DEBUG] Invalid JSON in login request")
         return JsonResponse({'error':'Invalid JSON'}, status=400)
         
     email = data.get('email','').lower().strip()
     password = data.get('password','')
-    print(f"[DEBUG] Attempting login for email: {email}")
     
     if not email or not password:
-        print(f"[DEBUG] Missing email or password")
         return JsonResponse({'error':'Email and password required'}, status=400)
         
     try:
-        print(f"[DEBUG] Searching for borrower with email: {email}")
         b = Borrower.objects.get(email=email)
-        print(f"[DEBUG] Found borrower: {b.id}, {b.full_name}")
     except Borrower.DoesNotExist:
-        print(f"[DEBUG] No borrower found with email: {email}")
         return JsonResponse({'error':'Invalid credentials'}, status=401)
     except Exception as e:
-        print(f"[DEBUG] Database error during borrower lookup: {e}")
         return JsonResponse({'error':'Database error'}, status=500)
         
-    print(f"[DEBUG] Checking password for borrower: {b.id}")
     if not check_password(password, b.password_hash):
-        print(f"[DEBUG] Password check failed for borrower: {b.id}")
         return JsonResponse({'error':'Invalid credentials'}, status=401)
-        
-    print(f"[DEBUG] Password check passed for borrower: {b.id}")
     
+        
     # Establish session (for same-origin requests)
     request.session['borrower_id'] = b.id
     request.session['role'] = 'borrower'
@@ -187,16 +156,9 @@ def borrower_login(request: HttpRequest):
     
     # Create auth token (for cross-origin requests)
     try:
-        print(f"[DEBUG] Creating auth token for borrower: {b.id}")
         auth_token = _create_auth_token(b, 'borrower')
-        print(f"[DEBUG] Auth token created successfully: {auth_token}")
     except Exception as e:
-        print(f"[DEBUG] Error creating auth token: {e}")
         return JsonResponse({'error':'Token creation failed'}, status=500)
-    
-    print(f"[DEBUG] Session established for borrower: {b.id}")
-    print(f"[DEBUG] Session data after login: {dict(request.session)}")
-    print(f"[DEBUG] Session key: {request.session.session_key}")
     
     response = JsonResponse({
         'id': b.id,
@@ -206,10 +168,7 @@ def borrower_login(request: HttpRequest):
         'token': auth_token  # Include token for cross-origin requests
     }, status=200)
     
-    print(f"[DEBUG] Login successful for borrower: {b.id}")
-    return response
-
-@csrf_exempt
+    return response@csrf_exempt
 def auth_logout(request: HttpRequest):
     if request.method != 'POST':
         return JsonResponse({'error':'Method not allowed'}, status=405)
@@ -217,16 +176,10 @@ def auth_logout(request: HttpRequest):
     return JsonResponse({'success': True})
 
 def auth_me(request: HttpRequest):
-    print(f"[DEBUG] Auth check - session data: {dict(request.session)}")
-    print(f"[DEBUG] Auth check - session key: {request.session.session_key}")
-    print(f"[DEBUG] Auth check - cookies: {request.COOKIES}")
-    print(f"[DEBUG] Auth check - headers: {dict(request.headers)}")
-    
     # Try both token-based and session-based authentication
     user, role = _get_user_from_request(request)
     
     if user and role:
-        print(f"[DEBUG] User authenticated via {'token' if 'Authorization' in request.headers else 'session'}: {user.id} ({role})")
         return JsonResponse({
             'authenticated': True,
             'id': user.id,
@@ -235,17 +188,14 @@ def auth_me(request: HttpRequest):
             'role': role
         })
     
-    print(f"[DEBUG] Authentication failed - no valid session or token")
     return JsonResponse({'authenticated': False}, status=401)
 
 @csrf_exempt
 def investor_signup(request: HttpRequest):
-    print(f"[DEBUG] Investor signup request received: {request.method}")
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     try:
         data = json.loads(request.body.decode("utf-8"))
-        print(f"[DEBUG] Received investor data: {data}")
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
@@ -293,7 +243,6 @@ def investor_signup(request: HttpRequest):
         return JsonResponse({"error": str(e)}, status=400)
 
     try:
-        print(f"[DEBUG] Creating investor object for email: {email}")
         with transaction.atomic():  # Ensure database transaction
             i = Investor(
                 full_name=full_name,
@@ -308,23 +257,15 @@ def investor_signup(request: HttpRequest):
                 zip_code=zip_code,
                 country=country
             )
-            print(f"[DEBUG] Setting password for investor...")
             i.set_password(password)
-            print(f"[DEBUG] Saving investor to database...")
             i.save()
-            print(f"[DEBUG] Successfully created investor with ID: {i.id}")
             
             # Verify the save by querying back
-            print(f"[DEBUG] Verifying investor save by querying back...")
             saved_investor = Investor.objects.get(id=i.id)
-            print(f"[DEBUG] Investor verification successful: {saved_investor.email}")
             
     except IntegrityError as e:
-        print(f"[DEBUG] Integrity error during investor save: {e}")
-        print(f"[DEBUG] Email already registered: {email}")
         return JsonResponse({"error": "Email already registered"}, status=409)
     except Exception as e:
-        print(f"[DEBUG] Unexpected error during investor save: {e}")
         return JsonResponse({"error": f"Database error: {str(e)}"}, status=500)
 
     return JsonResponse({
@@ -366,11 +307,6 @@ def investor_login(request: HttpRequest):
     # Create auth token (for cross-origin requests)
     auth_token = _create_auth_token(i, 'investor')
     
-    print(f"[DEBUG] Session established for investor: {i.id}")
-    print(f"[DEBUG] Session data after login: {dict(request.session)}")
-    print(f"[DEBUG] Session key: {request.session.session_key}")
-    print(f"[DEBUG] Auth token created: {auth_token}")
-    
     response = JsonResponse({
         'id': i.id,
         'fullName': i.full_name,
@@ -387,6 +323,15 @@ def _require_borrower_auth(request):
     
     if not user or role != 'borrower':
         return None, JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    return user, None
+
+def _require_investor_auth(request):
+    """Helper function to check if user is authenticated as investor"""
+    user, role = _get_user_from_request(request)
+    
+    if not user or role != 'investor':
+        return None, JsonResponse({'error': 'Investor authentication required'}, status=401)
     
     return user, None
 
@@ -592,6 +537,96 @@ def get_pool_detail(request: HttpRequest, pool_id: int):
         'monthlyDebtPayments': str(pool.monthly_debt_payments) if pool.monthly_debt_payments else None,
         
         # Documents
+        'homeInsuranceDoc': pool.home_insurance_doc,
+        'taxReturnDoc': pool.tax_return_doc,
+        'appraisalDoc': pool.appraisal_doc,
+        'propertyPhotos': pool.property_photos,
+    }, status=200)
+
+def get_investment_opportunities(request: HttpRequest):
+    """Get all active pools for investors to browse"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    investor, auth_error = _require_investor_auth(request)
+    if auth_error:
+        return auth_error
+    
+    # Get all active pools from all borrowers
+    pools = Pool.objects.filter(status='active').order_by('-created_at')
+    
+    pools_data = []
+    for pool in pools:
+        pools_data.append({
+            'id': pool.id,
+            'poolType': pool.pool_type,
+            'amount': str(pool.amount),
+            'roiRate': str(pool.roi_rate),
+            'term': pool.term,
+            'termMonths': pool.term_months,
+            'status': pool.status,
+            'fundingProgress': pool.funding_progress,
+            'createdAt': pool.created_at.isoformat(),
+            'address': f"{pool.address_line}, {pool.city}, {pool.state} {pool.zip_code}",
+            'propertyValue': str(pool.property_value) if pool.property_value else None,
+            'mortgageBalance': str(pool.mortgage_balance) if pool.mortgage_balance else None,
+            'borrowerName': pool.borrower.full_name,  # Add borrower info for investors
+            'percentOwned': str(pool.percent_owned),
+        })
+    
+    return JsonResponse({'pools': pools_data}, status=200)
+
+def get_investment_pool_detail(request: HttpRequest, pool_id: int):
+    """Get detailed information for a specific investment opportunity"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    investor, auth_error = _require_investor_auth(request)
+    if auth_error:
+        return auth_error
+    
+    try:
+        # Investors can view any active pool, not just their own
+        pool = Pool.objects.get(id=pool_id, status='active')
+    except Pool.DoesNotExist:
+        return JsonResponse({'error': 'Investment opportunity not found'}, status=404)
+    
+    return JsonResponse({
+        'id': pool.id,
+        'poolType': pool.pool_type,
+        'status': pool.status,
+        'amount': str(pool.amount),
+        'roiRate': str(pool.roi_rate),
+        'term': pool.term,
+        'termMonths': pool.term_months,
+        'customTermMonths': pool.custom_term_months,
+        'fundingProgress': pool.funding_progress,
+        'createdAt': pool.created_at.isoformat(),
+        'updatedAt': pool.updated_at.isoformat(),
+        
+        # Property details
+        'addressLine': pool.address_line,
+        'city': pool.city,
+        'state': pool.state,
+        'zipCode': pool.zip_code,
+        'percentOwned': str(pool.percent_owned),
+        'coOwner': pool.co_owner,
+        'propertyValue': str(pool.property_value) if pool.property_value else None,
+        'propertyLink': pool.property_link,
+        'mortgageBalance': str(pool.mortgage_balance) if pool.mortgage_balance else None,
+        
+        # Borrower information (limited for privacy)
+        'borrowerName': pool.borrower.full_name,
+        'borrowerEmail': pool.borrower.email,  # Investors might need this for contact
+        
+        # Risk assessment information
+        'otherPropertyLoans': str(pool.other_property_loans) if pool.other_property_loans else None,
+        'creditCardDebt': str(pool.credit_card_debt) if pool.credit_card_debt else None,
+        'monthlyDebtPayments': str(pool.monthly_debt_payments) if pool.monthly_debt_payments else None,
+        
+        # Documents (if available)
         'homeInsuranceDoc': pool.home_insurance_doc,
         'taxReturnDoc': pool.tax_return_doc,
         'appraisalDoc': pool.appraisal_doc,
