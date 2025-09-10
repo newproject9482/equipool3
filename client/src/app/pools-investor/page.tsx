@@ -23,6 +23,8 @@ export default function InvestorPoolsPage() {
   const [activeTab, setActiveTab] = useState<'explore' | 'investments' | 'archive'>('explore');
   const [myInvestments, setMyInvestments] = useState<any[]>([]);
   const [loadingInvestments, setLoadingInvestments] = useState(false);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loadingDashboard, setLoadingDashboard] = useState(false);
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
 
@@ -86,12 +88,43 @@ export default function InvestorPoolsPage() {
     }
   };
 
+  // Function to fetch dashboard metrics
+  const fetchDashboardData = async () => {
+    if (!isAuthenticated || userRole !== 'investor') {
+      return;
+    }
+
+    setLoadingDashboard(true);
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const dashboardUrl = `${backendUrl}/api/investor/dashboard`;
+      
+      const response = await fetch(dashboardUrl, getAuthenticatedFetchOptions({
+        method: 'GET'
+      }));
+
+      if (response.ok) {
+        const result = await response.json();
+        setDashboardData(result);
+      } else {
+        console.error('Failed to fetch dashboard data, status:', response.status);
+        setDashboardData(null);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      setDashboardData(null);
+    } finally {
+      setLoadingDashboard(false);
+    }
+  };
+
   // Fetch investment pools when authenticated as investor
   useEffect(() => {
     if (isAuthenticated && userRole === 'investor') {
       // Always fetch both pools and investments to properly filter
       fetchInvestmentPools();
       fetchMyInvestments();
+      fetchDashboardData();
     }
   }, [isAuthenticated, userRole]);
 
@@ -101,6 +134,7 @@ export default function InvestorPoolsPage() {
       if (isAuthenticated && userRole === 'investor') {
         fetchInvestmentPools();
         fetchMyInvestments();
+        fetchDashboardData();
       }
     };
 
@@ -124,6 +158,7 @@ export default function InvestorPoolsPage() {
     setActiveTab(tab);
     if (tab === 'investments' && isAuthenticated && userRole === 'investor') {
       fetchMyInvestments();
+      fetchDashboardData();
     }
   };
 
@@ -300,7 +335,9 @@ export default function InvestorPoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Total Invested</div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$1 285 000</div>
+                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                          {loadingDashboard ? 'Loading...' : dashboardData ? `$${parseFloat(dashboardData.totalInvested).toLocaleString()}` : '$0'}
+                        </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Total amount you've received across all funded pools.</div>
@@ -311,7 +348,9 @@ export default function InvestorPoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Current ROI</div>
                     </div>
                     <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>%14.5</div>
+                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                          {loadingDashboard ? 'Loading...' : dashboardData ? `${dashboardData.currentROI}%` : '0%'}
+                        </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Your upcoming repayment amount and due date.</div>
@@ -322,7 +361,9 @@ export default function InvestorPoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Active pools</div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>3</div>
+                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                          {loadingDashboard ? 'Loading...' : dashboardData ? dashboardData.activePools : '0'}
+                        </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Number of currently running loans.</div>
@@ -333,8 +374,12 @@ export default function InvestorPoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pending payouts</div>
                     </div>
                     <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>July 12</div>
-                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$7843.32</div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                          {loadingDashboard ? 'Loading...' : (dashboardData && dashboardData.pendingPayouts.nextDate) ? dashboardData.pendingPayouts.nextDate : 'No pending payouts'}
+                        </div>
+                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                          {loadingDashboard ? 'Loading...' : (dashboardData && dashboardData.pendingPayouts.amount) ? `$${parseFloat(dashboardData.pendingPayouts.amount).toLocaleString()}` : '$0'}
+                        </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Number of currently running loans.</div>

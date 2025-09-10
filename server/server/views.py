@@ -763,3 +763,57 @@ def get_my_investments(request: HttpRequest):
         })
     
     return JsonResponse({'investments': investments_data}, status=200)
+
+
+def get_investor_dashboard(request: HttpRequest):
+    """Get dashboard metrics for the authenticated investor"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    investor, auth_error = _require_investor_auth(request)
+    if auth_error:
+        return auth_error
+    
+    # Get all investments for this investor
+    investments = Investment.objects.filter(investor=investor).select_related('pool')
+    
+    # Calculate metrics
+    total_invested = sum(investment.amount for investment in investments)
+    active_pools_count = investments.filter(status='active').count()
+    
+    # Calculate ROI (simplified - this would be more complex in real scenarios)
+    # For now, we'll use the weighted average of pool ROI rates
+    if investments.exists():
+        total_investment_amount = sum(inv.amount for inv in investments)
+        weighted_roi = sum(inv.amount * inv.pool.roi_rate for inv in investments) / total_investment_amount if total_investment_amount > 0 else 0
+    else:
+        weighted_roi = 0
+    
+    # Calculate pending payouts (simplified - would need actual payout schedule)
+    # For now, we'll calculate expected returns from active investments
+    active_investments = investments.filter(status='active')
+    pending_payout_amount = 0
+    next_payout_date = None
+    
+    if active_investments.exists():
+        # Calculate expected returns (principal + interest)
+        for investment in active_investments:
+            expected_return = investment.amount * (1 + investment.pool.roi_rate / 100)
+            pending_payout_amount += expected_return
+        
+        # For demo purposes, set next payout date as next month
+        from datetime import datetime, timedelta
+        next_payout_date = (datetime.now() + timedelta(days=30)).strftime('%B %d')
+    
+    dashboard_data = {
+        'totalInvested': str(total_invested),
+        'currentROI': f"{weighted_roi:.1f}",
+        'activePools': active_pools_count,
+        'pendingPayouts': {
+            'amount': str(pending_payout_amount),
+            'nextDate': next_payout_date
+        }
+    }
+    
+    return JsonResponse(dashboard_data, status=200)
