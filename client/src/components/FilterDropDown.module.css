@@ -1,0 +1,33 @@
+.filterDropDown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 120px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #E5E7EB;
+  overflow: hidden;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.intelligenceCardTitle {
+  padding: 12px 16px;
+  color: #4A5565;
+  font-size: 14px;
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #F4F4F4;
+}
+
+.intelligenceCardTitle:last-child {
+  border-bottom: none;
+}
+
+.intelligenceCardTitle:hover {
+  background-color: #F8FAFC;
+  color: #113D7B;
+}

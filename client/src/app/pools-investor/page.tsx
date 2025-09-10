@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Toaster, useToaster } from '../../components/Toaster';
 import { getAuthenticatedFetchOptions, clearAuthData } from '../../utils/auth';
 import { getPoolsUrlForRole, getSmartPoolsUrl } from '../../utils/navigation';
+import FilterDropDown from '../../components/FilterDropDown';
 
 const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
 
@@ -80,6 +81,10 @@ export default function InvestorPoolsPage() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  
+  // Filter states
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [dateFilter, setDateFilter] = useState<'newest' | 'oldest' | null>(null);
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
 
@@ -210,7 +215,7 @@ export default function InvestorPoolsPage() {
 
   // Filter pools to exclude those the user has already invested in
   const getFilteredPools = () => {
-    if (activeTab !== 'explore') return investmentPools;
+    if (activeTab !== 'explore') return getSortedPools(investmentPools);
     
     // Show pools even if we're still loading investments, but filter them properly
     // This prevents the flickering effect
@@ -228,8 +233,65 @@ export default function InvestorPoolsPage() {
     const investedPoolIds = myInvestments.map(investment => investment.pool.id);
     
     // Filter out pools that user has already invested in
-    return investmentPools.filter(pool => !investedPoolIds.includes(pool.id));
+    const filteredPools = investmentPools.filter(pool => !investedPoolIds.includes(pool.id));
+    
+    // Apply sorting
+    return getSortedPools(filteredPools);
   };
+
+  // Sort pools based on date filter
+  const getSortedPools = (pools: Pool[]) => {
+    if (!dateFilter) return pools;
+    
+    return [...pools].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      
+      if (dateFilter === 'newest') {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
+    });
+  };
+
+  // Sort investments based on date filter
+  const getSortedInvestments = (investments: Investment[]) => {
+    if (!dateFilter) return investments;
+    
+    return [...investments].sort((a, b) => {
+      const dateA = new Date(a.investedAt).getTime();
+      const dateB = new Date(b.investedAt).getTime();
+      
+      if (dateFilter === 'newest') {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
+    });
+  };
+
+  // Handle filter change
+  const handleFilterChange = (filter: 'newest' | 'oldest') => {
+    setDateFilter(filter);
+  };
+
+  // Handle filter dropdown toggle
+  const handleFilterToggle = () => {
+    setShowFilterDropdown(!showFilterDropdown);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowFilterDropdown(false);
+    };
+
+    if (showFilterDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showFilterDropdown]);
 
   // Refresh data when switching to investments tab
   const handleTabChange = (tab: 'explore' | 'investments' | 'archive') => {
@@ -520,17 +582,25 @@ export default function InvestorPoolsPage() {
             </div>
             <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
                 <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Filters</div>
-                <div data-icon="ic:filter" style={{width: 14, height: 14, position: 'relative', overflow: 'hidden'}}>
-                    <div style={{width: 7, height: 7, left: 3.50, top: 3.50, position: 'absolute', outline: '1px var(--Grey, #767676) solid', outlineOffset: '-0.50px'}} />
-                </div>
+                <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.88889 4H10.1111C10.2143 4 10.3132 4.04162 10.3861 4.11571C10.459 4.1898 10.5 4.29028 10.5 4.39506V5.02162C10.5 5.12638 10.459 5.22685 10.3861 5.30092L7.89172 7.83482C7.81879 7.90889 7.7778 8.00935 7.77778 8.11412V10.605C7.77778 10.665 7.7643 10.7243 7.73837 10.7782C7.71244 10.8322 7.67474 10.8794 7.62814 10.9164C7.58154 10.9533 7.52726 10.979 7.46942 10.9914C7.41159 11.0039 7.35173 11.0028 7.29439 10.9882L6.51661 10.7906C6.43252 10.7692 6.35787 10.7199 6.30453 10.6505C6.2512 10.581 6.22222 10.4955 6.22222 10.4074V8.11412C6.2222 8.00935 6.18121 7.90889 6.10828 7.83482L3.61394 5.30092C3.54101 5.22685 3.50002 5.12638 3.5 5.02162V4.39506C3.5 4.29028 3.54097 4.1898 3.6139 4.11571C3.68683 4.04162 3.78575 4 3.88889 4Z" stroke="#767676" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
             </div>
-            <div data-left-icon="true" data-state="filter" style={{paddingLeft: 4, paddingRight: 4, paddingTop: 2, paddingBottom: 2, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'flex'}}>
-                <div data-icon="ic:calendar" style={{width: 12, height: 12, position: 'relative', overflow: 'hidden'}}>
-                    <div style={{width: 7.50, height: 6.25, left: 2.25, top: 3.50, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
-                    <div style={{width: 7.50, height: 1.67, left: 2.25, top: 3.50, position: 'absolute', background: 'var(--Black, black)'}} />
-                    <div style={{width: 4.17, height: 1.25, left: 3.91, top: 2.25, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+            <div data-left-icon="true" data-state="filter" style={{paddingLeft: 4, paddingRight: 4, paddingTop: 2, paddingBottom: 2, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'flex', position: 'relative', cursor: 'pointer'}} onClick={(e) => { e.stopPropagation(); handleFilterToggle(); }}>
+                <svg width="10" height="9" viewBox="0 0 10 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.91667 2H2.08333C1.6231 2 1.25 2.3731 1.25 2.83333V7.41667C1.25 7.8769 1.6231 8.25 2.08333 8.25H7.91667C8.3769 8.25 8.75 7.8769 8.75 7.41667V2.83333C8.75 2.3731 8.3769 2 7.91667 2Z" stroke="black"/>
+                    <path d="M1.25 3.66667C1.25 2.88083 1.25 2.48833 1.49417 2.24417C1.73833 2 2.13083 2 2.91667 2H7.08333C7.86917 2 8.26167 2 8.50583 2.24417C8.75 2.48833 8.75 2.88083 8.75 3.66667H1.25Z" fill="black"/>
+                    <path d="M2.91406 0.75V2M7.08073 0.75V2" stroke="black" strokeLinecap="round"/>
+                </svg>
+                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                  {dateFilter ? (dateFilter === 'newest' ? 'Newest' : 'Oldest') : 'Date Created'}
                 </div>
-                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Date Created</div>
+                {showFilterDropdown && (
+                  <FilterDropDown 
+                    onFilterChange={handleFilterChange}
+                    onClose={() => setShowFilterDropdown(false)}
+                  />
+                )}
             </div>
         </div>
         <div style={{width: '100%', maxWidth: 1122, height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'flex-start', alignItems: 'start', margin: '24px 0 0 0'}}>
@@ -697,7 +767,7 @@ export default function InvestorPoolsPage() {
                   </div>
                 </div>
               ) : (
-                myInvestments.map((investment) => (
+                getSortedInvestments(myInvestments).map((investment) => (
                   <div key={investment.id} style={{width: 350, height: 355, paddingTop: 20, paddingBottom: 12, paddingLeft: 20, paddingRight: 20, background: 'var(--White, white)', overflow: 'hidden', borderRadius: 24, outline: '1px #65CC8E solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex', cursor: 'pointer', transition: 'all 0.2s ease'}}
                     onClick={() => router.push(`/pools-investor/${investment.pool.id}`)}
                     onMouseEnter={(e) => {
