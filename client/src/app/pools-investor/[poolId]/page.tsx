@@ -151,13 +151,6 @@ export default function InvestorPoolDetailPage() {
     return () => { cancelled = true; };
   }, [poolId]);
 
-  // Fetch investments when investments tab is active
-  useEffect(() => {
-    if (activeTab === 'investments' && isAuthenticated && userRole === 'investor') {
-      fetchInvestments();
-    }
-  }, [activeTab, isAuthenticated, userRole, fetchInvestments]);
-
   const fetchInvestments = useCallback(async () => {
     setLoadingInvestments(true);
     try {
@@ -184,6 +177,13 @@ export default function InvestorPoolDetailPage() {
       setLoadingInvestments(false);
     }
   }, [poolData]);
+
+  // Fetch investments when investments tab is active
+  useEffect(() => {
+    if (activeTab === 'investments' && isAuthenticated && userRole === 'investor') {
+      fetchInvestments();
+    }
+  }, [activeTab, isAuthenticated, userRole, fetchInvestments]);
 
   // Check user investment status when pool data changes
   useEffect(() => {
