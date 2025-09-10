@@ -79,6 +79,7 @@ export default function InvestorPoolsPage() {
   const [loadingInvestments, setLoadingInvestments] = useState(false);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
 
@@ -164,29 +165,32 @@ export default function InvestorPoolsPage() {
         setDashboardData(result);
       } else {
         console.error('Failed to fetch dashboard data, status:', response.status);
-        if (!dashboardData) { // Only clear data if we don't have any
-          setDashboardData(null);
-        }
+        // Don't clear data on error to prevent UI flickering
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      if (!dashboardData) { // Only clear data if we don't have any
-        setDashboardData(null);
-      }
+      // Don't clear data on error to prevent UI flickering
     } finally {
       if (showLoading) {
         setLoadingDashboard(false);
       }
     }
-  }, [isAuthenticated, userRole, dashboardData]);
+  }, [isAuthenticated, userRole]);
 
   // Fetch investment pools when authenticated as investor
   useEffect(() => {
     if (isAuthenticated && userRole === 'investor') {
-      // Always fetch both pools and investments to properly filter
-      fetchInvestmentPools();
-      fetchMyInvestments();
-      fetchDashboardData();
+      // Reset initial data loaded flag
+      setInitialDataLoaded(false);
+      
+      // Fetch both pools and investments, then mark as loaded
+      Promise.all([
+        fetchInvestmentPools(),
+        fetchMyInvestments(),
+        fetchDashboardData()
+      ]).finally(() => {
+        setInitialDataLoaded(true);
+      });
     }
   }, [isAuthenticated, userRole, fetchInvestmentPools, fetchMyInvestments, fetchDashboardData]);
 
@@ -196,22 +200,29 @@ export default function InvestorPoolsPage() {
       if (isAuthenticated && userRole === 'investor') {
         fetchInvestmentPools();
         fetchMyInvestments();
-        // Only refresh dashboard if we don't have data yet, and don't show loading
-        if (!dashboardData) {
-          fetchDashboardData(true);
-        } else {
-          fetchDashboardData(false); // Refresh silently to update data
-        }
+        fetchDashboardData(false); // Refresh silently to update data
       }
     };
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [isAuthenticated, userRole, dashboardData, fetchInvestmentPools, fetchMyInvestments, fetchDashboardData]);
+  }, [isAuthenticated, userRole, fetchInvestmentPools, fetchMyInvestments, fetchDashboardData]);
 
   // Filter pools to exclude those the user has already invested in
   const getFilteredPools = () => {
     if (activeTab !== 'explore') return investmentPools;
+    
+    // Show pools even if we're still loading investments, but filter them properly
+    // This prevents the flickering effect
+    if (!initialDataLoaded) {
+      // If we haven't loaded initial data yet, show loading state
+      return [];
+    }
+    
+    // If we're still loading pools, show empty array
+    if (loadingPools) {
+      return [];
+    }
     
     // Get pool IDs that user has already invested in
     const investedPoolIds = myInvestments.map(investment => investment.pool.id);
@@ -525,7 +536,7 @@ export default function InvestorPoolsPage() {
         <div style={{width: '100%', maxWidth: 1122, height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'flex-start', alignItems: 'start', margin: '24px 0 0 0'}}>
           {activeTab === 'explore' && (
             <>
-              {loadingPools ? (
+              {(!initialDataLoaded || loadingPools) ? (
                 <div style={{
                   gridColumn: '1 / -1',
                   display: 'flex',
