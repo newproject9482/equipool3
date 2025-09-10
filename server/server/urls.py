@@ -31,5 +31,6 @@ urlpatterns = [
     path('api/pools/<int:pool_id>', views.get_pool_detail, name='get-pool-detail'),
     # Health check endpoints
     path('api/health/database', health.database_health_check, name='database-health'),
+    path('api/health/users', health.list_users, name='list-users'),
     path('api/health/migrate', health.force_migrate, name='force-migrate'),
 ]

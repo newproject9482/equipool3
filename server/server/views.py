@@ -5,7 +5,7 @@ from decimal import Decimal, InvalidOperation
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from .models import Borrower, Investor, Pool, AuthToken
 from django.contrib.auth.hashers import check_password
@@ -112,12 +112,19 @@ def borrower_signup(request: HttpRequest):
 
     try:
         print(f"[DEBUG] Creating borrower object...")
-        b = Borrower(full_name=full_name, email=email, date_of_birth=dob)
-        print(f"[DEBUG] Setting password...")
-        b.set_password(password)
-        print(f"[DEBUG] Saving borrower to database...")
-        b.save()
-        print(f"[DEBUG] Borrower saved successfully with ID: {b.id}")
+        with transaction.atomic():  # Ensure database transaction
+            b = Borrower(full_name=full_name, email=email, date_of_birth=dob)
+            print(f"[DEBUG] Setting password...")
+            b.set_password(password)
+            print(f"[DEBUG] Saving borrower to database...")
+            b.save()
+            print(f"[DEBUG] Borrower saved successfully with ID: {b.id}")
+            
+            # Verify the save by querying back
+            print(f"[DEBUG] Verifying save by querying back...")
+            saved_borrower = Borrower.objects.get(id=b.id)
+            print(f"[DEBUG] Verification successful: {saved_borrower.email}")
+            
     except IntegrityError as e:
         print(f"[DEBUG] Integrity error during save: {e}")
         return JsonResponse({"error": "Email already registered"}, status=409)
@@ -287,24 +294,31 @@ def investor_signup(request: HttpRequest):
 
     try:
         print(f"[DEBUG] Creating investor object for email: {email}")
-        i = Investor(
-            full_name=full_name,
-            email=email,
-            date_of_birth=dob,
-            phone=phone,
-            ssn=ssn,
-            address1=address1,
-            address2=address2,
-            city=city,
-            state=state,
-            zip_code=zip_code,
-            country=country
-        )
-        print(f"[DEBUG] Setting password for investor...")
-        i.set_password(password)
-        print(f"[DEBUG] Saving investor to database...")
-        i.save()
-        print(f"[DEBUG] Successfully created investor with ID: {i.id}")
+        with transaction.atomic():  # Ensure database transaction
+            i = Investor(
+                full_name=full_name,
+                email=email,
+                date_of_birth=dob,
+                phone=phone,
+                ssn=ssn,
+                address1=address1,
+                address2=address2,
+                city=city,
+                state=state,
+                zip_code=zip_code,
+                country=country
+            )
+            print(f"[DEBUG] Setting password for investor...")
+            i.set_password(password)
+            print(f"[DEBUG] Saving investor to database...")
+            i.save()
+            print(f"[DEBUG] Successfully created investor with ID: {i.id}")
+            
+            # Verify the save by querying back
+            print(f"[DEBUG] Verifying investor save by querying back...")
+            saved_investor = Investor.objects.get(id=i.id)
+            print(f"[DEBUG] Investor verification successful: {saved_investor.email}")
+            
     except IntegrityError as e:
         print(f"[DEBUG] Integrity error during investor save: {e}")
         print(f"[DEBUG] Email already registered: {email}")
