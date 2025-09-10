@@ -87,8 +87,19 @@ def borrower_login(request: HttpRequest):
     # Establish session
     request.session['borrower_id'] = b.id
     request.session['role'] = 'borrower'
+    request.session.save()  # Force save the session
     print(f"[DEBUG] Session established for borrower: {b.id}")
-    return JsonResponse({'id': b.id,'fullName': b.full_name,'email': b.email,'role':'borrower'}, status=200)
+    print(f"[DEBUG] Session data after login: {dict(request.session)}")
+    print(f"[DEBUG] Session key: {request.session.session_key}")
+    print(f"[DEBUG] Session modified: {request.session.modified}")
+    
+    response = JsonResponse({'id': b.id,'fullName': b.full_name,'email': b.email,'role':'borrower'}, status=200)
+    
+    # Debug session cookie
+    if hasattr(request.session, 'session_key') and request.session.session_key:
+        print(f"[DEBUG] Setting session cookie with key: {request.session.session_key}")
+    
+    return response
 
 @csrf_exempt
 def auth_logout(request: HttpRequest):
@@ -99,6 +110,10 @@ def auth_logout(request: HttpRequest):
 
 def auth_me(request: HttpRequest):
     print(f"[DEBUG] Auth check - session data: {dict(request.session)}")
+    print(f"[DEBUG] Auth check - session key: {request.session.session_key}")
+    print(f"[DEBUG] Auth check - cookies: {request.COOKIES}")
+    print(f"[DEBUG] Auth check - headers: {dict(request.headers)}")
+    
     borrower_id = request.session.get('borrower_id')
     investor_id = request.session.get('investor_id')
     print(f"[DEBUG] Borrower ID: {borrower_id}, Investor ID: {investor_id}")
@@ -240,13 +255,19 @@ def investor_login(request: HttpRequest):
     # Establish session
     request.session['investor_id'] = i.id
     request.session['role'] = 'investor'
+    request.session.save()  # Force save the session
+    print(f"[DEBUG] Session established for investor: {i.id}")
+    print(f"[DEBUG] Session data after login: {dict(request.session)}")
+    print(f"[DEBUG] Session key: {request.session.session_key}")
     
-    return JsonResponse({
+    response = JsonResponse({
         'id': i.id,
         'fullName': i.full_name,
         'email': i.email,
         'role': 'investor'
     }, status=200)
+    
+    return response
 
 def _require_borrower_auth(request):
     """Helper function to check if user is authenticated as borrower"""

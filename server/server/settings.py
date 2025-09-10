@@ -198,5 +198,20 @@ CORS_ALLOW_HEADERS = [
 # Session settings for cross-origin
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True  # Required for SameSite=None
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+
+# Additional session settings for cross-origin
+if not DEBUG:
+    SESSION_COOKIE_DOMAIN = None  # Let Django handle domain automatically
+    CSRF_TRUSTED_ORIGINS = [
+        "https://equipool3.vercel.app",
+        "https://equipool3-git-main-newproject9482s-projects.vercel.app",
+        "https://equipool3-newproject9482s-projects.vercel.app",
+    ]
