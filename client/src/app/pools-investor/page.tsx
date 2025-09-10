@@ -89,12 +89,14 @@ export default function InvestorPoolsPage() {
   };
 
   // Function to fetch dashboard metrics
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (showLoading = true) => {
     if (!isAuthenticated || userRole !== 'investor') {
       return;
     }
 
-    setLoadingDashboard(true);
+    if (showLoading) {
+      setLoadingDashboard(true);
+    }
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const dashboardUrl = `${backendUrl}/api/investor/dashboard`;
@@ -108,13 +110,19 @@ export default function InvestorPoolsPage() {
         setDashboardData(result);
       } else {
         console.error('Failed to fetch dashboard data, status:', response.status);
-        setDashboardData(null);
+        if (!dashboardData) { // Only clear data if we don't have any
+          setDashboardData(null);
+        }
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setDashboardData(null);
+      if (!dashboardData) { // Only clear data if we don't have any
+        setDashboardData(null);
+      }
     } finally {
-      setLoadingDashboard(false);
+      if (showLoading) {
+        setLoadingDashboard(false);
+      }
     }
   };
 
@@ -134,13 +142,18 @@ export default function InvestorPoolsPage() {
       if (isAuthenticated && userRole === 'investor') {
         fetchInvestmentPools();
         fetchMyInvestments();
-        fetchDashboardData();
+        // Only refresh dashboard if we don't have data yet, and don't show loading
+        if (!dashboardData) {
+          fetchDashboardData(true);
+        } else {
+          fetchDashboardData(false); // Refresh silently to update data
+        }
       }
     };
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [isAuthenticated, userRole]);
+  }, [isAuthenticated, userRole, dashboardData]);
 
   // Filter pools to exclude those the user has already invested in
   const getFilteredPools = () => {
@@ -158,7 +171,7 @@ export default function InvestorPoolsPage() {
     setActiveTab(tab);
     if (tab === 'investments' && isAuthenticated && userRole === 'investor') {
       fetchMyInvestments();
-      fetchDashboardData();
+      // Don't refresh dashboard data on tab switch - it should persist
     }
   };
 
@@ -336,7 +349,7 @@ export default function InvestorPoolsPage() {
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
-                          {loadingDashboard ? 'Loading...' : dashboardData ? `$${parseFloat(dashboardData.totalInvested).toLocaleString()}` : '$0'}
+                          {dashboardData ? `$${parseFloat(dashboardData.totalInvested).toLocaleString()}` : (loadingDashboard ? 'Loading...' : '$0')}
                         </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
@@ -349,7 +362,7 @@ export default function InvestorPoolsPage() {
                     </div>
                     <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
-                          {loadingDashboard ? 'Loading...' : dashboardData ? `${dashboardData.currentROI}%` : '0%'}
+                          {dashboardData ? `${dashboardData.currentROI}%` : (loadingDashboard ? 'Loading...' : '0%')}
                         </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
@@ -362,7 +375,7 @@ export default function InvestorPoolsPage() {
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
-                          {loadingDashboard ? 'Loading...' : dashboardData ? dashboardData.activePools : '0'}
+                          {dashboardData ? dashboardData.activePools : (loadingDashboard ? 'Loading...' : '0')}
                         </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
@@ -375,10 +388,10 @@ export default function InvestorPoolsPage() {
                     </div>
                     <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
-                          {loadingDashboard ? 'Loading...' : (dashboardData && dashboardData.pendingPayouts.nextDate) ? dashboardData.pendingPayouts.nextDate : 'No pending payouts'}
+                          {(dashboardData && dashboardData.pendingPayouts.nextDate) ? dashboardData.pendingPayouts.nextDate : (loadingDashboard ? 'Loading...' : 'No pending payouts')}
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
-                          {loadingDashboard ? 'Loading...' : (dashboardData && dashboardData.pendingPayouts.amount) ? `$${parseFloat(dashboardData.pendingPayouts.amount).toLocaleString()}` : '$0'}
+                          {(dashboardData && dashboardData.pendingPayouts.amount) ? `$${parseFloat(dashboardData.pendingPayouts.amount).toLocaleString()}` : (loadingDashboard ? 'Loading...' : '$0')}
                         </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
