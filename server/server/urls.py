@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from . import views
+from . import views, health
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,7 @@ urlpatterns = [
     path('api/pools/create', views.create_pool, name='create-pool'),
     path('api/pools', views.get_pools, name='get-pools'),
     path('api/pools/<int:pool_id>', views.get_pool_detail, name='get-pool-detail'),
+    # Health check endpoints
+    path('api/health/database', health.database_health_check, name='database-health'),
+    path('api/health/migrate', health.force_migrate, name='force-migrate'),
 ]

@@ -8,4 +8,4 @@ cmds = ['pip3 install -r server/requirements.txt']
 cmds = ['cd server && python3 manage.py collectstatic --noinput']
 
 [start]
-cmd = 'cd server && python3 manage.py migrate && gunicorn server.wsgi --bind 0.0.0.0:$PORT'
+cmd = 'cd server && python3 manage.py migrate --noinput && gunicorn server.wsgi --bind 0.0.0.0:$PORT'

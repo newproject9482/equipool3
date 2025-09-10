@@ -74,21 +74,29 @@ def _parse_date(date_str: str):
 
 @csrf_exempt  # For now; recommend enabling proper CSRF/token auth later
 def borrower_signup(request: HttpRequest):
+    print(f"[DEBUG] Borrower signup request received: {request.method}")
+    print(f"[DEBUG] Headers: {dict(request.headers)}")
+    
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)
     try:
         data = json.loads(request.body.decode("utf-8"))
+        print(f"[DEBUG] Signup data received: {data}")
     except json.JSONDecodeError:
+        print(f"[DEBUG] Invalid JSON in request body")
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
     missing = REQUIRED_FIELDS - set(data.keys())
     if missing:
+        print(f"[DEBUG] Missing required fields: {missing}")
         return JsonResponse({"error": f"Missing fields: {', '.join(sorted(missing))}"}, status=400)
 
     full_name = data.get("fullName", "").strip()
     email = data.get("email", "").lower().strip()
     dob_raw = data.get("dateOfBirth")
     password = data.get("password")
+
+    print(f"[DEBUG] Processing signup for email: {email}")
 
     if not full_name:
         return JsonResponse({"error": "Full name required"}, status=400)
@@ -99,14 +107,23 @@ def borrower_signup(request: HttpRequest):
     try:
         dob = _parse_date(dob_raw)
     except ValidationError as e:
+        print(f"[DEBUG] Date parsing error: {e}")
         return JsonResponse({"error": str(e)}, status=400)
 
     try:
+        print(f"[DEBUG] Creating borrower object...")
         b = Borrower(full_name=full_name, email=email, date_of_birth=dob)
+        print(f"[DEBUG] Setting password...")
         b.set_password(password)
+        print(f"[DEBUG] Saving borrower to database...")
         b.save()
-    except IntegrityError:
+        print(f"[DEBUG] Borrower saved successfully with ID: {b.id}")
+    except IntegrityError as e:
+        print(f"[DEBUG] Integrity error during save: {e}")
         return JsonResponse({"error": "Email already registered"}, status=409)
+    except Exception as e:
+        print(f"[DEBUG] Unexpected error during save: {e}")
+        return JsonResponse({"error": f"Database error: {str(e)}"}, status=500)
 
     return JsonResponse({
         "id": b.id,
@@ -120,35 +137,59 @@ def borrower_signup(request: HttpRequest):
 def borrower_login(request: HttpRequest):
     print(f"[DEBUG] Login request received: {request.method}")
     print(f"[DEBUG] Headers: {dict(request.headers)}")
+    
     if request.method != 'POST':
         return JsonResponse({'error':'Method not allowed'}, status=405)
     try:
         data = json.loads(request.body.decode('utf-8'))
         print(f"[DEBUG] Login data: {data}")
     except json.JSONDecodeError:
+        print(f"[DEBUG] Invalid JSON in login request")
         return JsonResponse({'error':'Invalid JSON'}, status=400)
+        
     email = data.get('email','').lower().strip()
     password = data.get('password','')
+    print(f"[DEBUG] Attempting login for email: {email}")
+    
     if not email or not password:
+        print(f"[DEBUG] Missing email or password")
         return JsonResponse({'error':'Email and password required'}, status=400)
+        
     try:
+        print(f"[DEBUG] Searching for borrower with email: {email}")
         b = Borrower.objects.get(email=email)
+        print(f"[DEBUG] Found borrower: {b.id}, {b.full_name}")
     except Borrower.DoesNotExist:
+        print(f"[DEBUG] No borrower found with email: {email}")
         return JsonResponse({'error':'Invalid credentials'}, status=401)
+    except Exception as e:
+        print(f"[DEBUG] Database error during borrower lookup: {e}")
+        return JsonResponse({'error':'Database error'}, status=500)
+        
+    print(f"[DEBUG] Checking password for borrower: {b.id}")
     if not check_password(password, b.password_hash):
+        print(f"[DEBUG] Password check failed for borrower: {b.id}")
         return JsonResponse({'error':'Invalid credentials'}, status=401)
+        
+    print(f"[DEBUG] Password check passed for borrower: {b.id}")
+    
     # Establish session (for same-origin requests)
     request.session['borrower_id'] = b.id
     request.session['role'] = 'borrower'
     request.session.save()  # Force save the session
     
     # Create auth token (for cross-origin requests)
-    auth_token = _create_auth_token(b, 'borrower')
+    try:
+        print(f"[DEBUG] Creating auth token for borrower: {b.id}")
+        auth_token = _create_auth_token(b, 'borrower')
+        print(f"[DEBUG] Auth token created successfully: {auth_token}")
+    except Exception as e:
+        print(f"[DEBUG] Error creating auth token: {e}")
+        return JsonResponse({'error':'Token creation failed'}, status=500)
     
     print(f"[DEBUG] Session established for borrower: {b.id}")
     print(f"[DEBUG] Session data after login: {dict(request.session)}")
     print(f"[DEBUG] Session key: {request.session.session_key}")
-    print(f"[DEBUG] Auth token created: {auth_token}")
     
     response = JsonResponse({
         'id': b.id,
@@ -158,6 +199,7 @@ def borrower_login(request: HttpRequest):
         'token': auth_token  # Include token for cross-origin requests
     }, status=200)
     
+    print(f"[DEBUG] Login successful for borrower: {b.id}")
     return response
 
 @csrf_exempt
@@ -244,6 +286,7 @@ def investor_signup(request: HttpRequest):
         return JsonResponse({"error": str(e)}, status=400)
 
     try:
+        print(f"[DEBUG] Creating investor object for email: {email}")
         i = Investor(
             full_name=full_name,
             email=email,
@@ -257,12 +300,18 @@ def investor_signup(request: HttpRequest):
             zip_code=zip_code,
             country=country
         )
+        print(f"[DEBUG] Setting password for investor...")
         i.set_password(password)
+        print(f"[DEBUG] Saving investor to database...")
         i.save()
         print(f"[DEBUG] Successfully created investor with ID: {i.id}")
-    except IntegrityError:
+    except IntegrityError as e:
+        print(f"[DEBUG] Integrity error during investor save: {e}")
         print(f"[DEBUG] Email already registered: {email}")
         return JsonResponse({"error": "Email already registered"}, status=409)
+    except Exception as e:
+        print(f"[DEBUG] Unexpected error during investor save: {e}")
+        return JsonResponse({"error": f"Database error: {str(e)}"}, status=500)
 
     return JsonResponse({
         "id": i.id,
