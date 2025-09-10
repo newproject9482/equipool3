@@ -301,21 +301,45 @@ export default function InvestorPoolsPage() {
                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Date Created</div>
             </div>
         </div>
-        <div style={{width: 1090, minHeight: 400, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex'}}>
+        <div style={{width: '100%', maxWidth: 1122, height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'flex-start', alignItems: 'start', margin: '24px 0 0 0'}}>
           {loadingPools ? (
-            <div style={{width: '100%', textAlign: 'center', padding: 40}}>
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p style={{color: '#767676', fontSize: 14, fontFamily: 'var(--ep-font-avenir)'}}>Loading investment opportunities...</p>
+            <div style={{
+              gridColumn: '1 / -1',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 40,
+              color: '#767676',
+              fontSize: 16,
+              fontFamily: 'var(--ep-font-avenir)',
+              fontWeight: '500'
+            }}>
+              Loading investment opportunities...
             </div>
           ) : investmentPools.length === 0 ? (
-            <div style={{width: '100%', textAlign: 'center', padding: 40}}>
-              <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)'}}>No investment opportunities available at the moment.</p>
+            <div style={{
+              gridColumn: '1 / -1',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 40,
+              gap: 16
+            }}>
+              <div style={{
+                color: '#767676',
+                fontSize: 18,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '500',
+                textAlign: 'center'
+              }}>
+                No investment opportunities available at the moment.
+              </div>
             </div>
           ) : (
-            <div style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24}}>
-              {investmentPools.map((pool) => (
-                <div key={pool.id} style={{width: 350, height: 355, paddingTop: 20, paddingBottom: 12, paddingLeft: 20, paddingRight: 20, background: 'var(--White, white)', overflow: 'hidden', borderRadius: 24, outline: '1px #113D7B solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                  <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+            investmentPools.map((pool) => (
+              <div key={pool.id} style={{width: 350, height: 355, paddingTop: 20, paddingBottom: 12, paddingLeft: 20, paddingRight: 20, background: 'var(--White, white)', overflow: 'hidden', borderRadius: 24, outline: '1px #113D7B solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                     <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>#{pool.id.toString().padStart(6, '0')}</div>
                     <div data-property-1="Available to invest" style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: '#CBD764', borderRadius: 50, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
                       <div style={{width: 8, height: 8, background: '#7E8C03', borderRadius: 9999}} />
@@ -364,12 +388,11 @@ export default function InvestorPoolsPage() {
                     <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>View Pool</div>
                     <Image src="/weui-arrow-filled_right.svg" alt="Arrow Right" width={14} height={14} />
                   </div>
-                </div>
-              ))}
-            </div>
+              </div>
+            ))
           )}
         </div>
-      </div>
+        </div>
 
       {/* Footer */}
       <div style={{width: '100%', height: '100%', paddingTop: 32, paddingBottom: 32, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'inline-flex', marginTop: 160}}>
