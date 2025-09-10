@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -83,7 +83,7 @@ export default function InvestorPoolsPage() {
   const { toasts, removeToast, showSuccess, showError } = useToaster();
 
   // Function to fetch investment opportunities
-  const fetchInvestmentPools = async () => {
+  const fetchInvestmentPools = useCallback(async () => {
     if (!isAuthenticated || userRole !== 'investor') {
       return;
     }
@@ -110,10 +110,10 @@ export default function InvestorPoolsPage() {
     } finally {
       setLoadingPools(false);
     }
-  };
+  }, [isAuthenticated, userRole]);
 
   // Function to fetch user investments
-  const fetchMyInvestments = async () => {
+  const fetchMyInvestments = useCallback(async () => {
     if (!isAuthenticated || userRole !== 'investor') {
       return;
     }
@@ -140,10 +140,10 @@ export default function InvestorPoolsPage() {
     } finally {
       setLoadingInvestments(false);
     }
-  };
+  }, [isAuthenticated, userRole]);
 
   // Function to fetch dashboard metrics
-  const fetchDashboardData = async (showLoading = true) => {
+  const fetchDashboardData = useCallback(async (showLoading = true) => {
     if (!isAuthenticated || userRole !== 'investor') {
       return;
     }
@@ -178,7 +178,7 @@ export default function InvestorPoolsPage() {
         setLoadingDashboard(false);
       }
     }
-  };
+  }, [isAuthenticated, userRole, dashboardData]);
 
   // Fetch investment pools when authenticated as investor
   useEffect(() => {
@@ -188,7 +188,7 @@ export default function InvestorPoolsPage() {
       fetchMyInvestments();
       fetchDashboardData();
     }
-  }, [isAuthenticated, userRole]);
+  }, [isAuthenticated, userRole, fetchInvestmentPools, fetchMyInvestments, fetchDashboardData]);
 
   // Refresh data when returning to the page (e.g., after making an investment)
   useEffect(() => {
@@ -207,7 +207,7 @@ export default function InvestorPoolsPage() {
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [isAuthenticated, userRole, dashboardData]);
+  }, [isAuthenticated, userRole, dashboardData, fetchInvestmentPools, fetchMyInvestments, fetchDashboardData]);
 
   // Filter pools to exclude those the user has already invested in
   const getFilteredPools = () => {
@@ -407,7 +407,7 @@ export default function InvestorPoolsPage() {
                         </div>
                     </div>
                     <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Total amount you've received across all funded pools.</div>
+                        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(i) Total amount you&apos;ve received across all funded pools.</div>
                     </div>
                 </div>
                 <div style={{flex: '1 1 0', height: 280, padding: 32, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
@@ -568,7 +568,7 @@ export default function InvestorPoolsPage() {
                       fontWeight: '500',
                       textAlign: 'center'
                     }}>
-                      You have already invested in all available pools. Check "My Investments" tab.
+                      You have already invested in all available pools. Check &quot;My Investments&quot; tab.
                     </div>
                   )}
                 </div>
@@ -673,7 +673,7 @@ export default function InvestorPoolsPage() {
                     fontWeight: '500',
                     textAlign: 'center'
                   }}>
-                    You haven't made any investments yet.
+                    You haven&apos;t made any investments yet.
                   </div>
                   <div style={{
                     color: '#B2B2B2',
@@ -821,7 +821,7 @@ export default function InvestorPoolsPage() {
             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
                 <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>Subscribe to our newsletter</div>
                 <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>Monthly digest of what's new and exciting from us.</div>
+                    <div style={{color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>Monthly digest of what&apos;s new and exciting from us.</div>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                         <input 
                             style={{flex: '1 1 0', height: 40, paddingLeft: 12, paddingRight: 12, background: 'white', borderRadius: 8, border: '1px #D1D5DB solid', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', outline: 'none'}}
