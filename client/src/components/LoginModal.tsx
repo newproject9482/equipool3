@@ -51,8 +51,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
             localStorage.setItem('ep-auth-token', data.token);
           }
         }
-        showSuccess(`Welcome back! You have successfully logged in as ${role}.`);
-        onSuccess(role);
+        showSuccess(`Welcome back! You have successfully logged in as ${data.role || role}.`);
+        onSuccess(data.role || role);
         onClose();
       }
     } catch (e: unknown){

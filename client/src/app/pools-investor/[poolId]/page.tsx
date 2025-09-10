@@ -13,7 +13,7 @@ export default function InvestorPoolDetailPage() {
   const [userRole, setUserRole] = useState<'borrower' | 'investor' | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'documents'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'documents' | 'investments'>('overview');
 
   // Pool detail state
   interface PoolDetail {
@@ -42,6 +42,21 @@ export default function InvestorPoolDetailPage() {
   const [poolData, setPoolData] = useState<PoolDetail | null>(null);
   const [loadingPool, setLoadingPool] = useState(false);
   const [poolError, setPoolError] = useState<string | null>(null);
+
+  // Investment state
+  interface Investment {
+    id: number;
+    amount: string;
+    status: string;
+    investedAt: string;
+    pool: PoolDetail;
+  }
+
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [loadingInvestments, setLoadingInvestments] = useState(false);
+  const [investing, setInvesting] = useState(false);
+  const [hasInvested, setHasInvested] = useState(false);
+  const [userInvestment, setUserInvestment] = useState<Investment | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -135,6 +150,89 @@ export default function InvestorPoolDetailPage() {
     fetchPool();
     return () => { cancelled = true; };
   }, [poolId]);
+
+  // Fetch investments when investments tab is active
+  useEffect(() => {
+    if (activeTab === 'investments' && isAuthenticated && userRole === 'investor') {
+      fetchInvestments();
+    }
+  }, [activeTab, isAuthenticated, userRole]);
+
+  const fetchInvestments = async () => {
+    setLoadingInvestments(true);
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/api/investor/investments`, getAuthenticatedFetchOptions());
+      
+      if (response.ok) {
+        const data = await response.json();
+        const allInvestments = data.investments || [];
+        setInvestments(allInvestments);
+        
+        // Check if user has invested in current pool
+        if (poolData) {
+          const currentPoolInvestment = allInvestments.find((inv: Investment) => inv.pool.id === poolData.id);
+          setHasInvested(!!currentPoolInvestment);
+          setUserInvestment(currentPoolInvestment || null);
+        }
+      } else {
+        console.error('Failed to fetch investments');
+      }
+    } catch (error) {
+      console.error('Error fetching investments:', error);
+    } finally {
+      setLoadingInvestments(false);
+    }
+  };
+
+  // Check user investment status when pool data changes
+  useEffect(() => {
+    if (poolData && isAuthenticated && userRole === 'investor') {
+      fetchInvestments();
+    }
+  }, [poolData, isAuthenticated, userRole]);
+
+  const handleInvest = async () => {
+    if (!poolData || hasInvested) return;
+    
+    setInvesting(true);
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/api/investor/pools/${poolData.id}/invest`, {
+        ...getAuthenticatedFetchOptions(),
+        method: 'POST',
+        body: JSON.stringify({
+          amount: poolData.amount // Invest the full amount for now
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Update investment status
+        setHasInvested(true);
+        setUserInvestment(data.investment);
+        
+        // Show success message
+        alert('Investment successful! You can now view this investment in your "My Investments" tab.');
+        
+        // Refresh investments data
+        fetchInvestments();
+        
+        // Redirect to investments tab after a short delay
+        setTimeout(() => {
+          router.push('/pools-investor');
+        }, 2000);
+      } else {
+        const errorData = await response.json();
+        alert(`Investment failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error('Investment error:', error);
+      alert('Investment failed. Please try again.');
+    } finally {
+      setInvesting(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -295,6 +393,27 @@ export default function InvestorPoolDetailPage() {
               >
                 Assigned Documents
               </div>
+              <div style={{
+                color: activeTab === 'investments' ? '#113D7B' : '#767676',
+                fontSize: 18,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '600',
+                wordWrap: 'break-word',
+                paddingBottom: 8,
+                borderBottom: activeTab === 'investments' ? '2px solid #113D7B' : 'none',
+                cursor: 'pointer',
+                transition: 'color 0.2s ease'
+              }}
+              onClick={() => setActiveTab('investments')}
+              onMouseEnter={(e) => {
+                if (activeTab !== 'investments') e.currentTarget.style.color = '#113D7B';
+              }}
+              onMouseLeave={(e) => {
+                if (activeTab !== 'investments') e.currentTarget.style.color = '#767676';
+              }}
+              >
+                My Investments
+              </div>
             </div>
 
             {/* Tab Content */}
@@ -306,208 +425,564 @@ export default function InvestorPoolDetailPage() {
                 </div>
 
                 {/* Pool Overview Card */}
-                <div style={{
-                  width: '100%',
-                  padding: 32,
-                  background: 'white',
-                  borderRadius: 24,
-                  border: '1px solid #E5E7EB',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  gap: 32,
-                  display: 'flex'
-                }}>
-                  {loadingPool ? (
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Loading pool details...</p>
-                    </div>
-                  ) : poolError ? (
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
-                      <p style={{color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>{poolError}</p>
-                    </div>
-                  ) : poolData ? (
-                    <>
+                {loadingPool ? (
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Loading pool details...</p>
+                  </div>
+                ) : poolError ? (
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
+                    <p style={{color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>{poolError}</p>
+                  </div>
+                ) : poolData ? (
+                  <div style={{
+                    width: '100%',
+                    padding: 32,
+                    background: 'white',
+                    borderRadius: 24,
+                    border: '1px solid #E5E7EB',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    gap: 32,
+                    display: 'flex'
+                  }}>
+                    {/* Header Section */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      display: 'flex'
+                    }}>
                       <div style={{
-                        alignSelf: 'stretch',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        display: 'flex'
+                        color: 'black',
+                        fontSize: 20,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
                       }}>
-                        <div style={{
-                          color: 'black',
-                          fontSize: 24,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '800',
-                          wordWrap: 'break-word'
-                        }}>
-                          Pool #{poolId}
-                        </div>
-                        <div style={{
-                          paddingLeft: 16,
-                          paddingRight: 16,
-                          paddingTop: 8,
-                          paddingBottom: 8,
-                          background: poolData.status === 'active' ? '#DDF4E6' : poolData.status === 'funded' ? '#DBEAFE' : '#FEF3C7',
-                          borderRadius: 20,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: 8,
-                          display: 'inline-flex'
-                        }}>
-                          <div style={{
-                            color: poolData.status === 'active' ? '#65CC8E' : poolData.status === 'funded' ? '#3B82F6' : '#F59E0B',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '600',
-                            wordWrap: 'break-word'
-                          }}>
-                            {poolData.status.charAt(0).toUpperCase() + poolData.status.slice(1)}
-                          </div>
-                        </div>
+                        Pool #EP{poolId} - Overview
                       </div>
-
                       <div style={{
-                        alignSelf: 'stretch',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        alignItems: 'flex-start',
-                        gap: 8,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          color: 'black',
-                          fontSize: 16,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>
-                          Investment Amount: ${poolData.amount}
-                        </div>
-                        {poolData.roiRate && (
-                          <div style={{
-                            alignSelf: 'stretch',
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Expected ROI: {poolData.roiRate}%
-                          </div>
-                        )}
-                        {poolData.term && (
-                          <div style={{
-                            alignSelf: 'stretch',
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Term: {poolData.term}
-                          </div>
-                        )}
-                        {poolData.addressLine && (
-                          <div style={{
-                            alignSelf: 'stretch',
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Property: {poolData.addressLine}, {poolData.city}, {poolData.state} {poolData.zipCode}
-                          </div>
-                        )}
-                      </div>
-
-                      <div style={{
-                        alignSelf: 'stretch',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        alignItems: 'flex-start',
-                        gap: 20,
-                        display: 'flex'
-                      }}>
-                        {poolData.fundingProgress !== undefined && (
-                          <div style={{
-                            alignSelf: 'stretch',
-                            flexDirection: 'column',
-                            justifyContent: 'flex-start',
-                            alignItems: 'flex-start',
-                            gap: 8,
-                            display: 'flex'
-                          }}>
-                            <div style={{
-                              alignSelf: 'stretch',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              display: 'flex'
-                            }}>
-                              <div style={{
-                                color: 'black',
-                                fontSize: 16,
-                                fontFamily: 'var(--ep-font-avenir)',
-                                fontWeight: '500',
-                                wordWrap: 'break-word'
-                              }}>
-                                Funding Progress
-                              </div>
-                              <div style={{
-                                color: '#767676',
-                                fontSize: 14,
-                                fontFamily: 'var(--ep-font-avenir)',
-                                fontWeight: '500',
-                                wordWrap: 'break-word'
-                              }}>
-                                {poolData.fundingProgress}%
-                              </div>
-                            </div>
-                            <div style={{
-                              alignSelf: 'stretch',
-                              height: 8,
-                              background: '#E5E7EB',
-                              borderRadius: 4,
-                              overflow: 'hidden'
-                            }}>
-                              <div style={{
-                                width: `${poolData.fundingProgress}%`,
-                                height: '100%',
-                                background: '#113D7B',
-                                borderRadius: 4
-                              }}></div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div style={{
-                        alignSelf: 'stretch',
+                        paddingLeft: 10,
+                        paddingRight: 10,
+                        paddingTop: 4,
+                        paddingBottom: 4,
+                        background: '#CBD764',
+                        borderRadius: 50,
                         justifyContent: 'flex-start',
                         alignItems: 'center',
-                        gap: 16,
+                        gap: 6,
                         display: 'flex'
                       }}>
                         <div style={{
-                          color: '#767676',
+                          width: 8,
+                          height: 8,
+                          background: '#7E8C03',
+                          borderRadius: 9999
+                        }} />
+                        <div style={{
+                          color: 'black',
                           fontSize: 14,
                           fontFamily: 'var(--ep-font-avenir)',
                           fontWeight: '500',
                           wordWrap: 'break-word'
                         }}>
-                          Created: {poolData.createdAt ? new Date(poolData.createdAt).toLocaleDateString() : 'N/A'}
+                          Available to invest
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
-                      <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool not found</p>
                     </div>
-                  )}
-                </div>
+
+                    {/* Pool Repayment Section */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-end',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          color: '#113D7B',
+                          fontSize: 16,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>
+                          Pool Repayment
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          color: 'black',
+                          fontSize: 32,
+                          fontFamily: 'var(--ep-font-avenir)',
+                          fontWeight: '500',
+                          wordWrap: 'break-word'
+                        }}>
+                          ${poolData.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pool Information Section */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-start',
+                      gap: 16,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        justifyContent: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        color: '#113D7B',
+                        fontSize: 16,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: '500',
+                        wordWrap: 'break-word'
+                      }}>
+                        Pool Information
+                      </div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 12,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Date Created
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            {poolData.createdAt ? new Date(poolData.createdAt).toLocaleDateString('en-GB') : 'N/A'}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Start Date
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            --/--/----
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            End Date
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            --/--/----
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Type
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            {poolData.poolType || 'Equity pool'}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Requested amount
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            ${poolData.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Terms
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            {poolData.roiRate ? `${poolData.roiRate}%` : ''} {poolData.term ? `/ ${poolData.term}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Property Info Section */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'flex-start',
+                      gap: 16,
+                      display: 'flex'
+                    }}>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          justifyContent: 'flex-start',
+                          alignItems: 'center',
+                          gap: 8,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#113D7B',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Property Info
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{
+                        alignSelf: 'stretch',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 12,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Address
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word',
+                            textAlign: 'right'
+                          }}>
+                            {poolData.addressLine ? `${poolData.addressLine}, ${poolData.city}, ${poolData.state} ${poolData.zipCode}` : 'N/A'}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Co-owner(s)
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            {poolData.coOwner || 'N/A'}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Property Link
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            textDecoration: 'underline',
+                            wordWrap: 'break-word',
+                            cursor: 'pointer'
+                          }}>
+                            {poolData.propertyLink || 'N/A'}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Property value
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            ${poolData.propertyValue || 'N/A'}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Total mortgage balance
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            ${poolData.mortgageBalance || 'N/A'}
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: '#B2B2B2',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Ownership
+                          </div>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 16,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            {poolData.percentOwned ? `${poolData.percentOwned}% Owned` : 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Invest Button */}
+                    <div style={{
+                      alignSelf: 'stretch',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 8,
+                      display: 'flex'
+                    }}>
+                      {hasInvested ? (
+                        <div style={{
+                          paddingLeft: 16,
+                          paddingRight: 16,
+                          paddingTop: 10,
+                          paddingBottom: 10,
+                          background: '#DDF4E6',
+                          borderRadius: 12,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 8,
+                          display: 'flex',
+                          border: '1px solid #65CC8E'
+                        }}>
+                          <div style={{
+                            width: 8,
+                            height: 8,
+                            background: '#65CC8E',
+                            borderRadius: 9999
+                          }} />
+                          <div style={{
+                            color: '#065F46',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Invested ${userInvestment?.amount ? parseFloat(userInvestment.amount).toLocaleString() : ''}
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{
+                          paddingLeft: 16,
+                          paddingRight: 16,
+                          paddingTop: 10,
+                          paddingBottom: 10,
+                          background: investing ? '#ccc' : 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)',
+                          borderRadius: 12,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: 8,
+                          display: 'flex',
+                          cursor: investing ? 'not-allowed' : 'pointer',
+                          opacity: investing ? 0.6 : 1
+                        }}
+                        onClick={investing ? undefined : handleInvest}>
+                          <div style={{
+                            color: 'white',
+                            fontSize: 14,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            {investing ? 'Investing...' : 'Invest'}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
+                    <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool not found</p>
+                  </div>
+                )}
               </>
             )}
 
@@ -544,6 +1019,399 @@ export default function InvestorPoolDetailPage() {
                     Documents will be available once the pool is funded and active.
                   </div>
                 </div>
+              </>
+            )}
+
+            {/* My Investments Tab Content */}
+            {activeTab === 'investments' && (
+              <>
+                {/* Investments Section Header */}
+                <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                  <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>My Investments</div>
+                </div>
+
+                {/* Investments Content */}
+                {loadingInvestments ? (
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Loading your investments...</p>
+                  </div>
+                ) : investments.length === 0 ? (
+                  <div style={{
+                    width: '100%',
+                    padding: 32,
+                    background: 'white',
+                    borderRadius: 24,
+                    border: '1px solid #E5E7EB',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 16,
+                    display: 'flex'
+                  }}>
+                    <div style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', textAlign: 'center'}}>
+                      You haven't made any investments yet.
+                    </div>
+                    <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', textAlign: 'center'}}>
+                      Browse available pools to start investing.
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                    {investments.map((investment) => (
+                      <div key={investment.id} style={{
+                        width: '100%',
+                        padding: 32,
+                        background: 'white',
+                        borderRadius: 24,
+                        border: '1px solid #E5E7EB',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 24,
+                        display: 'flex'
+                      }}>
+                        {/* Investment Header */}
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 20,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Pool #EP{investment.pool.id} - {investment.pool.poolType}
+                          </div>
+                          <div style={{
+                            paddingLeft: 10,
+                            paddingRight: 10,
+                            paddingTop: 4,
+                            paddingBottom: 4,
+                            background: investment.status === 'active' ? '#DDF4E6' : '#DBEAFE',
+                            borderRadius: 50,
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            gap: 6,
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              width: 8,
+                              height: 8,
+                              background: investment.status === 'active' ? '#65CC8E' : '#3B82F6',
+                              borderRadius: 9999
+                            }} />
+                            <div style={{
+                              color: investment.status === 'active' ? '#065F46' : '#1E40AF',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Investment Details */}
+                        <div style={{
+                          alignSelf: 'stretch',
+                          flexDirection: 'column',
+                          justifyContent: 'flex-start',
+                          alignItems: 'flex-start',
+                          gap: 16,
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            alignSelf: 'stretch',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              color: '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              Investment Amount
+                            </div>
+                            <div style={{
+                              color: 'black',
+                              fontSize: 16,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              ${parseFloat(investment.amount).toLocaleString()}
+                            </div>
+                          </div>
+                          <div style={{
+                            alignSelf: 'stretch',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              color: '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              Expected ROI
+                            </div>
+                            <div style={{
+                              color: 'black',
+                              fontSize: 16,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              {investment.pool.roiRate}%
+                            </div>
+                          </div>
+                          <div style={{
+                            alignSelf: 'stretch',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              color: '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              Invested On
+                            </div>
+                            <div style={{
+                              color: 'black',
+                              fontSize: 16,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              {new Date(investment.investedAt).toLocaleDateString('en-GB')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* My Investments Tab Content */}
+            {activeTab === 'investments' && (
+              <>
+                {/* Investments Section Header */}
+                <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                  <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>My Investments</div>
+                </div>
+
+                {/* Investments Content */}
+                {loadingInvestments ? (
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Loading your investments...</p>
+                  </div>
+                ) : investments.length === 0 ? (
+                  <div style={{
+                    width: '100%',
+                    padding: 32,
+                    background: 'white',
+                    borderRadius: 24,
+                    border: '1px solid #E5E7EB',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 16,
+                    display: 'flex'
+                  }}>
+                    <div style={{
+                      color: '#767676',
+                      fontSize: 18,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '500',
+                      textAlign: 'center'
+                    }}>
+                      You haven't made any investments yet.
+                    </div>
+                    <div style={{
+                      color: '#767676',
+                      fontSize: 14,
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontWeight: '400',
+                      textAlign: 'center'
+                    }}>
+                      Start by exploring available investment opportunities.
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
+                    width: '100%',
+                    flexDirection: 'column',
+                    gap: 16,
+                    display: 'flex'
+                  }}>
+                    {investments.map((investment) => (
+                      <div key={investment.id} style={{
+                        width: '100%',
+                        padding: 24,
+                        background: 'white',
+                        borderRadius: 24,
+                        border: '1px solid #E5E7EB',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        gap: 16,
+                        display: 'flex'
+                      }}>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          display: 'flex'
+                        }}>
+                          <div style={{
+                            color: 'black',
+                            fontSize: 18,
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontWeight: '500',
+                            wordWrap: 'break-word'
+                          }}>
+                            Pool #{investment.pool.id}
+                          </div>
+                          <div style={{
+                            paddingLeft: 10,
+                            paddingRight: 10,
+                            paddingTop: 4,
+                            paddingBottom: 4,
+                            background: investment.status === 'active' ? '#CBD764' : '#FEF3C7',
+                            borderRadius: 50,
+                            justifyContent: 'flex-start',
+                            alignItems: 'center',
+                            gap: 6,
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              width: 8,
+                              height: 8,
+                              background: investment.status === 'active' ? '#7E8C03' : '#F59E0B',
+                              borderRadius: 9999
+                            }} />
+                            <div style={{
+                              color: 'black',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              {investment.status.charAt(0).toUpperCase() + investment.status.slice(1)}
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{
+                          alignSelf: 'stretch',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          display: 'flex',
+                          gap: 24
+                        }}>
+                          <div style={{
+                            flex: '1 1 0',
+                            flexDirection: 'column',
+                            justifyContent: 'flex-start',
+                            alignItems: 'flex-start',
+                            gap: 8,
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              color: '#B2B2B2',
+                              fontSize: 12,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              Investment Amount
+                            </div>
+                            <div style={{
+                              color: 'black',
+                              fontSize: 20,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              ${parseFloat(investment.amount).toLocaleString()}
+                            </div>
+                          </div>
+                          <div style={{
+                            flex: '1 1 0',
+                            flexDirection: 'column',
+                            justifyContent: 'flex-start',
+                            alignItems: 'flex-start',
+                            gap: 8,
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              color: '#B2B2B2',
+                              fontSize: 12,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              ROI Rate
+                            </div>
+                            <div style={{
+                              color: 'black',
+                              fontSize: 16,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              {investment.pool.roiRate}%
+                            </div>
+                          </div>
+                          <div style={{
+                            flex: '1 1 0',
+                            flexDirection: 'column',
+                            justifyContent: 'flex-start',
+                            alignItems: 'flex-start',
+                            gap: 8,
+                            display: 'flex'
+                          }}>
+                            <div style={{
+                              color: '#B2B2B2',
+                              fontSize: 12,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              Investment Date
+                            </div>
+                            <div style={{
+                              color: 'black',
+                              fontSize: 16,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500',
+                              wordWrap: 'break-word'
+                            }}>
+                              {new Date(investment.investedAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </>
             )}
           </div>

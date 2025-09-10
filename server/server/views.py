@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-from .models import Borrower, Investor, Pool, AuthToken
+from .models import Borrower, Investor, Pool, AuthToken, Investment
 from django.contrib.auth.hashers import check_password
 
 REQUIRED_FIELDS = {"fullName", "email", "dateOfBirth", "password"}
@@ -50,6 +50,10 @@ def _get_user_from_request(request):
     if borrower_id:
         try:
             borrower = Borrower.objects.get(id=borrower_id)
+            # If we also have investor_id, clear it (legacy session conflict)
+            if request.session.get('investor_id'):
+                del request.session['investor_id']
+                request.session.save()
             return borrower, 'borrower'
         except Borrower.DoesNotExist:
             pass
@@ -58,6 +62,10 @@ def _get_user_from_request(request):
     if investor_id:
         try:
             investor = Investor.objects.get(id=investor_id)
+            # If we also have borrower_id, clear it (legacy session conflict)
+            if request.session.get('borrower_id'):
+                del request.session['borrower_id']
+                request.session.save()
             return investor, 'investor'
         except Investor.DoesNotExist:
             pass
@@ -152,6 +160,9 @@ def borrower_login(request: HttpRequest):
     # Establish session (for same-origin requests)
     request.session['borrower_id'] = b.id
     request.session['role'] = 'borrower'
+    # Clear investor session data if it exists
+    if 'investor_id' in request.session:
+        del request.session['investor_id']
     request.session.save()  # Force save the session
     
     # Create auth token (for cross-origin requests)
@@ -302,6 +313,9 @@ def investor_login(request: HttpRequest):
     # Establish session (for same-origin requests)
     request.session['investor_id'] = i.id
     request.session['role'] = 'investor'
+    # Clear borrower session data if it exists
+    if 'borrower_id' in request.session:
+        del request.session['borrower_id']
     request.session.save()  # Force save the session
     
     # Create auth token (for cross-origin requests)
@@ -632,3 +646,120 @@ def get_investment_pool_detail(request: HttpRequest, pool_id: int):
         'appraisalDoc': pool.appraisal_doc,
         'propertyPhotos': pool.property_photos,
     }, status=200)
+
+@csrf_exempt
+def invest_in_pool(request: HttpRequest, pool_id: int):
+    """Allow an investor to invest in a pool"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    investor, auth_error = _require_investor_auth(request)
+    if auth_error:
+        return auth_error
+    
+    try:
+        pool = Pool.objects.get(id=pool_id, status='active')
+    except Pool.DoesNotExist:
+        return JsonResponse({'error': 'Pool not found or not available for investment'}, status=404)
+    
+    # Check if investor has already invested in this pool
+    existing_investment = Investment.objects.filter(investor=investor, pool=pool).first()
+    if existing_investment:
+        return JsonResponse({'error': 'You have already invested in this pool'}, status=400)
+    
+    try:
+        data = json.loads(request.body)
+        amount = data.get('amount')
+        
+        if not amount:
+            return JsonResponse({'error': 'Investment amount is required'}, status=400)
+        
+        # Convert to Decimal
+        try:
+            investment_amount = Decimal(str(amount))
+        except (InvalidOperation, ValueError):
+            return JsonResponse({'error': 'Invalid investment amount'}, status=400)
+        
+        # Validate investment amount (should be positive and not exceed pool amount)
+        if investment_amount <= 0:
+            return JsonResponse({'error': 'Investment amount must be positive'}, status=400)
+        
+        if investment_amount > pool.amount:
+            return JsonResponse({'error': 'Investment amount cannot exceed pool amount'}, status=400)
+        
+        # Create the investment
+        with transaction.atomic():
+            investment = Investment.objects.create(
+                investor=investor,
+                pool=pool,
+                amount=investment_amount,
+                status='active'
+            )
+            
+            # Update pool funding progress (you might want to calculate this based on total investments)
+            # For now, we'll just mark the pool as having some investment
+            
+        return JsonResponse({
+            'success': True,
+            'investment': {
+                'id': investment.id,
+                'amount': str(investment.amount),
+                'status': investment.status,
+                'investedAt': investment.invested_at.isoformat(),
+                'poolId': pool.id,
+                'poolType': pool.pool_type,
+                'roiRate': str(pool.roi_rate),
+                'term': pool.term
+            }
+        }, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Investment failed: {str(e)}'}, status=500)
+
+def get_my_investments(request: HttpRequest):
+    """Get all investments for the authenticated investor"""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check authentication
+    investor, auth_error = _require_investor_auth(request)
+    if auth_error:
+        return auth_error
+    
+    investments = Investment.objects.filter(investor=investor).select_related('pool', 'pool__borrower').order_by('-invested_at')
+    
+    investments_data = []
+    for investment in investments:
+        pool = investment.pool
+        investments_data.append({
+            'id': investment.id,
+            'amount': str(investment.amount),
+            'status': investment.status,
+            'investedAt': investment.invested_at.isoformat(),
+            'pool': {
+                'id': pool.id,
+                'poolType': pool.pool_type,
+                'status': pool.status,
+                'amount': str(pool.amount),
+                'roiRate': str(pool.roi_rate),
+                'term': pool.term,
+                'termMonths': pool.term_months,
+                'createdAt': pool.created_at.isoformat(),
+                'addressLine': pool.address_line,
+                'city': pool.city,
+                'state': pool.state,
+                'zipCode': pool.zip_code,
+                'percentOwned': str(pool.percent_owned),
+                'coOwner': pool.co_owner,
+                'propertyValue': str(pool.property_value) if pool.property_value else None,
+                'propertyLink': pool.property_link,
+                'mortgageBalance': str(pool.mortgage_balance) if pool.mortgage_balance else None,
+                'borrowerName': pool.borrower.full_name,
+                'borrowerEmail': pool.borrower.email
+            }
+        })
+    
+    return JsonResponse({'investments': investments_data}, status=200)

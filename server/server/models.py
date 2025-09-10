@@ -147,3 +147,26 @@ class Pool(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+
+class Investment(models.Model):
+    """Track investor investments in pools"""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    investor = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='investments')
+    pool = models.ForeignKey(Pool, on_delete=models.CASCADE, related_name='investments')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)  # Amount invested
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    invested_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['investor', 'pool']  # Each investor can only invest once per pool
+        ordering = ['-invested_at']
+    
+    def __str__(self):
+        return f"Investment({self.investor.email} -> Pool {self.pool.id}: ${self.amount})"
