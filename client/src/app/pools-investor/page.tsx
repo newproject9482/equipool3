@@ -305,9 +305,7 @@ export default function InvestorPoolsPage() {
                 </div>
                 <div data-left-icon="true" data-state="secondary" style={{paddingTop: 8, paddingLeft: 16, paddingRight: 16, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
                     <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>View Pool</div>
-                    <div data-icon="ic:arrowright" style={{width: 12, height: 12, position: 'relative', overflow: 'hidden'}}>
-                        <div style={{width: 4.50, height: 9, left: 3.75, top: 1.50, position: 'absolute', background: 'var(--Black, black)'}} />
-                    </div>
+                    <Image src="/weui-arrow-filled_right.svg" alt="Arrow Right" width={14} height={14} />
                 </div>
             </div>
         </div>
