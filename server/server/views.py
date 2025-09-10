@@ -179,7 +179,9 @@ def borrower_login(request: HttpRequest):
         'token': auth_token  # Include token for cross-origin requests
     }, status=200)
     
-    return response@csrf_exempt
+    return response
+
+@csrf_exempt
 def auth_logout(request: HttpRequest):
     if request.method != 'POST':
         return JsonResponse({'error':'Method not allowed'}, status=405)
