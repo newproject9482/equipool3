@@ -1,0 +1,255 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { Toaster, useToaster } from '../../components/Toaster';
+import { getAuthenticatedFetchOptions, clearAuthData } from '../../utils/auth';
+
+const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
+
+export default function InvestorPoolsPage() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<'borrower' | 'investor' | null>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const { toasts, removeToast, showSuccess, showError } = useToaster();
+
+  // Check authentication and role
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+        const authUrl = `${backendUrl}/api/auth/me`;
+        
+        console.log('[DEBUG] Checking authentication with URL:', authUrl);
+        
+        const response = await fetch(authUrl, getAuthenticatedFetchOptions());
+        
+        console.log('[DEBUG] Auth check response status:', response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[DEBUG] Auth check response data:', data);
+          if (!cancelled && data.authenticated) {
+            setIsAuthenticated(true);
+            setUserRole(data.role);
+            
+            // Redirect borrowers to the borrower pools page
+            if (data.role === 'borrower') {
+              console.log('[DEBUG] Redirecting borrower to /pools');
+              router.push('/pools');
+              return;
+            }
+          } else {
+            // Not authenticated, redirect to home
+            console.log('[DEBUG] Not authenticated, redirecting to home');
+            router.push('/');
+            return;
+          }
+        } else {
+          console.log('[DEBUG] Auth check failed with status:', response.status);
+          // Not authenticated, redirect to home
+          router.push('/');
+          return;
+        }
+      } catch (error) {
+        console.error('[DEBUG] Auth check error:', error);
+        // On error, redirect to home
+        if (!cancelled) {
+          router.push('/');
+          return;
+        }
+      }
+      
+      if (!cancelled) {
+        setIsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, getAuthenticatedFetchOptions({
+        method: 'POST'
+      }));
+      setIsAuthenticated(false);
+      setUserRole(null);
+      setShowProfileMenu(false);
+      clearAuthData();
+      // Redirect to home page after logout
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only render if user is authenticated and is an investor
+  if (!isAuthenticated || userRole !== 'investor') {
+    return null; // This should not happen due to the redirect in useEffect
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navbar */}
+      <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
+          <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
+          <span className="ep-nav-brand">EquiPool</span>
+        </div>
+
+        <nav className="hidden md:flex items-center gap-6">
+          <a className="ep-nav-link">About Us</a>
+          <a className="ep-nav-link">Security</a>
+          <div className="flex items-center gap-2">
+            <a className="ep-nav-link">Learn</a>
+            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+          </div>
+        </nav>
+
+        {/* Auth Section */}
+        <div className="flex items-center gap-4" style={{position:'relative'}}>
+          {isAuthenticated ? (
+            <>
+              {/* Notifications Icon */}
+              <div
+                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
+              >
+                <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+              </div>
+              {/* Profile Icon (right / opens menu) */}
+              <div
+                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
+                onClick={() => setShowProfileMenu(v => !v)}
+                aria-haspopup="menu"
+                aria-expanded={showProfileMenu}
+              >
+                <Image src="/profile.svg" alt="Profile" width={16} height={16} />
+                {showProfileMenu && (
+                  <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
+                    <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => window.location.href = '/pools-investor'}>Pools & Dashboard</button>
+                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
+                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <button 
+                className="ep-nav-login-btn"
+                onClick={() => setShowLoginModal(true)}
+              >
+                Log in
+              </button>
+              <button 
+                className="ep-nav-join-btn"
+                onClick={() => window.location.href = '/'}
+              >
+                Join EquiPool
+              </button>
+            </>
+          )}
+        </div>
+      </header>
+
+      {/* Main Content - Placeholder for now */}
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Investor Dashboard</h1>
+          <p className="text-lg text-gray-600">Welcome to your investor dashboard. Content coming soon...</p>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <div style={{width: '100%', height: '100%', paddingTop: 32, paddingBottom: 32, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'inline-flex', marginTop: 160}}>
+        <div style={{width: 1080, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 130, display: 'inline-flex'}}>
+            <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 40, display: 'inline-flex'}}>
+                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                    <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                        <Image src="/logo-icon.svg" alt="EquiPool" width={26} height={27} />
+                        <div style={{color: '#091024', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>EquiPool</div>
+                    </div>
+                    <div style={{width: 359, color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.5, wordWrap: 'break-word'}}>Unlock the power of real estate investing. Join a growing community of smart investors and property owners.</div>
+                </div>
+                <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex'}}>
+                    <Image src="/ic-baseline-facebook.svg" alt="Facebook" width={20} height={20} style={{cursor: 'pointer'}} />
+                    <Image src="/mdi-instagram.svg" alt="Instagram" width={20} height={20} style={{cursor: 'pointer'}} />
+                    <Image src="/mdi-linkedin.svg" alt="LinkedIn" width={20} height={20} style={{cursor: 'pointer'}} />
+                </div>
+            </div>
+            <div style={{width: 71, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>Company</div>
+                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word', cursor: 'pointer'}}>About Us</div>
+                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word', cursor: 'pointer'}}>Careers</div>
+                </div>
+            </div>
+            <div style={{width: 104, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>Resources</div>
+                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word', cursor: 'pointer'}}>Help Center</div>
+                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word', cursor: 'pointer'}}>Privacy Policy</div>
+                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word', cursor: 'pointer'}}>Terms of Service</div>
+                </div>
+            </div>
+            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>Subscribe to our newsletter</div>
+                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
+                    <div style={{color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>Monthly digest of what's new and exciting from us.</div>
+                    <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                        <input 
+                            style={{flex: '1 1 0', height: 40, paddingLeft: 12, paddingRight: 12, background: 'white', borderRadius: 8, border: '1px #D1D5DB solid', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', outline: 'none'}}
+                            placeholder="Enter your email"
+                            value={newsletterEmail}
+                            onChange={(e) => setNewsletterEmail(e.target.value)}
+                        />
+                        <button style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: '#113D7B', borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', border: 'none', cursor: 'pointer'}}>
+                            <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Subscribe</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style={{width: 1080, color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
+      </div>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <LoginModal 
+          onClose={() => setShowLoginModal(false)}
+          onSwitchToSignUp={() => { setShowLoginModal(false); window.location.href = '/'; }}
+          onSuccess={() => { 
+            setIsAuthenticated(true); 
+            setShowLoginModal(false); 
+            // Refresh the page to re-check user role
+            window.location.reload();
+          }}
+          showSuccess={showSuccess}
+          showError={showError}
+        />
+      )}
+      
+      <Toaster toasts={toasts} onRemoveToast={removeToast} />
+    </div>
+  );
+}

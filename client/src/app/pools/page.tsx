@@ -31,10 +31,12 @@ interface Pool {
 export default function PoolsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<'borrower' | 'investor' | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   
   // Pool creation states
   const [currentStep, setCurrentStep] = useState(1);
@@ -254,22 +256,41 @@ export default function PoolsPage() {
           console.log('[DEBUG] Auth check response data:', data);
           if (!cancelled && data.authenticated) {
             setIsAuthenticated(true);
+            setUserRole(data.role);
+            
+            // Redirect investors to the investor pools page
+            if (data.role === 'investor') {
+              console.log('[DEBUG] Redirecting investor to /pools-investor');
+              router.push('/pools-investor');
+              return;
+            }
+          } else {
+            // Not authenticated, redirect to home
+            console.log('[DEBUG] Not authenticated, redirecting to home');
+            router.push('/');
+            return;
           }
-          return;
         } else {
           console.log('[DEBUG] Auth check failed with status:', response.status);
+          // Not authenticated, redirect to home
+          router.push('/');
+          return;
         }
       } catch (error) {
         console.error('[DEBUG] Auth check error:', error);
-        // Ignore auth check errors
+        // On error, redirect to home
+        if (!cancelled) {
+          router.push('/');
+          return;
+        }
       }
-      // Fallback to localStorage
-      if (!cancelled && typeof window !== 'undefined' && localStorage.getItem('ep-auth') === '1') {
-        setIsAuthenticated(true);
+      
+      if (!cancelled) {
+        setIsLoading(false);
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [router]);
 
   const handleLogout = async () => {
     try {
@@ -277,6 +298,7 @@ export default function PoolsPage() {
         method: 'POST'
       }));
       setIsAuthenticated(false);
+      setUserRole(null);
       setShowProfileMenu(false);
       clearAuthData(); // Clear both session flag and token
       // Redirect to home page after logout
@@ -297,6 +319,23 @@ export default function PoolsPage() {
     setSelectedPoolType('');
   setShowConfirmation(false);
   };
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only render if user is authenticated and is a borrower
+  if (!isAuthenticated || userRole !== 'borrower') {
+    return null; // This should not happen due to the redirect in useEffect
+  }
 
   return (
     <div className="min-h-screen bg-white">

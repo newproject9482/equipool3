@@ -165,3 +165,38 @@ body {
   line-height: 20px;
   word-wrap: break-word;
 }
+
+/* Navbar button styles */
+.ep-nav-login-btn {
+  color: var(--ep-brand);
+  font-size: var(--ep-nav-link-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.ep-nav-login-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.ep-nav-join-btn {
+  background: var(--ep-brand);
+  color: white;
+  font-size: var(--ep-nav-link-size);
+  font-family: var(--ep-font-avenir);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ep-nav-join-btn:hover {
+  background-color: #0f2d5f;
+}
