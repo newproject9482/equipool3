@@ -70,6 +70,11 @@ export default function PoolsPage() {
   const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
   const [customTermMonths, setCustomTermMonths] = useState('');
 
+  // Step 5 - Liability & Credit Info state
+  const [otherPropertyLoans, setOtherPropertyLoans] = useState('');
+  const [creditCardDebt, setCreditCardDebt] = useState('');
+  const [monthlyDebtPayments, setMonthlyDebtPayments] = useState('');
+
   // Submitting state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -186,11 +191,11 @@ export default function PoolsPage() {
         mortgageBalance: mortgageBalance ? parseFloat(mortgageBalance.replace(/[,$]/g, '')) : null,
         amount: parseFloat(poolAmount.replace(/[,$]/g, '')) || 0,
         roiRate: parseFloat(roiRate) || 0,
-        term: selectedTerm,
+    term: selectedTerm,
   customTermMonths: selectedTerm === 'custom' ? (parseInt(customTermMonths, 10) || null) : null,
-        otherPropertyLoans: null, // Add these fields to the form if needed
-        creditCardDebt: null,
-        monthlyDebtPayments: null
+    otherPropertyLoans: otherPropertyLoans ? parseFloat(otherPropertyLoans.replace(/[,$]/g, '')) : null,
+    creditCardDebt: creditCardDebt ? parseFloat(creditCardDebt.replace(/[,$]/g, '')) : null,
+    monthlyDebtPayments: monthlyDebtPayments ? parseFloat(monthlyDebtPayments.replace(/[,$]/g, '')) : null
       };
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
@@ -230,6 +235,9 @@ export default function PoolsPage() {
         setRoiRate('');
         setSelectedTerm('12');
         setCustomTermMonths('');
+  setOtherPropertyLoans('');
+  setCreditCardDebt('');
+  setMonthlyDebtPayments('');
 
         // Refresh the pools list
         await fetchPools();
@@ -513,15 +521,11 @@ export default function PoolsPage() {
 
       {/* All Pools Section */}
       <div style={{width: '100%', maxWidth: 1440, height: '100%', padding: '80px 20px', margin: '80px auto 0 auto', position: 'relative', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
-        <div style={{width: '100%', maxWidth: 1093, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-            <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>All Pools</div>
-                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Active</div>
-                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
-                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Archive</div>
-            </div>
-      {/* Filters removed */}
-        </div>
+    <div style={{width: '100%', maxWidth: 1093, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+      <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
+        <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>All Pools</div>
+      </div>
+    </div>
   <div style={{width: '100%', maxWidth: 1122, height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'flex-start', alignItems: 'start', margin: '24px 0 0 0'}}>
     {/* Loading state */}
     {loadingPools && (
@@ -926,9 +930,16 @@ export default function PoolsPage() {
                       </div>
                   </div>
                   
-                  {/* Progress Steps - external component */}
+                  {/* Progress Steps - external component (clickable steps) */}
                   <div style={{alignSelf: 'stretch'}}>
-                    <Frame1116607621 currentStep={currentStep} />
+                    <Frame1116607621
+                      currentStep={currentStep}
+                      onStepClick={(step) => {
+                        // Allow navigating to any previous step or the current/next steps.
+                        // We don't clear any state here, so inputs remain preserved.
+                        setCurrentStep(step);
+                      }}
+                    />
                   </div>
               </div>
               
@@ -1981,10 +1992,12 @@ export default function PoolsPage() {
                         }}>$</div>
                         <input
                           type="text"
+                          value={otherPropertyLoans}
+                          onChange={(e) => setOtherPropertyLoans(e.target.value)}
                           placeholder="e.g. 100 000"
                           style={{
                             flex: '1 1 0',
-                            color: '#B2B2B2',
+                            color: otherPropertyLoans ? 'black' : '#B2B2B2',
                             fontSize: 14,
                             fontFamily: 'var(--ep-font-avenir)',
                             fontWeight: '500',
@@ -2060,10 +2073,12 @@ export default function PoolsPage() {
                         }}>$</div>
                         <input
                           type="text"
+                          value={creditCardDebt}
+                          onChange={(e) => setCreditCardDebt(e.target.value)}
                           placeholder="e.g. 100 000"
                           style={{
                             flex: '1 1 0',
-                            color: '#B2B2B2',
+                            color: creditCardDebt ? 'black' : '#B2B2B2',
                             fontSize: 14,
                             fontFamily: 'var(--ep-font-avenir)',
                             fontWeight: '500',
@@ -2139,10 +2154,12 @@ export default function PoolsPage() {
                         }}>Monthly</div>
                         <input
                           type="text"
+                          value={monthlyDebtPayments}
+                          onChange={(e) => setMonthlyDebtPayments(e.target.value)}
                           placeholder="e.g. 100 000"
                           style={{
                             flex: '1 1 0',
-                            color: '#B2B2B2',
+                            color: monthlyDebtPayments ? 'black' : '#B2B2B2',
                             fontSize: 14,
                             fontFamily: 'var(--ep-font-avenir)',
                             fontWeight: '500',
