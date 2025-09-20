@@ -2,15 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { getAuthenticatedFetchOptions } from '../../../utils/auth';
 
 export default function PoolDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const poolId = params?.poolId as string;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'documents'>('overview');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   // Pool detail state
   interface PoolDetail {
     id: number;
@@ -115,6 +121,36 @@ export default function PoolDetailPage() {
       window.location.href = '/';
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  };
+
+  const handleDeletePool = async () => {
+    if (!poolData) return;
+    
+    setIsDeleting(true);
+    setDeleteError(null);
+    
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools/${poolData.id}/delete`,
+        getAuthenticatedFetchOptions({
+          method: 'DELETE'
+        })
+      );
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete pool');
+      }
+      
+      // Redirect to pools page
+      router.push('/pools');
+    } catch (error) {
+      console.error('Delete failed:', error);
+      setDeleteError(error instanceof Error ? error.message : 'Failed to delete pool');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -710,17 +746,20 @@ export default function PoolDetailPage() {
                 gap: 16,
                 display: 'flex'
               }}>
-                <button style={{
-                  padding: '12px 24px',
-                  background: 'white',
-                  borderRadius: 12,
-                  border: '1px solid #E5E7EB',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 8,
-                  display: 'flex',
-                  cursor: 'pointer'
-                }}>
+                <button 
+                  onClick={() => setShowEditModal(true)}
+                  style={{
+                    padding: '12px 24px',
+                    background: 'white',
+                    borderRadius: 12,
+                    border: '1px solid #E5E7EB',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 8,
+                    display: 'flex',
+                    cursor: 'pointer'
+                  }}
+                >
                   <div style={{
                     color: 'black',
                     fontSize: 14,
@@ -731,17 +770,20 @@ export default function PoolDetailPage() {
                     Edit
                   </div>
                 </button>
-                <button style={{
-                  padding: '12px 24px',
-                  background: '#CC4747',
-                  borderRadius: 12,
-                  border: 'none',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 8,
-                  display: 'flex',
-                  cursor: 'pointer'
-                }}>
+                <button 
+                  onClick={() => setShowDeleteConfirm(true)}
+                  style={{
+                    padding: '12px 24px',
+                    background: '#CC4747',
+                    borderRadius: 12,
+                    border: 'none',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 8,
+                    display: 'flex',
+                    cursor: 'pointer'
+                  }}
+                >
                   <div style={{
                     color: 'white',
                     fontSize: 14,
@@ -1271,17 +1313,20 @@ export default function PoolDetailPage() {
                     gap: 16,
                     display: 'flex'
                   }}>
-                    <button style={{
-                      padding: '12px 24px',
-                      background: 'white',
-                      borderRadius: 12,
-                      border: '1px solid #E5E7EB',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: 8,
-                      display: 'flex',
-                      cursor: 'pointer'
-                    }}>
+                    <button 
+                      onClick={() => setShowEditModal(true)}
+                      style={{
+                        padding: '12px 24px',
+                        background: 'white',
+                        borderRadius: 12,
+                        border: '1px solid #E5E7EB',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}
+                    >
                       <div style={{
                         color: 'black',
                         fontSize: 14,
@@ -1292,17 +1337,20 @@ export default function PoolDetailPage() {
                         Edit
                       </div>
                     </button>
-                    <button style={{
-                      padding: '12px 24px',
-                      background: '#CC4747',
-                      borderRadius: 12,
-                      border: 'none',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: 8,
-                      display: 'flex',
-                      cursor: 'pointer'
-                    }}>
+                    <button 
+                      onClick={() => setShowDeleteConfirm(true)}
+                      style={{
+                        padding: '12px 24px',
+                        background: '#CC4747',
+                        borderRadius: 12,
+                        border: 'none',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 8,
+                        display: 'flex',
+                        cursor: 'pointer'
+                      }}
+                    >
                       <div style={{
                         color: 'white',
                         fontSize: 14,
@@ -1593,6 +1641,242 @@ export default function PoolDetailPage() {
         </div>
         <div style={{width: 1080, color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
     </div>
+
+    {/* Edit Pool Modal - Shows Review Popup */}
+    {showEditModal && poolData && (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: 16,
+          padding: 32,
+          maxWidth: 600,
+          width: '90%',
+          maxHeight: '90vh',
+          overflowY: 'auto'
+        }}>
+          <h2 style={{
+            fontSize: 24,
+            fontWeight: 'bold',
+            marginBottom: 24,
+            fontFamily: 'var(--ep-font-avenir)'
+          }}>
+            Review Pool Details
+          </h2>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Pool Type Summary */}
+            <div style={{
+              padding: 16,
+              background: '#F9FAFB',
+              borderRadius: 12,
+              border: '1px solid #E5E7EB'
+            }}>
+              <div style={{
+                color: 'black',
+                fontSize: 14,
+                fontWeight: '500',
+                marginBottom: 8
+              }}>Pool Type</div>
+              <div style={{
+                color: '#4B5563',
+                fontSize: 12
+              }}>{poolData.poolType === 'equity' ? 'Equity Pool' : 'Refinance Pool'}</div>
+            </div>
+
+            {/* Property Information Summary */}
+            <div style={{
+              padding: 16,
+              background: '#F9FAFB',
+              borderRadius: 12,
+              border: '1px solid #E5E7EB'
+            }}>
+              <div style={{
+                color: 'black',
+                fontSize: 14,
+                fontWeight: '500',
+                marginBottom: 12
+              }}>Property Information</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#6B7280', fontSize: 12 }}>Address:</span>
+                  <span style={{ color: '#4B5563', fontSize: 12 }}>
+                    {poolData.addressLine}, {poolData.city}, {poolData.state} {poolData.zipCode}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#6B7280', fontSize: 12 }}>Ownership:</span>
+                  <span style={{ color: '#4B5563', fontSize: 12 }}>
+                    {poolData.percentOwned}%{poolData.coOwner ? ` (Co-owner: ${poolData.coOwner})` : ''}
+                  </span>
+                </div>
+                {poolData.propertyValue && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#6B7280', fontSize: 12 }}>Property Value:</span>
+                    <span style={{ color: '#4B5563', fontSize: 12 }}>${poolData.propertyValue}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Pool Terms Summary */}
+            <div style={{
+              padding: 16,
+              background: '#F9FAFB',
+              borderRadius: 12,
+              border: '1px solid #E5E7EB'
+            }}>
+              <div style={{
+                color: 'black',
+                fontSize: 14,
+                fontWeight: '500',
+                marginBottom: 12
+              }}>Pool Terms</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#6B7280', fontSize: 12 }}>Amount Requested:</span>
+                  <span style={{ color: '#4B5563', fontSize: 12 }}>${poolData.amount}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#6B7280', fontSize: 12 }}>Interest Rate:</span>
+                  <span style={{ color: '#4B5563', fontSize: 12 }}>{poolData.roiRate}%</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#6B7280', fontSize: 12 }}>Term:</span>
+                  <span style={{ color: '#4B5563', fontSize: 12 }}>
+                    {poolData.term === 'custom' ? `${poolData.customTermMonths} months` : `${poolData.term} months`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 16, marginTop: 24, justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => setShowEditModal(false)}
+              style={{
+                padding: '12px 24px',
+                background: 'white',
+                border: '1px solid #D1D5DB',
+                borderRadius: 8,
+                cursor: 'pointer'
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Delete Confirmation Modal */}
+    {showDeleteConfirm && (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: 16,
+          padding: 32,
+          maxWidth: 400,
+          width: '90%'
+        }}>
+          <h2 style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+            marginBottom: 16,
+            fontFamily: 'var(--ep-font-avenir)',
+            color: '#DC2626'
+          }}>
+            Delete Pool
+          </h2>
+          
+          <p style={{
+            marginBottom: 24,
+            color: '#6B7280',
+            lineHeight: 1.5
+          }}>
+            Are you sure you want to delete this pool? This action cannot be undone.
+          </p>
+          
+          {poolData && (
+            <div style={{
+              backgroundColor: '#F3F4F6',
+              padding: 12,
+              borderRadius: 8,
+              marginBottom: 16,
+              fontSize: 14,
+              color: '#374151'
+            }}>
+              <strong>Pool Status:</strong> {poolData.status}
+            </div>
+          )}
+
+          {deleteError && (
+            <div style={{
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              color: '#DC2626',
+              padding: 12,
+              borderRadius: 8,
+              marginBottom: 16,
+              fontSize: 14
+            }}>
+              {deleteError}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={isDeleting}
+              style={{
+                padding: '12px 24px',
+                background: 'white',
+                border: '1px solid #D1D5DB',
+                borderRadius: 8,
+                cursor: isDeleting ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeletePool}
+              disabled={isDeleting}
+              style={{
+                padding: '12px 24px',
+                background: isDeleting ? '#9CA3AF' : '#DC2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: 8,
+                cursor: isDeleting ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Pool'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }

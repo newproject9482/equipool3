@@ -819,3 +819,107 @@ def get_investor_dashboard(request: HttpRequest):
     }
     
     return JsonResponse(dashboard_data, status=200)
+
+
+@csrf_exempt
+def update_pool(request: HttpRequest, pool_id: int):
+    """Update pool details - only for draft pools"""
+    if request.method != 'PUT':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        # Get borrower from session
+        borrower_id = request.session.get('borrower_id')
+        if not borrower_id:
+            return JsonResponse({'error': 'Not authenticated'}, status=401)
+        
+        try:
+            borrower = Borrower.objects.get(id=borrower_id)
+        except Borrower.DoesNotExist:
+            return JsonResponse({'error': 'Borrower not found'}, status=404)
+        
+        # Get pool and verify ownership
+        try:
+            pool = Pool.objects.get(id=pool_id, borrower=borrower)
+        except Pool.DoesNotExist:
+            return JsonResponse({'error': 'Pool not found'}, status=404)
+        
+        # Only allow updates for draft pools
+        if pool.status != 'draft':
+            return JsonResponse({'error': 'Can only update draft pools'}, status=400)
+        
+        # Parse JSON data
+        import json
+        data = json.loads(request.body)
+        
+        # Update pool fields
+        if 'poolType' in data:
+            pool.pool_type = data['poolType']
+        if 'addressLine' in data:
+            pool.address_line = data['addressLine']
+        if 'city' in data:
+            pool.city = data['city']
+        if 'state' in data:
+            pool.state = data['state']
+        if 'zipCode' in data:
+            pool.zip_code = data['zipCode']
+        if 'percentOwned' in data:
+            pool.percent_owned = data['percentOwned']
+        if 'coOwner' in data:
+            pool.co_owner = data['coOwner']
+        if 'propertyValue' in data:
+            pool.property_value = data['propertyValue']
+        if 'amount' in data:
+            pool.amount = data['amount']
+        if 'roiRate' in data:
+            pool.roi_rate = data['roiRate']
+        if 'term' in data:
+            pool.term = data['term']
+        if 'customTermMonths' in data:
+            pool.custom_term_months = data['customTermMonths']
+        
+        pool.save()
+        
+        return JsonResponse({'message': 'Pool updated successfully'}, status=200)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def delete_pool(request: HttpRequest, pool_id: int):
+    """Delete pool - only for draft pools"""
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        # Get borrower from session
+        borrower_id = request.session.get('borrower_id')
+        if not borrower_id:
+            return JsonResponse({'error': 'Not authenticated'}, status=401)
+        
+        try:
+            borrower = Borrower.objects.get(id=borrower_id)
+        except Borrower.DoesNotExist:
+            return JsonResponse({'error': 'Borrower not found'}, status=404)
+        
+        # Get pool and verify ownership
+        try:
+            pool = Pool.objects.get(id=pool_id, borrower=borrower)
+        except Pool.DoesNotExist:
+            return JsonResponse({'error': 'Pool not found'}, status=404)
+        
+        # Allow deletion of pools in any status for now
+        # You can add restrictions later if needed
+        # if pool.status != 'draft':
+        #     return JsonResponse({'error': 'Can only delete draft pools'}, status=400)
+        
+        # Delete the pool
+        pool.delete()
+        
+        return JsonResponse({'message': 'Pool deleted successfully'}, status=200)
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
