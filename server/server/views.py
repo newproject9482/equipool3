@@ -823,36 +823,31 @@ def get_investor_dashboard(request: HttpRequest):
 
 @csrf_exempt
 def update_pool(request: HttpRequest, pool_id: int):
-    """Update pool details - only for draft pools"""
+    """Update pool details for the authenticated borrower"""
     if request.method != 'PUT':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
+
+    # Check authentication (supports Bearer token or session)
+    borrower, auth_error = _require_borrower_auth(request)
+    if auth_error:
+        return auth_error
+
     try:
-        # Get borrower from session
-        borrower_id = request.session.get('borrower_id')
-        if not borrower_id:
-            return JsonResponse({'error': 'Not authenticated'}, status=401)
-        
-        try:
-            borrower = Borrower.objects.get(id=borrower_id)
-        except Borrower.DoesNotExist:
-            return JsonResponse({'error': 'Borrower not found'}, status=404)
-        
-        # Get pool and verify ownership
-        try:
-            pool = Pool.objects.get(id=pool_id, borrower=borrower)
-        except Pool.DoesNotExist:
-            return JsonResponse({'error': 'Pool not found'}, status=404)
-        
-        # Only allow updates for draft pools
-        if pool.status != 'draft':
-            return JsonResponse({'error': 'Can only update draft pools'}, status=400)
-        
-        # Parse JSON data
-        import json
-        data = json.loads(request.body)
-        
-        # Update pool fields
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    # Get pool and verify ownership
+    try:
+        pool = Pool.objects.get(id=pool_id, borrower=borrower)
+    except Pool.DoesNotExist:
+        return JsonResponse({'error': 'Pool not found'}, status=404)
+
+    # Allow updates regardless of status for now (can restrict in future if needed)
+
+    # Map and validate fields
+    try:
+        # Simple string fields
         if 'poolType' in data:
             pool.pool_type = data['poolType']
         if 'addressLine' in data:
@@ -863,27 +858,78 @@ def update_pool(request: HttpRequest, pool_id: int):
             pool.state = data['state']
         if 'zipCode' in data:
             pool.zip_code = data['zipCode']
-        if 'percentOwned' in data:
-            pool.percent_owned = data['percentOwned']
         if 'coOwner' in data:
-            pool.co_owner = data['coOwner']
-        if 'propertyValue' in data:
-            pool.property_value = data['propertyValue']
-        if 'amount' in data:
-            pool.amount = data['amount']
-        if 'roiRate' in data:
-            pool.roi_rate = data['roiRate']
+            co_owner = data.get('coOwner')
+            pool.co_owner = (co_owner.strip() if isinstance(co_owner, str) else co_owner) or None
+        if 'propertyLink' in data:
+            prop_link = data.get('propertyLink')
+            pool.property_link = (prop_link.strip() if isinstance(prop_link, str) else prop_link) or None
         if 'term' in data:
             pool.term = data['term']
+            # If term is not custom, clear custom months unless explicitly provided
+            if pool.term != 'custom' and 'customTermMonths' not in data:
+                pool.custom_term_months = None
         if 'customTermMonths' in data:
-            pool.custom_term_months = data['customTermMonths']
-        
+            ctm = data['customTermMonths']
+            pool.custom_term_months = int(ctm) if ctm is not None else None
+
+        # Decimal/numeric fields via helper
+        if 'percentOwned' in data:
+            val = _safe_decimal(data.get('percentOwned'))
+            if val is not None:
+                pool.percent_owned = val
+        if 'propertyValue' in data:
+            pool.property_value = _safe_decimal(data.get('propertyValue'))
+        if 'mortgageBalance' in data:
+            pool.mortgage_balance = _safe_decimal(data.get('mortgageBalance'))
+        if 'amount' in data:
+            amt = _safe_decimal(data.get('amount'))
+            if amt is not None:
+                pool.amount = amt
+        if 'roiRate' in data:
+            rate = _safe_decimal(data.get('roiRate'))
+            if rate is not None:
+                pool.roi_rate = rate
+        if 'otherPropertyLoans' in data:
+            pool.other_property_loans = _safe_decimal(data.get('otherPropertyLoans'))
+        if 'creditCardDebt' in data:
+            pool.credit_card_debt = _safe_decimal(data.get('creditCardDebt'))
+        if 'monthlyDebtPayments' in data:
+            pool.monthly_debt_payments = _safe_decimal(data.get('monthlyDebtPayments'))
+
         pool.save()
-        
-        return JsonResponse({'message': 'Pool updated successfully'}, status=200)
-        
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        # Return updated pool details similar to get_pool_detail
+        return JsonResponse({
+            'id': pool.id,
+            'poolType': pool.pool_type,
+            'status': pool.status,
+            'amount': str(pool.amount),
+            'roiRate': str(pool.roi_rate),
+            'term': pool.term,
+            'termMonths': pool.term_months,
+            'customTermMonths': pool.custom_term_months,
+            'fundingProgress': pool.funding_progress,
+            'createdAt': pool.created_at.isoformat(),
+            'updatedAt': pool.updated_at.isoformat(),
+            'addressLine': pool.address_line,
+            'city': pool.city,
+            'state': pool.state,
+            'zipCode': pool.zip_code,
+            'percentOwned': str(pool.percent_owned),
+            'coOwner': pool.co_owner,
+            'propertyValue': str(pool.property_value) if pool.property_value else None,
+            'propertyLink': pool.property_link,
+            'mortgageBalance': str(pool.mortgage_balance) if pool.mortgage_balance else None,
+            'otherPropertyLoans': str(pool.other_property_loans) if pool.other_property_loans else None,
+            'creditCardDebt': str(pool.credit_card_debt) if pool.credit_card_debt else None,
+            'monthlyDebtPayments': str(pool.monthly_debt_payments) if pool.monthly_debt_payments else None,
+            'homeInsuranceDoc': pool.home_insurance_doc,
+            'taxReturnDoc': pool.tax_return_doc,
+            'appraisalDoc': pool.appraisal_doc,
+            'propertyPhotos': pool.property_photos,
+        }, status=200)
+
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 

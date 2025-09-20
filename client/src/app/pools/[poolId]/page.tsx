@@ -14,6 +14,8 @@ export default function PoolDetailPage() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'documents'>('overview');
   const [showEditModal, setShowEditModal] = useState(false);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -50,6 +52,27 @@ export default function PoolDetailPage() {
   const [poolData, setPoolData] = useState<PoolDetail | null>(null);
   const [loadingPool, setLoadingPool] = useState(false);
   const [poolError, setPoolError] = useState<string | null>(null);
+
+  // Editable fields for the Edit modal
+  const [editFields, setEditFields] = useState({
+    poolType: '' as 'equity' | 'refinance' | '',
+    addressLine: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    percentOwned: '',
+    coOwner: '',
+    propertyValue: '',
+    propertyLink: '',
+    mortgageBalance: '',
+    amount: '',
+    roiRate: '',
+    term: '' as '6' | '12' | '24' | 'custom' | '',
+    customTermMonths: '',
+    otherPropertyLoans: '',
+    creditCardDebt: '',
+    monthlyDebtPayments: ''
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -107,6 +130,77 @@ export default function PoolDetailPage() {
     fetchPool();
     return () => { cancelled = true; };
   }, [poolId]);
+
+  // When opening edit modal, seed fields from current pool data
+  useEffect(() => {
+    if (showEditModal && poolData) {
+      setEditFields({
+        poolType: (poolData.poolType as 'equity' | 'refinance') || '',
+        addressLine: poolData.addressLine || '',
+        city: poolData.city || '',
+        state: poolData.state || '',
+        zipCode: poolData.zipCode || '',
+        percentOwned: poolData.percentOwned || '',
+        coOwner: poolData.coOwner || '',
+        propertyValue: poolData.propertyValue || '',
+        propertyLink: poolData.propertyLink || '',
+        mortgageBalance: poolData.mortgageBalance || '',
+        amount: poolData.amount || '',
+        roiRate: poolData.roiRate || '',
+        term: (poolData.term as '6' | '12' | '24' | 'custom') || '',
+        customTermMonths: poolData.customTermMonths ? String(poolData.customTermMonths) : '',
+        otherPropertyLoans: poolData.otherPropertyLoans || '',
+        creditCardDebt: poolData.creditCardDebt || '',
+        monthlyDebtPayments: poolData.monthlyDebtPayments || ''
+      });
+      setSaveError(null);
+      setIsSavingEdit(false);
+    }
+  }, [showEditModal, poolData]);
+
+  const handleSaveEdit = async () => {
+    if (!poolData) return;
+    setIsSavingEdit(true);
+    setSaveError(null);
+    try {
+      const payload: Record<string, any> = {
+        poolType: editFields.poolType || poolData.poolType,
+        addressLine: editFields.addressLine,
+        city: editFields.city,
+        state: editFields.state,
+        zipCode: editFields.zipCode,
+        percentOwned: editFields.percentOwned,
+        coOwner: editFields.coOwner,
+        propertyValue: editFields.propertyValue,
+        propertyLink: editFields.propertyLink,
+        mortgageBalance: editFields.mortgageBalance,
+        amount: editFields.amount,
+        roiRate: editFields.roiRate,
+        term: editFields.term || poolData.term,
+        customTermMonths: editFields.term === 'custom' ? (editFields.customTermMonths ? Number(editFields.customTermMonths) : null) : null,
+        otherPropertyLoans: editFields.otherPropertyLoans,
+        creditCardDebt: editFields.creditCardDebt,
+        monthlyDebtPayments: editFields.monthlyDebtPayments,
+      };
+
+      const resp = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools/${poolData.id}/update`, getAuthenticatedFetchOptions({
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      }));
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || `Failed to save (status ${resp.status})`);
+      }
+      const updated = await resp.json();
+      setPoolData(updated);
+      setShowEditModal(false);
+    } catch (e: unknown) {
+      const err = e as Error;
+      setSaveError(err.message || 'Failed to save changes');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -1642,7 +1736,7 @@ export default function PoolDetailPage() {
         <div style={{width: 1080, color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
     </div>
 
-    {/* Edit Pool Modal - Shows Review Popup */}
+    {/* Edit Pool Modal */}
     {showEditModal && poolData && (
       <div style={{
         position: 'fixed',
@@ -1669,93 +1763,166 @@ export default function PoolDetailPage() {
             fontSize: 24,
             fontWeight: 'bold',
             marginBottom: 24,
-            fontFamily: 'var(--ep-font-avenir)'
+            fontFamily: 'var(--ep-font-avenir)',
+            color: 'black'
           }}>
-            Review Pool Details
+            Edit Pool Details
           </h2>
-          
+
+          {/* Error notice */}
+          {saveError && (
+            <div style={{
+              background: '#FEF2F2',
+              border: '1px solid #FECACA',
+              color: '#B91C1C',
+              padding: 12,
+              borderRadius: 8,
+              marginBottom: 12,
+              fontSize: 14,
+              fontFamily: 'var(--ep-font-avenir)'
+            }}>
+              {saveError}
+            </div>
+          )}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* Pool Type Summary */}
+            {/* Pool Type */}
             <div style={{
               padding: 16,
               background: '#F9FAFB',
               borderRadius: 12,
               border: '1px solid #E5E7EB'
             }}>
-              <div style={{
-                color: 'black',
-                fontSize: 14,
-                fontWeight: '500',
-                marginBottom: 8
-              }}>Pool Type</div>
-              <div style={{
-                color: '#4B5563',
-                fontSize: 12
-              }}>{poolData.poolType === 'equity' ? 'Equity Pool' : 'Refinance Pool'}</div>
+              <div style={{ color: 'black', fontSize: 14, fontWeight: 500, marginBottom: 12, fontFamily: 'var(--ep-font-avenir)' }}>Pool Type</div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                {(['equity','refinance'] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setEditFields(f => ({ ...f, poolType: type }))}
+                    style={{
+                      padding: '8px 12px',
+                      background: editFields.poolType === type ? '#113D7B' : '#F4F4F4',
+                      color: editFields.poolType === type ? 'white' : 'black',
+                      outline: '1px #E5E7EB solid',
+                      border: 'none',
+                      borderRadius: 12,
+                      cursor: 'pointer',
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontSize: 14,
+                      fontWeight: 500
+                    }}
+                  >
+                    {type === 'equity' ? 'Equity Pool' : 'Refinance Pool'}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Property Information Summary */}
-            <div style={{
-              padding: 16,
-              background: '#F9FAFB',
-              borderRadius: 12,
-              border: '1px solid #E5E7EB'
-            }}>
-              <div style={{
-                color: 'black',
-                fontSize: 14,
-                fontWeight: '500',
-                marginBottom: 12
-              }}>Property Information</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#6B7280', fontSize: 12 }}>Address:</span>
-                  <span style={{ color: '#4B5563', fontSize: 12 }}>
-                    {poolData.addressLine}, {poolData.city}, {poolData.state} {poolData.zipCode}
-                  </span>
+            {/* Property Information */}
+            <div style={{ padding: 16, background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
+              <div style={{ color: 'black', fontSize: 14, fontWeight: 500, marginBottom: 12, fontFamily: 'var(--ep-font-avenir)' }}>Property Information</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                {/* Address */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Address Line</label>
+                  <input value={editFields.addressLine} onChange={(e) => setEditFields(f => ({...f, addressLine: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#6B7280', fontSize: 12 }}>Ownership:</span>
-                  <span style={{ color: '#4B5563', fontSize: 12 }}>
-                    {poolData.percentOwned}%{poolData.coOwner ? ` (Co-owner: ${poolData.coOwner})` : ''}
-                  </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>City</label>
+                  <input value={editFields.city} onChange={(e) => setEditFields(f => ({...f, city: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
                 </div>
-                {poolData.propertyValue && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#6B7280', fontSize: 12 }}>Property Value:</span>
-                    <span style={{ color: '#4B5563', fontSize: 12 }}>${poolData.propertyValue}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>State</label>
+                  <input value={editFields.state} onChange={(e) => setEditFields(f => ({...f, state: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>ZIP Code</label>
+                  <input value={editFields.zipCode} onChange={(e) => setEditFields(f => ({...f, zipCode: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Percent Owned (%)</label>
+                  <input value={editFields.percentOwned} onChange={(e) => setEditFields(f => ({...f, percentOwned: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Co-owner</label>
+                  <input value={editFields.coOwner} onChange={(e) => setEditFields(f => ({...f, coOwner: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Property Value ($)</label>
+                  <input value={editFields.propertyValue} onChange={(e) => setEditFields(f => ({...f, propertyValue: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Property Link</label>
+                  <input value={editFields.propertyLink} onChange={(e) => setEditFields(f => ({...f, propertyLink: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Mortgage Balance ($)</label>
+                  <input value={editFields.mortgageBalance} onChange={(e) => setEditFields(f => ({...f, mortgageBalance: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Pool Terms */}
+            <div style={{ padding: 16, background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
+              <div style={{ color: 'black', fontSize: 14, fontWeight: 500, marginBottom: 12, fontFamily: 'var(--ep-font-avenir)' }}>Pool Terms</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Amount Requested ($)</label>
+                  <input value={editFields.amount} onChange={(e) => setEditFields(f => ({...f, amount: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Interest Rate (%)</label>
+                  <input value={editFields.roiRate} onChange={(e) => setEditFields(f => ({...f, roiRate: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Term</label>
+                  <select value={editFields.term} onChange={(e) => setEditFields(f => ({...f, term: e.target.value as any}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }}>
+                    <option value="6">6 months</option>
+                    <option value="12">12 months</option>
+                    <option value="24">24 months</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                {editFields.term === 'custom' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Custom Term (months)</label>
+                    <input value={editFields.customTermMonths} onChange={(e) => setEditFields(f => ({...f, customTermMonths: e.target.value}))}
+                      style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Pool Terms Summary */}
-            <div style={{
-              padding: 16,
-              background: '#F9FAFB',
-              borderRadius: 12,
-              border: '1px solid #E5E7EB'
-            }}>
-              <div style={{
-                color: 'black',
-                fontSize: 14,
-                fontWeight: '500',
-                marginBottom: 12
-              }}>Pool Terms</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#6B7280', fontSize: 12 }}>Amount Requested:</span>
-                  <span style={{ color: '#4B5563', fontSize: 12 }}>${poolData.amount}</span>
+            {/* Liability & Credit Info */}
+            <div style={{ padding: 16, background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
+              <div style={{ color: 'black', fontSize: 14, fontWeight: 500, marginBottom: 12, fontFamily: 'var(--ep-font-avenir)' }}>Liability & Credit Info</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Other Property Loans ($)</label>
+                  <input value={editFields.otherPropertyLoans} onChange={(e) => setEditFields(f => ({...f, otherPropertyLoans: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#6B7280', fontSize: 12 }}>Interest Rate:</span>
-                  <span style={{ color: '#4B5563', fontSize: 12 }}>{poolData.roiRate}%</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Credit Card Debt ($)</label>
+                  <input value={editFields.creditCardDebt} onChange={(e) => setEditFields(f => ({...f, creditCardDebt: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#6B7280', fontSize: 12 }}>Term:</span>
-                  <span style={{ color: '#4B5563', fontSize: 12 }}>
-                    {poolData.term === 'custom' ? `${poolData.customTermMonths} months` : `${poolData.term} months`}
-                  </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Monthly Debt Payments ($)</label>
+                  <input value={editFields.monthlyDebtPayments} onChange={(e) => setEditFields(f => ({...f, monthlyDebtPayments: e.target.value}))}
+                    style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }} />
                 </div>
               </div>
             </div>
@@ -1764,15 +1931,38 @@ export default function PoolDetailPage() {
           <div style={{ display: 'flex', gap: 16, marginTop: 24, justifyContent: 'flex-end' }}>
             <button
               onClick={() => setShowEditModal(false)}
+              disabled={isSavingEdit}
               style={{
                 padding: '12px 24px',
                 background: 'white',
-                border: '1px solid #D1D5DB',
-                borderRadius: 8,
-                cursor: 'pointer'
+                outline: '1px #E5E7EB solid',
+                border: 'none',
+                borderRadius: 12,
+                cursor: isSavingEdit ? 'not-allowed' : 'pointer',
+                fontFamily: 'var(--ep-font-avenir)',
+                fontSize: 14,
+                fontWeight: 500,
+                color: 'black'
               }}
             >
-              Close
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveEdit}
+              disabled={isSavingEdit}
+              style={{
+                padding: '12px 24px',
+                background: isSavingEdit ? '#9CA3AF' : '#113D7B',
+                color: 'white',
+                border: 'none',
+                borderRadius: 12,
+                cursor: isSavingEdit ? 'not-allowed' : 'pointer',
+                fontFamily: 'var(--ep-font-avenir)',
+                fontSize: 14,
+                fontWeight: 500
+              }}
+            >
+              {isSavingEdit ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </div>
