@@ -49,6 +49,29 @@ export default function PoolDetailPage() {
     appraisalDoc?: string | null;
     propertyPhotos?: string[];
   }
+  // Allowed term options for the pool
+  type TermOption = '6' | '12' | '24' | 'custom' | '';
+
+  // Payload type when updating a pool (only send fields that may change)
+  type UpdatePayload = {
+    poolType?: string;
+    addressLine?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    percentOwned?: string;
+    coOwner?: string | null;
+    propertyValue?: string | null;
+    propertyLink?: string | null;
+    mortgageBalance?: string | null;
+    amount?: string;
+    roiRate?: string;
+    term?: TermOption | string; // backend may accept string months or 'custom'
+    customTermMonths?: number | null;
+    otherPropertyLoans?: string;
+    creditCardDebt?: string;
+    monthlyDebtPayments?: string;
+  };
   const [poolData, setPoolData] = useState<PoolDetail | null>(null);
   const [loadingPool, setLoadingPool] = useState(false);
   const [poolError, setPoolError] = useState<string | null>(null);
@@ -67,7 +90,7 @@ export default function PoolDetailPage() {
     mortgageBalance: '',
     amount: '',
     roiRate: '',
-    term: '' as '6' | '12' | '24' | 'custom' | '',
+    term: '' as TermOption,
     customTermMonths: '',
     otherPropertyLoans: '',
     creditCardDebt: '',
@@ -161,7 +184,7 @@ export default function PoolDetailPage() {
     setIsSavingEdit(true);
     setSaveError(null);
     try {
-      const payload: Record<string, any> = {
+      const payload: UpdatePayload = {
         poolType: editFields.poolType || poolData.poolType,
         addressLine: editFields.addressLine,
         city: editFields.city,
@@ -1884,7 +1907,7 @@ export default function PoolDetailPage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <label style={{ color: '#6B7280', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500 }}>Term</label>
-                  <select value={editFields.term} onChange={(e) => setEditFields(f => ({...f, term: e.target.value as any}))}
+                  <select value={editFields.term} onChange={(e) => setEditFields(f => ({...f, term: e.target.value as TermOption}))}
                     style={{ padding: 10, background: '#F4F4F4', outline: '1px #E5E7EB solid', border: 'none', borderRadius: 12, fontFamily: 'var(--ep-font-avenir)', fontSize: 14, color: 'black' }}>
                     <option value="6">6 months</option>
                     <option value="12">12 months</option>
