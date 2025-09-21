@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { getAuthenticatedFetchOptions } from '../../../utils/auth';
+import { getAuthenticatedFetchOptions, clearAuthData } from '../../../utils/auth';
 
 export default function PoolDetailPage() {
   const params = useParams();
@@ -78,9 +78,7 @@ export default function PoolDetailPage() {
     let cancelled = false;
     (async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, {
-          credentials: 'include'
-        });
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
         if (response.ok) {
           const data = await response.json();
           if (!cancelled && data.authenticated) {
@@ -109,7 +107,7 @@ export default function PoolDetailPage() {
       setLoadingPool(true);
       setPoolError(null);
       try {
-        const resp = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools/${numericId}`, { credentials: 'include' });
+  const resp = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/pools/${numericId}`, getAuthenticatedFetchOptions());
         if (!resp.ok) {
           setPoolError(`Failed to load pool (status ${resp.status})`);
           setPoolData(null);
@@ -204,13 +202,12 @@ export default function PoolDetailPage() {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      });
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, getAuthenticatedFetchOptions({
+        method: 'POST'
+      }));
       setIsAuthenticated(false);
       setShowProfileMenu(false);
-      if (typeof window !== 'undefined') localStorage.removeItem('ep-auth');
+      clearAuthData();
       // Redirect to home page after logout
       window.location.href = '/';
     } catch (error) {

@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import dynamic from 'next/dynamic';
 import { Toaster, useToaster } from '../components/Toaster';
 import { getPoolsUrlForRole } from '../utils/navigation';
+import { getAuthenticatedFetchOptions, clearAuthData } from '../utils/auth';
 const LoginModal = dynamic(()=> import('../components/LoginModal'), { ssr:false });
 
 export default function Home() {
@@ -199,16 +200,20 @@ export default function Home() {
           credentials: 'include',
           body: JSON.stringify(payload),
         });
+        const data = await res.json().catch(()=>({}));
         if(!res.ok){
-          const err = await res.json().catch(()=>({error:'Signup failed'}));
-          showError(err.error || 'Signup failed');
+          showError(data.error || 'Signup failed');
           return;
         }
         // On success mark authenticated and continue to verification
         setIsAuthenticated(true);
         showSuccess('Account created successfully! Welcome to EquiPool!');
         // Persist simple flag (session cookie is real auth)
-        if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ep-auth','1');
+          if (data?.token) localStorage.setItem('ep-auth-token', data.token);
+        }
+        if (data?.role === 'borrower') setSelectedRole('borrower');
   // Borrower flow: go straight to email verification step
   setModalStep('emailVerification');
       } catch (e: unknown) {
@@ -241,16 +246,20 @@ export default function Home() {
           credentials: 'include',
           body: JSON.stringify(payload),
         });
+        const data = await res.json().catch(()=>({}));
         if(!res.ok){
-          const err = await res.json().catch(()=>({error:'Signup failed'}));
-          showError(err.error || 'Signup failed');
+          showError(data.error || 'Signup failed');
           return;
         }
         // On success mark authenticated and continue to verification
         setIsAuthenticated(true);
         showSuccess('Investor account created successfully! Welcome to EquiPool!');
         // Persist simple flag (session cookie is real auth)
-        if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ep-auth','1');
+          if (data?.token) localStorage.setItem('ep-auth-token', data.token);
+        }
+        if (data?.role === 'investor') setSelectedRole('investor');
         // Investor flow: go to combined contact verification first
         setModalStep('verifyContact');
       } catch (e: unknown) {
@@ -284,9 +293,9 @@ export default function Home() {
         credentials: 'include',
         body: JSON.stringify(payload),
       });
+      const data = await res.json().catch(()=>({}));
       if(!res.ok){
-        const err = await res.json().catch(()=>({error:'Signup failed'}));
-        showError(err.error || 'Signup failed');
+        showError(data.error || 'Signup failed');
         return;
       }
       // On success mark authenticated and continue to verification
@@ -294,7 +303,10 @@ export default function Home() {
       setIsAuthenticated(true);
       showSuccess('Investor account created successfully! Welcome to EquiPool!');
       // Persist simple flag (session cookie is real auth)
-      if (typeof window !== 'undefined') localStorage.setItem('ep-auth','1');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ep-auth','1');
+        if (data?.token) localStorage.setItem('ep-auth-token', data.token);
+      }
       // Investor flow: go to combined contact verification first
       setModalStep('verifyContact');
     } catch (e: unknown) {
@@ -305,17 +317,16 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, { 
-        method:'POST',
-        credentials: 'include'
-      });
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, getAuthenticatedFetchOptions({ 
+        method:'POST'
+      }));
     } catch {
       // Ignore logout errors
     }
     setIsAuthenticated(false);
     setShowProfileMenu(false);
     showSuccess('You have been logged out successfully!');
-    if (typeof window !== 'undefined') localStorage.removeItem('ep-auth');
+    clearAuthData();
   };
 
   // On mount, probe backend session; fallback to localStorage flag
@@ -323,9 +334,7 @@ export default function Home() {
     let cancelled = false;
     (async()=>{
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, {
-          credentials: 'include'
-        });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
         if (res.ok) {
           const data = await res.json();
             if(!cancelled && data.authenticated) {
@@ -569,7 +578,7 @@ export default function Home() {
                   <div style={{width:220,padding:24,position:'absolute',top:48,right:0,background:'#F4F4F4',overflow:'hidden',borderRadius:24,outline:'1px #E5E7EB solid',display:'inline-flex',flexDirection:'column',justifyContent:'flex-end',alignItems:'flex-start',gap:14,zIndex:50}} role="menu">
                     <button style={{all:'unset',alignSelf:'stretch',color:'black',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={async () => {
                       try {
-                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, { credentials: 'include' });
+                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
                         if (res.ok) {
                           const data = await res.json();
                           if (data.authenticated) {

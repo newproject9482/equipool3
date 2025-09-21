@@ -123,12 +123,26 @@ def borrower_signup(request: HttpRequest):
     except Exception as e:
         return JsonResponse({"error": f"Database error: {str(e)}"}, status=500)
 
+    # Auto-login newly registered borrower: establish session and create token
+    try:
+        request.session['borrower_id'] = b.id
+        request.session['role'] = 'borrower'
+        if 'investor_id' in request.session:
+            del request.session['investor_id']
+        request.session.save()
+        auth_token = _create_auth_token(b, 'borrower')
+    except Exception:
+        auth_token = None
+
     return JsonResponse({
         "id": b.id,
         "fullName": b.full_name,
         "email": b.email,
         "dateOfBirth": b.date_of_birth.isoformat(),
         "createdAt": b.created_at.isoformat(),
+        "role": "borrower",
+        "token": auth_token,
+        "authenticated": True,
     }, status=201)
 
 @csrf_exempt
@@ -185,6 +199,16 @@ def borrower_login(request: HttpRequest):
 def auth_logout(request: HttpRequest):
     if request.method != 'POST':
         return JsonResponse({'error':'Method not allowed'}, status=405)
+    # Revoke bearer token if provided
+    auth_header = request.headers.get('Authorization', '')
+    if auth_header.startswith('Bearer '):
+        token_value = auth_header.split(' ', 1)[1]
+        try:
+            token_obj = AuthToken.objects.get(token=token_value)
+            token_obj.delete()
+        except AuthToken.DoesNotExist:
+            pass
+    # Flush server-side session
     request.session.flush()
     return JsonResponse({'success': True})
 
@@ -281,12 +305,26 @@ def investor_signup(request: HttpRequest):
     except Exception as e:
         return JsonResponse({"error": f"Database error: {str(e)}"}, status=500)
 
+    # Auto-login newly registered investor: establish session and create token
+    try:
+        request.session['investor_id'] = i.id
+        request.session['role'] = 'investor'
+        if 'borrower_id' in request.session:
+            del request.session['borrower_id']
+        request.session.save()
+        auth_token = _create_auth_token(i, 'investor')
+    except Exception:
+        auth_token = None
+
     return JsonResponse({
         "id": i.id,
         "fullName": i.full_name,
         "email": i.email,
         "dateOfBirth": i.date_of_birth.isoformat(),
         "createdAt": i.created_at.isoformat(),
+        "role": "investor",
+        "token": auth_token,
+        "authenticated": True,
     }, status=201)
 
 @csrf_exempt
