@@ -1294,7 +1294,7 @@ export default function PoolsPage() {
                               fontSize: 11,
                               fontFamily: 'var(--ep-font-avenir)',
                               fontWeight: '500'
-                          }}>Continue</div>
+                          }}>Save and Continue</div>
                       </div>
                   </div>
                 </div>
@@ -1481,7 +1481,7 @@ export default function PoolsPage() {
                         }
                       }}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Save and Continue</div>
                     </div>
                   </div>
                 </div>
@@ -1884,7 +1884,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(5)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Save and Continue</div>
                     </div>
                   </div>
                 </div>
@@ -2194,7 +2194,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(6)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Save and Continue</div>
                     </div>
                   </div>
                 </div>
