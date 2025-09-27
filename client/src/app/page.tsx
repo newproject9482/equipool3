@@ -47,6 +47,17 @@ export default function Home() {
   const [monthInput, setMonthInput] = useState('June');
   const [yearInput, setYearInput] = useState('1993');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  // Borrower validation errors
+  const [borrowerErrors, setBorrowerErrors] = useState<string[]>([]);
+  const [showBorrowerErrors, setShowBorrowerErrors] = useState(false);
+  // Track which borrower fields the user has interacted with and submit attempts
+  type BorrowerField = 'fullName' | 'dateOfBirth' | 'email' | 'password' | 'repeatPassword' | 'acceptedTerms';
+  const [borrowerTouched, setBorrowerTouched] = useState<Partial<Record<BorrowerField, boolean>>>({});
+  const [borrowerSubmitAttempted, setBorrowerSubmitAttempted] = useState(false);
+  
+  // Investor validation errors
+  const [investorErrors, setInvestorErrors] = useState<string[]>([]);
+  const [showInvestorErrors, setShowInvestorErrors] = useState(false);
 
   // Toaster hook
   const { toasts, removeToast, showInfo, showSuccess, showError } = useToaster();
@@ -112,6 +123,10 @@ export default function Home() {
     setShowSignUpModal(false);
     setModalStep('roleSelection');
     setAcceptedTerms(false); // Reset terms acceptance
+  setShowBorrowerErrors(false);
+  setBorrowerErrors([]);
+  setBorrowerTouched({});
+  setBorrowerSubmitAttempted(false);
     // Reset form data
     setFormData({
       fullName: '',
@@ -129,10 +144,22 @@ export default function Home() {
       repeatPassword: ''
     });
   };
-  const goToBorrowerSignUp = () => { setSelectedRole('borrower'); setModalStep('borrowerSignUp'); };
+  const goToBorrowerSignUp = () => { 
+    setSelectedRole('borrower'); 
+    setModalStep('borrowerSignUp'); 
+    setShowBorrowerErrors(false);
+    setBorrowerErrors([]);
+    setBorrowerTouched({});
+    setBorrowerSubmitAttempted(false);
+    setShowInvestorErrors(false);
+    setInvestorErrors([]);
+  };
   const goToInvestorSignUp = () => { 
     setSelectedRole('investor'); 
     setModalStep('investorSignUp'); 
+    // Reset investor errors and state
+    setShowInvestorErrors(false);
+    setInvestorErrors([]);
     // Reset any open date picker UI state when switching steps
     setShowDatePicker(false);
     setShowMonthDropdown(false);
@@ -158,6 +185,8 @@ export default function Home() {
     setSelectedRole('borrower');
     setModalStep('borrowerSignUp');
     setShowSignUpModal(true);
+    setShowBorrowerErrors(false);
+    setBorrowerErrors([]);
   };
 
   const handleInvestorButtonClick = () => {
@@ -175,6 +204,8 @@ export default function Home() {
     setSelectedRole('investor');
     setModalStep('investorSignUp');
     setShowSignUpModal(true);
+    setShowInvestorErrors(false);
+    setInvestorErrors([]);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -182,9 +213,183 @@ export default function Home() {
       ...prev,
       [field]: value
     }));
+    // Mark field as touched and show error area only after user starts typing in borrower step
+    if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
+      if ((['fullName','dateOfBirth','email','password','repeatPassword'] as string[]).includes(field)) {
+        setBorrowerTouched(prev => ({ ...prev, [field]: true }));
+      }
+      setShowBorrowerErrors(true);
+    }
+    // Show errors only after user starts typing in investor step
+    if (selectedRole === 'investor' && modalStep === 'investorSignUp') {
+      setShowInvestorErrors(true);
+    }
   };
 
+  // Dedicated handler for terms checkbox to mark touched consistently
+  const handleAcceptedTermsChange = (checked: boolean) => {
+    setAcceptedTerms(checked);
+    if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
+      setBorrowerTouched(prev => ({ ...prev, acceptedTerms: true }));
+      setShowBorrowerErrors(true);
+    }
+  };
+
+  // ---------- Validation helpers (borrower) ----------
+  const isValidEmail = (email: string) => {
+    if (!email) return false;
+    // Simple RFC5322-like email check
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const isValidName = (name: string) => {
+    if (!name) return false;
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length < 2) return false; // require first and last
+    // Allow letters incl. accents, spaces, hyphens and apostrophes
+    return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(name.trim());
+  };
+
+  const isAdult18 = (isoDate: string) => {
+    if (!isoDate) return false;
+    const dob = new Date(isoDate + 'T00:00:00');
+    if (isNaN(dob.getTime())) return false;
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+    return age >= 18;
+  };
+
+  // Compute borrower validation errors per-field
+  type BorrowerErrorMap = Partial<Record<BorrowerField, string[]>>;
+  const computeBorrowerErrorsByField = (): BorrowerErrorMap => {
+    const errs: BorrowerErrorMap = {};
+    // fullName
+    if (!formData.fullName) {
+      errs.fullName = ['Full name is required'];
+    } else {
+      const parts = formData.fullName.trim().split(/\s+/).filter(Boolean);
+      const messages: string[] = [];
+      if (parts.length < 2) messages.push('Please enter your full name (first and last)');
+      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(formData.fullName.trim())) {
+        messages.push('Name contains invalid characters');
+      }
+      if (messages.length) errs.fullName = messages;
+    }
+    // email
+    if (!isValidEmail(formData.email)) {
+      errs.email = ['Valid email required'];
+    }
+    // dateOfBirth
+    if (!formData.dateOfBirth) {
+      errs.dateOfBirth = ['Date of birth is required'];
+    } else if (!isAdult18(formData.dateOfBirth)) {
+      errs.dateOfBirth = ['You must be at least 18 years old'];
+    }
+    // password + repeatPassword
+    const pwMessages: string[] = [];
+    if (!formData.password || formData.password.length < 8) pwMessages.push('Password must be at least 8 characters');
+    if (pwMessages.length) errs.password = pwMessages;
+    if (formData.password !== formData.repeatPassword) {
+      errs.repeatPassword = ['Passwords do not match'];
+    }
+    // terms
+    if (!acceptedTerms) {
+      errs.acceptedTerms = ['You must agree to the Terms of Service and Privacy Policy'];
+    }
+    return errs;
+  };
+
+  const flattenErrors = (map: BorrowerErrorMap, onlyFields?: BorrowerField[]) => {
+    const entries = Object.entries(map) as [BorrowerField, string[]][];
+    return entries
+      .filter(([field]) => !onlyFields || onlyFields.includes(field))
+      .flatMap(([, msgs]) => msgs || []);
+  };
+
+  // ---------- Investor validation helpers ----------
+  const computeInvestorErrors = () => {
+    const errs: string[] = [];
+    if (!formData.fullName) {
+      errs.push('Full name is required');
+    } else {
+      const parts = formData.fullName.trim().split(/\s+/).filter(Boolean);
+      if (parts.length < 2) errs.push('Please enter your full name (first and last)');
+      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(formData.fullName.trim())) {
+        errs.push('Name contains invalid characters');
+      }
+    }
+    if (!isValidEmail(formData.email)) errs.push('Valid email required');
+    if (!formData.dateOfBirth) errs.push('Date of birth is required');
+    else if (!isAdult18(formData.dateOfBirth)) errs.push('You must be at least 18 years old');
+    if (!formData.phone) errs.push('Phone number is required');
+    if (!formData.ssn) errs.push('SSN is required');
+    if (!formData.address1) errs.push('Address is required');
+    if (!formData.city) errs.push('City is required');
+    if (!formData.state) errs.push('State is required');
+    if (!formData.zip) errs.push('ZIP code is required');
+    if (!formData.password || formData.password.length < 8) errs.push('Password must be at least 8 characters');
+    if (formData.password !== formData.repeatPassword) errs.push('Passwords do not match');
+    if (!acceptedTerms) errs.push('You must agree to the Terms of Service and Privacy Policy');
+    return errs;
+  };
+
+  // Recompute borrower errors when relevant state changes while on borrower step,
+  // but only after the user has interacted or submit attempt happened.
+  useEffect(() => {
+    if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
+      const map = computeBorrowerErrorsByField();
+      if (showBorrowerErrors) {
+        if (borrowerSubmitAttempted) {
+          // After submit attempt, show all errors
+          setBorrowerErrors(flattenErrors(map));
+        } else {
+          // Before submit, show only errors for fields the user interacted with
+          const touchedFields = (Object.keys(borrowerTouched) as BorrowerField[]).filter(k => borrowerTouched[k]);
+          setBorrowerErrors(flattenErrors(map, touchedFields));
+        }
+      } else {
+        setBorrowerErrors([]);
+      }
+    }
+  }, [formData, acceptedTerms, selectedRole, modalStep, showBorrowerErrors, borrowerTouched, borrowerSubmitAttempted]);
+
+  // Recompute investor errors when relevant state changes while on investor step,
+  // but only after the user has interacted or submit attempt happened.
+  useEffect(() => {
+    if (selectedRole === 'investor' && modalStep === 'investorSignUp') {
+      if (showInvestorErrors) {
+        setInvestorErrors(computeInvestorErrors());
+      } else {
+        setInvestorErrors([]);
+      }
+    }
+  }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors]);
+
   const handleSignUp = async () => {
+    // On attempt to submit, if borrower step has errors, show them and stop
+    if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
+      const map = computeBorrowerErrorsByField();
+      const allErrs = flattenErrors(map);
+      setBorrowerErrors(allErrs);
+      if (allErrs.length > 0) {
+        setShowBorrowerErrors(true);
+        setBorrowerSubmitAttempted(true);
+        // Also mark all fields as touched to surface all messages
+        setBorrowerTouched({ fullName:true, dateOfBirth:true, email:true, password:true, repeatPassword:true, acceptedTerms:true });
+        return;
+      }
+    }
+    // On attempt to submit, if investor step has errors, show them and stop
+    if (selectedRole === 'investor' && modalStep === 'investorSignUp') {
+      const errs = computeInvestorErrors();
+      setInvestorErrors(errs);
+      if (errs.length > 0) {
+        setShowInvestorErrors(true);
+        return;
+      }
+    }
     if(selectedRole === 'borrower') {
       try {
         const payload = {
@@ -202,7 +407,11 @@ export default function Home() {
         });
         const data = await res.json().catch(()=>({}));
         if(!res.ok){
-          showError(data.error || 'Signup failed');
+          const msg = data.error || 'Signup failed';
+          // Surface server error into form error area
+          setBorrowerErrors(prev => Array.from(new Set([...(prev||[]), msg])));
+          setShowBorrowerErrors(true);
+          showError(msg);
           return;
         }
         // On success mark authenticated and continue to verification
@@ -248,7 +457,11 @@ export default function Home() {
         });
         const data = await res.json().catch(()=>({}));
         if(!res.ok){
-          showError(data.error || 'Signup failed');
+          const msg = data.error || 'Signup failed';
+          // Surface server error into form error area
+          setInvestorErrors(prev => Array.from(new Set([...(prev||[]), msg])));
+          setShowInvestorErrors(true);
+          showError(msg);
           return;
         }
         // On success mark authenticated and continue to verification
@@ -354,30 +567,13 @@ export default function Home() {
   return ()=> { cancelled = true; };
   },[]);
 
-  const borrowerCanContinue = (
-    !!formData.fullName &&
-    !!formData.dateOfBirth &&
-    !!formData.email &&
-    !!formData.password &&
-    formData.password === formData.repeatPassword &&
-    acceptedTerms
-  );
+  // Re-evaluate ability to continue without forcing errors to display
+  const borrowerCanContinue = (() => {
+    const map = computeBorrowerErrorsByField();
+    return flattenErrors(map).length === 0;
+  })();
 
-  const investorCanContinue = (
-    !!formData.fullName &&
-    !!formData.dateOfBirth &&
-    !!formData.email &&
-    !!formData.phone &&
-    !!formData.ssn &&
-    !!formData.address1 &&
-    !!formData.city &&
-    !!formData.state &&
-    !!formData.zip &&
-    !!formData.country &&
-    !!formData.password &&
-    formData.password === formData.repeatPassword &&
-    acceptedTerms
-  );
+  const investorCanContinue = computeInvestorErrors().length === 0;
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const currentMonthIndex = months.indexOf(selectedMonth);
@@ -636,21 +832,23 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <main className="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row items-start gap-8" style={{marginTop: 100}}>
-        <section className="flex-1">
-      <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'inline-flex'}}>
-      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'flex'}}>
-        <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-          <div style={{textAlign: 'center', color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Welcome to EquiPool</div>
-        </div>
-        <div style={{width: 566, textAlign: 'center'}}>
-          <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 400, wordWrap: 'break-word'}}>Your Property. Your Terms. </span>
-          <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, fontStyle: 'italic', wordWrap: 'break-word'}}>Your Capital.</span>
-        </div>
-        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>
+      <main className="max-w-6xl mx-auto px-6 py-12" style={{marginTop: 100}}>
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center'}}>
+          {/* Left Side - Content */}
+          <section>
+            <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 32, display: 'flex'}}>
+              <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                <div style={{width: '100%', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Welcome to EquiPool</div>
+                </div>
+                <div style={{width: '100%'}}>
+                  <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 400, wordWrap: 'break-word'}}>Your Property. Your Terms. </span>
+                  <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, fontStyle: 'italic', wordWrap: 'break-word'}}>Your Capital.</span>
+                </div>
+                <div style={{width: '100%', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>
           Access fair, fast, and community-powered loans backed by real assets. Whether you’re borrowing or investing — our AI-powered platform gives you control, clarity, and confidence.
         </div>
-        <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                <div style={{width: '100%', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
           <div 
             data-left-icon={true} 
             data-state="default" 
@@ -704,11 +902,24 @@ export default function Home() {
           >
             <Image src="/invest.svg" alt="Investment icon" width={24} height={24} />
             <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I want to invest</div>
-          </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Right Side - New Content */}
+          <section>
+            <div style={{width: '100%', minHeight: 400, position: 'relative', background: '#EAEAEA', overflow: 'hidden', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+              <div style={{paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 18, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 56, justifyContent: 'flex-start', alignItems: 'center', gap: 9, display: 'inline-flex'}}>
+                <div data-icon="ic:play" style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
+                  <div style={{width: 15, height: 15, left: 4.50, top: 4.50, position: 'absolute', background: 'var(--Black, black)'}} />
+                </div>
+                <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>How this works?</div>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
-      </div>
-        </section>
       </main>
 
       {/* Trusted by section - 160px below hero */}
@@ -1528,7 +1739,7 @@ export default function Home() {
                           type="checkbox"
                           id="termsCheckbox"
                           checked={acceptedTerms}
-                          onChange={(e) => setAcceptedTerms(e.target.checked)}
+                          onChange={(e) => handleAcceptedTermsChange(e.target.checked)}
                           style={{
                             width: 16,
                             height: 16,
@@ -1594,6 +1805,14 @@ export default function Home() {
                   >
                     ← Back
                   </button>
+                  {/* Error list underneath everything */}
+                  {borrowerErrors.length > 0 && showBorrowerErrors && (
+                    <div style={{marginTop: 8, textAlign: 'center', alignSelf: 'stretch'}}>
+                      {borrowerErrors.map((err, idx) => (
+                        <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -2151,6 +2370,14 @@ export default function Home() {
                   >
                     ← Back
                   </button>
+                  {/* Error list underneath everything */}
+                  {investorErrors.length > 0 && showInvestorErrors && (
+                    <div style={{marginTop: 8, textAlign: 'center', alignSelf: 'stretch'}}>
+                      {investorErrors.map((err, idx) => (
+                        <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

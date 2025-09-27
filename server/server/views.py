@@ -100,6 +100,13 @@ def borrower_signup(request: HttpRequest):
 
     if not full_name:
         return JsonResponse({"error": "Full name required"}, status=400)
+    # Require first and last name, only letters, spaces, hyphens and apostrophes; at least 2 words
+    name_parts = [p for p in full_name.split() if p]
+    if len(name_parts) < 2:
+        return JsonResponse({"error": "Please enter your full name (first and last)"}, status=400)
+    import re
+    if not re.fullmatch(r"[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}", full_name):
+        return JsonResponse({"error": "Name contains invalid characters"}, status=400)
     if not email or "@" not in email:
         return JsonResponse({"error": "Valid email required"}, status=400)
     if not password or len(password) < 8:
@@ -108,6 +115,17 @@ def borrower_signup(request: HttpRequest):
         dob = _parse_date(dob_raw)
     except ValidationError as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+    # Ensure age >= 18
+    today = timezone.now().date()
+    try:
+        eighteenth_birthday = dob.replace(year=dob.year + 18)
+    except ValueError:
+        # Handle Feb 29 edge-case by subtracting one day before adding 18 years
+        from datetime import timedelta
+        eighteenth_birthday = (dob - timedelta(days=1)).replace(year=dob.year + 18)
+    if eighteenth_birthday > today:
+        return JsonResponse({"error": "You must be at least 18 years old"}, status=400)
 
     try:
         with transaction.atomic():  # Ensure database transaction
@@ -227,6 +245,19 @@ def auth_me(request: HttpRequest):
     
     return JsonResponse({'authenticated': False}, status=401)
 
+def validate_email(request: HttpRequest):
+    """Check if an email is available (not used by Borrower or Investor).
+    GET /api/validate/email?email=foo@example.com
+    Returns: { available: boolean }
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    email = (request.GET.get('email') or '').strip().lower()
+    if not email or '@' not in email:
+        return JsonResponse({'error': 'Valid email required'}, status=400)
+    exists = Borrower.objects.filter(email=email).exists() or Investor.objects.filter(email=email).exists()
+    return JsonResponse({'available': not exists})
+
 @csrf_exempt
 def investor_signup(request: HttpRequest):
     if request.method != "POST":
@@ -257,6 +288,13 @@ def investor_signup(request: HttpRequest):
     # Validation
     if not full_name:
         return JsonResponse({"error": "Full name required"}, status=400)
+    # Require first and last name and validate characters
+    name_parts = [p for p in full_name.split() if p]
+    if len(name_parts) < 2:
+        return JsonResponse({"error": "Please enter your full name (first and last)"}, status=400)
+    import re
+    if not re.fullmatch(r"[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}", full_name):
+        return JsonResponse({"error": "Name contains invalid characters"}, status=400)
     if not email or "@" not in email:
         return JsonResponse({"error": "Valid email required"}, status=400)
     if not password or len(password) < 8:
@@ -278,6 +316,15 @@ def investor_signup(request: HttpRequest):
         dob = _parse_date(dob_raw)
     except ValidationError as e:
         return JsonResponse({"error": str(e)}, status=400)
+    # Ensure age >= 18
+    today = timezone.now().date()
+    try:
+        eighteenth_birthday = dob.replace(year=dob.year + 18)
+    except ValueError:
+        from datetime import timedelta
+        eighteenth_birthday = (dob - timedelta(days=1)).replace(year=dob.year + 18)
+    if eighteenth_birthday > today:
+        return JsonResponse({"error": "You must be at least 18 years old"}, status=400)
 
     try:
         with transaction.atomic():  # Ensure database transaction
