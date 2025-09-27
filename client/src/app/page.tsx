@@ -594,6 +594,10 @@ export default function Home() {
 
   const investorCanContinue = computeInvestorErrors().length === 0;
 
+  // Borrower field errors for UI highlighting
+  const borrowerErrorsByField = computeBorrowerErrorsByField();
+  const fieldHasError = (field: BorrowerField) => !!borrowerErrorsByField[field] && (showBorrowerErrors || borrowerTouched[field] || borrowerSubmitAttempted);
+
   const navigateMonth = (direction: 'prev' | 'next') => {
     const currentMonthIndex = months.indexOf(selectedMonth);
     let newMonthIndex = currentMonthIndex;
@@ -1353,12 +1357,14 @@ export default function Home() {
         }}>
           <div style={{
             width: 760,
-            height: modalStep === 'investorSignUp' ? 640 : 580,
             background: 'white',
             borderRadius: 24,
             position: 'relative',
             boxShadow: '0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            transition: 'height 0.2s ease'
+            // Let the modal grow but not exceed viewport height; enable scrolling inside
+            minHeight: modalStep === 'investorSignUp' ? 640 : 580,
+            maxHeight: '90vh',
+            overflowY: 'auto'
           }}>
             {modalStep === 'roleSelection' && (
               <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
@@ -1458,7 +1464,7 @@ export default function Home() {
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         {/* First & Middle Name side by side (max equals Surname width) */}
                         <div style={{width: 322, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                          <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                          <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: fieldHasError('firstName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('firstName') ? '-1px' : undefined}}>
                             <input
                               type="text"
                               placeholder="First Name"
@@ -1476,7 +1482,7 @@ export default function Home() {
                               }}
                             />
                           </div>
-                          <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                          <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: fieldHasError('middleName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('middleName') ? '-1px' : undefined}}>
                             <input
                               type="text"
                               placeholder="Middle Name"
@@ -1496,7 +1502,7 @@ export default function Home() {
                           </div>
                         </div>
                         {/* Surname */}
-                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: fieldHasError('surname') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('surname') ? '-1px' : undefined}}>
                           <input
                             type="text"
                             placeholder="Surname"
@@ -1514,7 +1520,7 @@ export default function Home() {
                             }}
                           />
                         </div>
-                        <div style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex', position: 'relative'}}>
+                        <div style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex', position: 'relative', outline: fieldHasError('dateOfBirth') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('dateOfBirth') ? '-1px' : undefined}}>
                           <div 
                             onClick={() => setShowDatePicker(!showDatePicker)}
                             style={{
@@ -1719,7 +1725,7 @@ export default function Home() {
                           )}
                         </div>
                         {/* Email */}
-                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: fieldHasError('email') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('email') ? '-1px' : undefined}}>
                           <input
                             type="email"
                             placeholder="Email"
@@ -1763,7 +1769,7 @@ export default function Home() {
                             }}
                           />
                         </div>
-                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: fieldHasError('password') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('password') ? '-1px' : undefined}}>
                           <input
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Password"
@@ -1790,7 +1796,7 @@ export default function Home() {
                             <Image src="/show_password.svg" alt="Toggle password visibility" width={16} height={16} />
                           </button>
                         </div>
-                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: fieldHasError('repeatPassword') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('repeatPassword') ? '-1px' : undefined}}>
                           <input
                             type={showRepeatPassword ? 'text' : 'password'}
                             placeholder="Repeat"
@@ -1815,6 +1821,14 @@ export default function Home() {
                             <Image src="/show_password.svg" alt="Toggle password visibility" width={16} height={16} />
                           </button>
                         </div>
+                        {/* Borrower error list right under the second password field */}
+                        {borrowerErrors.length > 0 && showBorrowerErrors && (
+                          <div style={{marginTop: 8, textAlign: 'left', alignSelf: 'stretch'}}>
+                            {borrowerErrors.map((err, idx) => (
+                              <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
@@ -1853,7 +1867,7 @@ export default function Home() {
                 >
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', position: 'sticky', bottom: 0, background: 'white', paddingTop: 12, paddingBottom: 12}}>
                   <button 
                     onClick={handleSignUp}
                     disabled={!borrowerCanContinue}
@@ -1889,14 +1903,7 @@ export default function Home() {
                   >
                     ← Back
                   </button>
-                  {/* Error list underneath everything */}
-                  {borrowerErrors.length > 0 && showBorrowerErrors && (
-                    <div style={{marginTop: 8, textAlign: 'center', alignSelf: 'stretch'}}>
-                      {borrowerErrors.map((err, idx) => (
-                        <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
-                      ))}
-                    </div>
-                  )}
+                  {/* Error list was moved under second password field to preserve layout */}
                 </div>
               </div>
             )}
@@ -2415,7 +2422,7 @@ export default function Home() {
                 >
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', position: 'sticky', bottom: 0, background: 'white', paddingTop: 12, paddingBottom: 12}}>
                   <div
                     onClick={() => { 
                       if(investorCanContinue){ 
