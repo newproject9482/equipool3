@@ -56,7 +56,7 @@ export default function Home() {
   const [borrowerErrors, setBorrowerErrors] = useState<string[]>([]);
   const [showBorrowerErrors, setShowBorrowerErrors] = useState(false);
   // Track which borrower fields the user has interacted with and submit attempts
-  type BorrowerField = 'firstName' | 'middleName' | 'surname' | 'dateOfBirth' | 'email' | 'password' | 'repeatPassword' | 'acceptedTerms';
+  type BorrowerField = 'firstName' | 'middleName' | 'surname' | 'dateOfBirth' | 'email' | 'phone' | 'password' | 'repeatPassword' | 'acceptedTerms';
   const [borrowerTouched, setBorrowerTouched] = useState<Partial<Record<BorrowerField, boolean>>>({});
   const [borrowerSubmitAttempted, setBorrowerSubmitAttempted] = useState(false);
   
@@ -223,7 +223,7 @@ export default function Home() {
     }));
     // Mark field as touched and show error area only after user starts typing in borrower step
     if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
-      if ((['firstName','middleName','surname','dateOfBirth','email','password','repeatPassword'] as string[]).includes(field)) {
+      if ((['firstName','middleName','surname','dateOfBirth','email','phone','password','repeatPassword'] as string[]).includes(field)) {
         setBorrowerTouched(prev => ({ ...prev, [field]: true }));
       }
       setShowBorrowerErrors(true);
@@ -275,6 +275,10 @@ export default function Home() {
     return age >= 18;
   };
 
+  // Normalize US phone digits (strip non-digits)
+  const normalizePhone = (s: string) => (s || '').replace(/\D/g, '');
+  const isValidUSPhone10 = (s: string) => normalizePhone(s).length === 10; // 10 digits required
+
   // Compute borrower validation errors per-field
   type BorrowerErrorMap = Partial<Record<BorrowerField, string[]>>;
   const computeBorrowerErrorsByField = (): BorrowerErrorMap => {
@@ -294,6 +298,10 @@ export default function Home() {
     // email
     if (!isValidEmail(formData.email)) {
       errs.email = ['Valid email required'];
+    }
+    // phone (borrower requires US 10-digit)
+    if (!isValidUSPhone10(formData.phone)) {
+      errs.phone = ['Enter a valid 10-digit US phone number'];
     }
     // dateOfBirth
     if (!formData.dateOfBirth) {
@@ -334,10 +342,10 @@ export default function Home() {
         errs.push('Name contains invalid characters');
       }
     }
-    if (!isValidEmail(formData.email)) errs.push('Valid email required');
+  if (!isValidEmail(formData.email)) errs.push('Valid email required');
     if (!formData.dateOfBirth) errs.push('Date of birth is required');
     else if (!isAdult18(formData.dateOfBirth)) errs.push('You must be at least 18 years old');
-    if (!formData.phone) errs.push('Phone number is required');
+  if (!isValidUSPhone10(formData.phone)) errs.push('Enter a valid 10-digit US phone number');
     if (!formData.ssn) errs.push('SSN is required');
     if (!formData.address1) errs.push('Address is required');
     if (!formData.city) errs.push('City is required');
@@ -1744,7 +1752,7 @@ export default function Home() {
                           />
                         </div>
                         {/* Phone Number (with flag and divider) */}
-                        <div data-righticon="false" data-state={formData.phone? 'focus':'phoneNumber'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                        <div data-righticon="false" data-state={formData.phone? 'focus':'phoneNumber'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex', outline: fieldHasError('phone') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('phone') ? '-1px' : undefined}}>
                           <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
                             <Image src="/flagpack-us.svg" alt="US flag" width={22} height={16} style={{borderRadius: 2}} />
                             <div data-icon="Icon6" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
