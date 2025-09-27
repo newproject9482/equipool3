@@ -24,7 +24,7 @@ const Field: React.FC<React.InputHTMLAttributes<HTMLInputElement> & {wrapperStyl
   );
 };
 
-type InvestorField = 'fullName' | 'dob' | 'email' | 'phone' | 'ssn' | 'address1' | 'address2' | 'city' | 'state' | 'zip' | 'country' | 'password' | 'repeat' | 'acceptedTerms';
+type InvestorField = 'firstName' | 'middleName' | 'surname' | 'fullName' | 'dob' | 'email' | 'phone' | 'ssn' | 'address1' | 'address2' | 'city' | 'state' | 'zip' | 'country' | 'password' | 'repeat' | 'acceptedTerms';
 
 export const InvestorForm: React.FC = () => {
   const router = useRouter();
@@ -32,6 +32,9 @@ export const InvestorForm: React.FC = () => {
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const [form, setForm] = useState({
+    firstName: '',
+    middleName: '',
+    surname: '',
     fullName: '',
     dob: '',
     email: '',
@@ -89,18 +92,16 @@ export const InvestorForm: React.FC = () => {
   
   const computeInvestorErrorsByField = (): ErrorMap => {
     const errs: ErrorMap = {};
-    // fullName (require first and last)
-    const name = form.fullName.trim();
-    if (!name) {
-      errs.fullName = ['Full name is required'];
-    } else {
-      const parts = name.split(/\s+/).filter(Boolean);
-      const messages: string[] = [];
-      if (parts.length < 2) messages.push('Please enter your full name (first and last)');
-      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(name)) {
-        messages.push('Name contains invalid characters');
-      }
-      if (messages.length) errs.fullName = messages;
+    // Split name validators (individual)
+    const isValidNamePart = (s: string) => !!s && /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{1,255}$/.test(s.trim());
+    if (!form.firstName || !isValidNamePart(form.firstName)) {
+      errs.firstName = [!form.firstName ? 'First name is required' : 'First name contains invalid characters'];
+    }
+    if (form.middleName && !isValidNamePart(form.middleName)) {
+      errs.middleName = ['Middle name contains invalid characters'];
+    }
+    if (!form.surname || !isValidNamePart(form.surname)) {
+      errs.surname = [!form.surname ? 'Surname is required' : 'Surname contains invalid characters'];
     }
     // email
     if (!isValidEmail(form.email)) {
@@ -190,7 +191,7 @@ export const InvestorForm: React.FC = () => {
   const investorCanContinue = (() => {
     // Basic form completeness check - don't validate here, just check if fields are filled
     const basicFieldsFilled = !!(
-      form.fullName && 
+      form.firstName && form.surname && 
       form.dob && 
       form.email && 
       form.phone && 
@@ -244,6 +245,9 @@ export const InvestorForm: React.FC = () => {
       setSubmitAttempted(true);
       // Also mark all fields as touched to surface all messages
       setTouched({ 
+        firstName: true,
+        middleName: true,
+        surname: true,
         fullName: true, 
         dob: true, 
         email: true, 
@@ -266,7 +270,7 @@ export const InvestorForm: React.FC = () => {
     // Submit to backend
     try {
       const payload = {
-        fullName: form.fullName,
+        fullName: [form.firstName, form.middleName, form.surname].map(s => (s||'').trim()).filter(Boolean).join(' '),
         dateOfBirth: form.dob,
         email: form.email,
         phone: form.phone,
@@ -310,7 +314,11 @@ export const InvestorForm: React.FC = () => {
     <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'row', gap: 10}}>
       <div style={{height: 320, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
         <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-          <Field placeholder="Full name" value={form.fullName} onChange={e=>update('fullName', e.target.value)} wrapperStyle={{ outline: fieldHasError('fullName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('fullName') ? '-1px' : undefined }} />
+          <div style={{width: 322, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+            <Field placeholder="First Name" value={form.firstName} onChange={e=>update('firstName', e.target.value)} wrapperStyle={{ width: 157, flex: '0 0 157px', outline: fieldHasError('firstName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('firstName') ? '-1px' : undefined }} />
+            <Field placeholder="Middle Name" value={form.middleName} onChange={e=>update('middleName', e.target.value)} wrapperStyle={{ width: 157, flex: '0 0 157px', outline: fieldHasError('middleName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('middleName') ? '-1px' : undefined }} />
+          </div>
+          <Field placeholder="Surname" value={form.surname} onChange={e=>update('surname', e.target.value)} wrapperStyle={{ outline: fieldHasError('surname') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('surname') ? '-1px' : undefined }} />
           <Field type="date" placeholder="Date of Birth" value={form.dob} onChange={e=>update('dob', e.target.value)} wrapperStyle={{ outline: fieldHasError('dob') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('dob') ? '-1px' : undefined }} />
           <div style={{display:'flex', flexDirection:'column', gap:4}}>
             <Field type="email" placeholder="Email" value={form.email} onChange={e=>update('email', e.target.value)} wrapperStyle={{ outline: fieldHasError('email') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('email') ? '-1px' : undefined }} />

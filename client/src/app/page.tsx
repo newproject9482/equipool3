@@ -64,7 +64,8 @@ export default function Home() {
   const [investorErrors, setInvestorErrors] = useState<string[]>([]);
   const [showInvestorErrors, setShowInvestorErrors] = useState(false);
   // Track investor touched fields and submit attempts (like borrower)
-  type InvestorField = 'fullName' | 'dateOfBirth' | 'email' | 'phone' | 'ssn' | 'address1' | 'address2' | 'city' | 'state' | 'zip' | 'country' | 'password' | 'repeatPassword' | 'acceptedTerms';
+  // For individual investors we now use split name fields; for company we keep a single company name (fullName)
+  type InvestorField = 'firstName' | 'middleName' | 'surname' | 'fullName' | 'dateOfBirth' | 'email' | 'phone' | 'ssn' | 'address1' | 'address2' | 'city' | 'state' | 'zip' | 'country' | 'password' | 'repeatPassword' | 'acceptedTerms';
   const [investorTouched, setInvestorTouched] = useState<Partial<Record<InvestorField, boolean>>>({});
   const [investorSubmitAttempted, setInvestorSubmitAttempted] = useState(false);
 
@@ -240,7 +241,7 @@ export default function Home() {
     }
     // Investor step: mark touched and show only touched-field errors while typing
     if (selectedRole === 'investor' && modalStep === 'investorSignUp') {
-      const relevant: InvestorField[] = ['fullName','dateOfBirth','email','phone','ssn','address1','address2','city','state','zip','country','password','repeatPassword','acceptedTerms'];
+      const relevant: InvestorField[] = ['firstName','middleName','surname','fullName','dateOfBirth','email','phone','ssn','address1','address2','city','state','zip','country','password','repeatPassword','acceptedTerms'];
       if ((relevant as string[]).includes(field)) {
         const updatedTouched = { ...investorTouched, [field]: true } as Partial<Record<InvestorField, boolean>>;
         setInvestorTouched(updatedTouched);
@@ -353,16 +354,28 @@ export default function Home() {
   type InvestorErrorMap = Partial<Record<InvestorField, string[]>>;
   const computeInvestorErrorsByField = (): InvestorErrorMap => {
     const errs: InvestorErrorMap = {};
-    // fullName (require first and last, only for individual for now)
-    if (!formData.fullName) {
-      errs.fullName = ['Full name is required'];
+    // Name validation depends on investor type
+    if (investorType === 'individual') {
+      // firstName
+      if (!formData.firstName || !isValidNamePart(formData.firstName)) {
+        errs.firstName = [!formData.firstName ? 'First name is required' : 'First name contains invalid characters'];
+      }
+      // middleName optional
+      if (formData.middleName && !isValidNamePart(formData.middleName)) {
+        errs.middleName = ['Middle name contains invalid characters'];
+      }
+      // surname
+      if (!formData.surname || !isValidNamePart(formData.surname)) {
+        errs.surname = [!formData.surname ? 'Surname is required' : 'Surname contains invalid characters'];
+      }
     } else {
-      const name = formData.fullName.trim();
-      const parts = name.split(/\s+/).filter(Boolean);
-      const messages: string[] = [];
-      if (parts.length < 2) messages.push('Please enter your full name (first and last)');
-      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(name)) messages.push('Name contains invalid characters');
-      if (messages.length) errs.fullName = messages;
+      // Company flow: keep single company name in fullName (relaxed validation)
+      const name = (formData.fullName || '').trim();
+      if (!name) {
+        errs.fullName = ['Company name is required'];
+      } else if (name.length < 2) {
+        errs.fullName = ['Company name must be at least 2 characters'];
+      }
     }
     // email
     if (!isValidEmail(formData.email)) {
@@ -402,14 +415,15 @@ export default function Home() {
   };
   const computeInvestorErrors = () => {
     const errs: string[] = [];
-    if (!formData.fullName) {
-      errs.push('Full name is required');
+    if (investorType === 'individual') {
+      if (!formData.firstName) errs.push('First name is required');
+      if (formData.firstName && !isValidNamePart(formData.firstName)) errs.push('First name contains invalid characters');
+      if (formData.middleName && !isValidNamePart(formData.middleName)) errs.push('Middle name contains invalid characters');
+      if (!formData.surname) errs.push('Surname is required');
+      if (formData.surname && !isValidNamePart(formData.surname)) errs.push('Surname contains invalid characters');
     } else {
-      const parts = formData.fullName.trim().split(/\s+/).filter(Boolean);
-      if (parts.length < 2) errs.push('Please enter your full name (first and last)');
-      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(formData.fullName.trim())) {
-        errs.push('Name contains invalid characters');
-      }
+      if (!formData.fullName) errs.push('Company name is required');
+      else if (formData.fullName.trim().length < 2) errs.push('Company name must be at least 2 characters');
     }
   if (!isValidEmail(formData.email)) errs.push('Valid email required');
     if (!formData.dateOfBirth) errs.push('Date of birth is required');
@@ -459,7 +473,7 @@ export default function Home() {
         setInvestorErrors([]);
       }
     }
-  }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors, investorTouched, investorSubmitAttempted]);
+  }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors, investorTouched, investorSubmitAttempted, investorType]);
 
   const handleSignUp = async () => {
     // On attempt to submit, if borrower step has errors, show them and stop
@@ -534,8 +548,12 @@ export default function Home() {
     // Investor signup path
     if(selectedRole === 'investor') {
       try {
+        // Compose fullName: for individual from parts, for company from fullName field
+        const composedFullName = investorType === 'individual'
+          ? [formData.firstName, formData.middleName, formData.surname].map(s => (s||'').trim()).filter(Boolean).join(' ')
+          : (formData.fullName || '').trim();
         const payload = {
-          fullName: formData.fullName,
+          fullName: composedFullName,
           dateOfBirth: formData.dateOfBirth,
           email: formData.email,
           phone: formData.phone,
@@ -584,8 +602,9 @@ export default function Home() {
 
   const handleInvestorSignUp = async () => {
     try {
+      const composedFullName = [formData.firstName, formData.middleName, formData.surname].map(s => (s||'').trim()).filter(Boolean).join(' ');
       const payload = {
-        fullName: formData.fullName,
+        fullName: investorType === 'individual' ? composedFullName : (formData.fullName || '').trim(),
         dateOfBirth: formData.dateOfBirth,
         email: formData.email,
         phone: formData.phone,
@@ -677,6 +696,10 @@ export default function Home() {
   // Borrower field errors for UI highlighting
   const borrowerErrorsByField = computeBorrowerErrorsByField();
   const fieldHasError = (field: BorrowerField) => !!borrowerErrorsByField[field] && (showBorrowerErrors || borrowerTouched[field] || borrowerSubmitAttempted);
+
+  // Investor field-level errors for UI highlighting
+  const investorErrorsByField = computeInvestorErrorsByField();
+  const investorFieldHasError = (field: InvestorField) => !!investorErrorsByField[field] && (showInvestorErrors || investorTouched[field] || investorSubmitAttempted);
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const currentMonthIndex = months.indexOf(selectedMonth);
@@ -2037,17 +2060,51 @@ export default function Home() {
                     {/* Left Column */}
                     <div style={{width: 322, height: '100%', paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
                       <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                        {(() => { const error = !!formData.fullName && formData.fullName.length < 5; return (
-                          <div data-righticon="false" data-state={error? 'error': (formData.fullName? 'focus':'default')} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16, outline: error? '1px var(--Error, #CC4747) solid': undefined, outlineOffset: error? '-1px': undefined}}>
+                        {investorType === 'individual' ? (
+                          <>
+                            {/* First & Middle like borrower */}
+                            <div style={{width: 322, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                              <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: investorFieldHasError('firstName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: investorFieldHasError('firstName') ? '-1px' : undefined}}>
+                                <input
+                                  type="text"
+                                  placeholder="First Name"
+                                  value={formData.firstName}
+                                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                                  style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: formData.firstName ? 'black' : '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}
+                                />
+                              </div>
+                              <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: investorFieldHasError('middleName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: investorFieldHasError('middleName') ? '-1px' : undefined}}>
+                                <input
+                                  type="text"
+                                  placeholder="Middle Name"
+                                  value={formData.middleName}
+                                  onChange={(e) => handleInputChange('middleName', e.target.value)}
+                                  style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: formData.middleName ? 'black' : '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}
+                                />
+                              </div>
+                            </div>
+                            {/* Surname */}
+                            <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: investorFieldHasError('surname') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: investorFieldHasError('surname') ? '-1px' : undefined}}>
+                              <input
+                                type="text"
+                                placeholder="Surname"
+                                value={formData.surname}
+                                onChange={(e) => handleInputChange('surname', e.target.value)}
+                                style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: formData.surname ? 'black' : '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <div data-righticon="false" data-state={!formData.fullName? 'default': 'focus'} style={{width: 322, padding: '12px 16px', background: '#F4F4F4', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 16, outline: investorFieldHasError('fullName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: investorFieldHasError('fullName') ? '-1px' : undefined}}>
                             <input
                               type="text"
-                              placeholder={investorType === 'individual' ? "Full name" : "Company name"}
+                              placeholder="Company name"
                               value={formData.fullName}
                               onChange={(e)=>handleInputChange('fullName', e.target.value)}
                               style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: formData.fullName ? 'black':'#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}
                             />
                           </div>
-                        ); })()}
+                        )}
                         <div style={{width: 322, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex', position: 'relative'}}>
                           <div 
                             onClick={() => setShowDatePicker(!showDatePicker)}
@@ -2296,7 +2353,7 @@ export default function Home() {
                             style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: formData.phone? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5px'}}
                           />
                         </div>
-            <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, display: 'flex', flexDirection: 'column', gap:4}}>
+                        <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, display: 'flex', flexDirection: 'column', gap:4, outline: investorFieldHasError('ssn') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: investorFieldHasError('ssn') ? '-1px' : undefined}}>
                           <div style={{alignSelf:'stretch', padding: '10px 12px', background: 'white', borderRadius:10, outline:'1px #767676 solid', outlineOffset:'-1px', display:'inline-flex', alignItems:'center', gap:10}}>
                             <input
                               type="text"
@@ -2505,14 +2562,14 @@ export default function Home() {
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', position: 'sticky', bottom: 0, background: 'white', paddingTop: 12, paddingBottom: 12}}>
                   <div
                     onClick={() => { 
-                      const map = computeInvestorErrorsByField();
+                          const map = computeInvestorErrorsByField();
                       const errs = flattenInvestorErrors(map);
                       if (errs.length > 0) {
                         setInvestorErrors(errs);
                         setShowInvestorErrors(true);
                         setInvestorSubmitAttempted(true);
                         // mark all fields as touched to reveal all messages
-                        setInvestorTouched({ fullName:true, dateOfBirth:true, email:true, phone:true, ssn:true, address1:true, address2:true, city:true, state:true, zip:true, country:true, password:true, repeatPassword:true, acceptedTerms:true });
+                        setInvestorTouched({ firstName:true, middleName:true, surname:true, fullName:true, dateOfBirth:true, email:true, phone:true, ssn:true, address1:true, address2:true, city:true, state:true, zip:true, country:true, password:true, repeatPassword:true, acceptedTerms:true });
                         return;
                       }
                       handleInvestorSignUp();
