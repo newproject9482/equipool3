@@ -912,10 +912,8 @@ export default function Home() {
           <section>
             <div style={{width: '100%', minHeight: 400, position: 'relative', background: '#EAEAEA', overflow: 'hidden', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               <div style={{paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 18, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 56, justifyContent: 'flex-start', alignItems: 'center', gap: 9, display: 'inline-flex'}}>
-                <div data-icon="ic:play" style={{width: 24, height: 24, position: 'relative', overflow: 'hidden'}}>
-                  <div style={{width: 15, height: 15, left: 4.50, top: 4.50, position: 'absolute', background: 'var(--Black, black)'}} />
-                </div>
-                <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>How this works?</div>
+                <Image src="/play.svg" alt="Play icon" width={24} height={24} />
+                <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>How this works?</div>
               </div>
             </div>
           </section>
