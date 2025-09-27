@@ -17,6 +17,11 @@ export default function Home() {
   
   // Form state
   const [formData, setFormData] = useState({
+    // Borrower name fields (split)
+    firstName: '',
+    middleName: '',
+    surname: '',
+    // Investor/legacy combined field (kept for investor flow)
     fullName: '',
     dateOfBirth: '',
     email: '',
@@ -51,7 +56,7 @@ export default function Home() {
   const [borrowerErrors, setBorrowerErrors] = useState<string[]>([]);
   const [showBorrowerErrors, setShowBorrowerErrors] = useState(false);
   // Track which borrower fields the user has interacted with and submit attempts
-  type BorrowerField = 'fullName' | 'dateOfBirth' | 'email' | 'password' | 'repeatPassword' | 'acceptedTerms';
+  type BorrowerField = 'firstName' | 'middleName' | 'surname' | 'dateOfBirth' | 'email' | 'password' | 'repeatPassword' | 'acceptedTerms';
   const [borrowerTouched, setBorrowerTouched] = useState<Partial<Record<BorrowerField, boolean>>>({});
   const [borrowerSubmitAttempted, setBorrowerSubmitAttempted] = useState(false);
   
@@ -129,6 +134,9 @@ export default function Home() {
   setBorrowerSubmitAttempted(false);
     // Reset form data
     setFormData({
+      firstName: '',
+      middleName: '',
+      surname: '',
       fullName: '',
       dateOfBirth: '',
       email: '',
@@ -215,7 +223,7 @@ export default function Home() {
     }));
     // Mark field as touched and show error area only after user starts typing in borrower step
     if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
-      if ((['fullName','dateOfBirth','email','password','repeatPassword'] as string[]).includes(field)) {
+      if ((['firstName','middleName','surname','dateOfBirth','email','password','repeatPassword'] as string[]).includes(field)) {
         setBorrowerTouched(prev => ({ ...prev, [field]: true }));
       }
       setShowBorrowerErrors(true);
@@ -250,6 +258,12 @@ export default function Home() {
     return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(name.trim());
   };
 
+  // Name part validator (single field like first/surname)
+  const isValidNamePart = (s: string) => {
+    if (!s) return false;
+    return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{1,255}$/.test(s.trim());
+  };
+
   const isAdult18 = (isoDate: string) => {
     if (!isoDate) return false;
     const dob = new Date(isoDate + 'T00:00:00');
@@ -265,17 +279,17 @@ export default function Home() {
   type BorrowerErrorMap = Partial<Record<BorrowerField, string[]>>;
   const computeBorrowerErrorsByField = (): BorrowerErrorMap => {
     const errs: BorrowerErrorMap = {};
-    // fullName
-    if (!formData.fullName) {
-      errs.fullName = ['Full name is required'];
-    } else {
-      const parts = formData.fullName.trim().split(/\s+/).filter(Boolean);
-      const messages: string[] = [];
-      if (parts.length < 2) messages.push('Please enter your full name (first and last)');
-      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(formData.fullName.trim())) {
-        messages.push('Name contains invalid characters');
-      }
-      if (messages.length) errs.fullName = messages;
+    // firstName
+    if (!formData.firstName || !isValidNamePart(formData.firstName)) {
+      errs.firstName = [!formData.firstName ? 'First name is required' : 'First name contains invalid characters'];
+    }
+    // middleName (optional, but if provided must be valid)
+    if (formData.middleName && !isValidNamePart(formData.middleName)) {
+      errs.middleName = ['Middle name contains invalid characters'];
+    }
+    // surname
+    if (!formData.surname || !isValidNamePart(formData.surname)) {
+      errs.surname = [!formData.surname ? 'Surname is required' : 'Surname contains invalid characters'];
     }
     // email
     if (!isValidEmail(formData.email)) {
@@ -377,7 +391,7 @@ export default function Home() {
         setShowBorrowerErrors(true);
         setBorrowerSubmitAttempted(true);
         // Also mark all fields as touched to surface all messages
-        setBorrowerTouched({ fullName:true, dateOfBirth:true, email:true, password:true, repeatPassword:true, acceptedTerms:true });
+        setBorrowerTouched({ firstName:true, middleName:true, surname:true, dateOfBirth:true, email:true, password:true, repeatPassword:true, acceptedTerms:true });
         return;
       }
     }
@@ -392,8 +406,13 @@ export default function Home() {
     }
     if(selectedRole === 'borrower') {
       try {
+        // Construct full name from parts
+        const fullNameParts = [formData.firstName, formData.middleName, formData.surname]
+          .map(s => (s || '').trim())
+          .filter(Boolean);
+        const fullName = fullNameParts.join(' ');
         const payload = {
-          fullName: formData.fullName,
+          fullName,
             // Backend accepts YYYY-MM-DD; formData.dateOfBirth already stored as ISO string
           dateOfBirth: formData.dateOfBirth,
           email: formData.email,
@@ -1437,18 +1456,58 @@ export default function Home() {
                   <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
                     <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'flex'}}>
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                        <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                        {/* First & Middle Name side by side (max equals Surname width) */}
+                        <div style={{width: 322, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                          <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <input
+                              type="text"
+                              placeholder="First Name"
+                              value={formData.firstName}
+                              onChange={(e) => handleInputChange('firstName', e.target.value)}
+                              style={{
+                                flex: '1 1 0',
+                                background: 'transparent',
+                                border: 'none',
+                                outline: 'none',
+                                color: formData.firstName ? 'black' : '#B2B2B2',
+                                fontSize: 14,
+                                fontFamily: 'var(--ep-font-avenir)',
+                                fontWeight: '500'
+                              }}
+                            />
+                          </div>
+                          <div data-righticon="false" data-state="default" style={{width: 157, flex: '0 0 157px', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <input
+                              type="text"
+                              placeholder="Middle Name"
+                              value={formData.middleName}
+                              onChange={(e) => handleInputChange('middleName', e.target.value)}
+                              style={{
+                                flex: '1 1 0',
+                                background: 'transparent',
+                                border: 'none',
+                                outline: 'none',
+                                color: formData.middleName ? 'black' : '#B2B2B2',
+                                fontSize: 14,
+                                fontFamily: 'var(--ep-font-avenir)',
+                                fontWeight: '500'
+                              }}
+                            />
+                          </div>
+                        </div>
+                        {/* Surname */}
+                        <div data-righticon="false" data-state="default" style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                           <input
                             type="text"
-                            placeholder="Full name"
-                            value={formData.fullName}
-                            onChange={(e) => handleInputChange('fullName', e.target.value)}
+                            placeholder="Surname"
+                            value={formData.surname}
+                            onChange={(e) => handleInputChange('surname', e.target.value)}
                             style={{
                               flex: '1 1 0',
                               background: 'transparent',
                               border: 'none',
                               outline: 'none',
-                              color: formData.fullName ? 'black' : '#B2B2B2',
+                              color: formData.surname ? 'black' : '#B2B2B2',
                               fontSize: 14,
                               fontFamily: 'var(--ep-font-avenir)',
                               fontWeight: '500'
@@ -1659,6 +1718,7 @@ export default function Home() {
                             </div>
                           )}
                         </div>
+                        {/* Email */}
                         <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                           <input
                             type="email"
@@ -1671,6 +1731,32 @@ export default function Home() {
                               border: 'none',
                               outline: 'none',
                               color: formData.email ? 'black' : '#B2B2B2',
+                              fontSize: 14,
+                              fontFamily: 'var(--ep-font-avenir)',
+                              fontWeight: '500'
+                            }}
+                          />
+                        </div>
+                        {/* Phone Number (with flag and divider) */}
+                        <div data-righticon="false" data-state={formData.phone? 'focus':'phoneNumber'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                          <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                            <Image src="/flagpack-us.svg" alt="US flag" width={22} height={16} style={{borderRadius: 2}} />
+                            <div data-icon="Icon6" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                          </div>
+                          <div style={{width: 20, height: 0, transform: 'rotate(90deg)', transformOrigin: 'top left', outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-0.50px'}} />
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="Phone Number"
+                            value={formData.phone}
+                            onChange={(e) => handleInputChange('phone', e.target.value.replace(/[^0-9]/g, ''))}
+                            style={{
+                              flex: '1 1 0',
+                              background: 'transparent',
+                              border: 'none',
+                              outline: 'none',
+                              color: formData.phone ? 'black' : '#B2B2B2',
                               fontSize: 14,
                               fontFamily: 'var(--ep-font-avenir)',
                               fontWeight: '500'

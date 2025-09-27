@@ -26,6 +26,38 @@ body {
   font-family: Avenir, 'Avenir Next', Arial, Helvetica, sans-serif;
 }
 
+/* --- Form UI polish to match design --- */
+/* Consistent placeholder color */
+input::placeholder,
+textarea::placeholder {
+  color: #B2B2B2;
+  opacity: 1; /* ensure consistent intensity across browsers */
+}
+
+/* Remove autofill blue/yellow background (Chrome/WebKit) and match #F4F4F4 field */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #000000;
+  caret-color: #000000;
+  /* Paint the field background to the same grey as wrappers */
+  -webkit-box-shadow: 0 0 0px 1000px #F4F4F4 inset;
+  box-shadow: 0 0 0px 1000px #F4F4F4 inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Prevent iOS/macOS WebKit from adding rounded blue glow to inputs */
+input, textarea, select {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* EquiPool design tokens (test styles from Figma) */
 :root {
   /* Colors */
