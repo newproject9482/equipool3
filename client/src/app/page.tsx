@@ -63,6 +63,10 @@ export default function Home() {
   // Investor validation errors
   const [investorErrors, setInvestorErrors] = useState<string[]>([]);
   const [showInvestorErrors, setShowInvestorErrors] = useState(false);
+  // Track investor touched fields and submit attempts (like borrower)
+  type InvestorField = 'fullName' | 'dateOfBirth' | 'email' | 'phone' | 'ssn' | 'address1' | 'address2' | 'city' | 'state' | 'zip' | 'country' | 'password' | 'repeatPassword' | 'acceptedTerms';
+  const [investorTouched, setInvestorTouched] = useState<Partial<Record<InvestorField, boolean>>>({});
+  const [investorSubmitAttempted, setInvestorSubmitAttempted] = useState(false);
 
   // Toaster hook
   const { toasts, removeToast, showInfo, showSuccess, showError } = useToaster();
@@ -159,6 +163,10 @@ export default function Home() {
     setBorrowerErrors([]);
     setBorrowerTouched({});
     setBorrowerSubmitAttempted(false);
+  setShowInvestorErrors(false);
+  setInvestorErrors([]);
+  setInvestorTouched({});
+  setInvestorSubmitAttempted(false);
     setShowInvestorErrors(false);
     setInvestorErrors([]);
   };
@@ -168,6 +176,8 @@ export default function Home() {
     // Reset investor errors and state
     setShowInvestorErrors(false);
     setInvestorErrors([]);
+    setInvestorTouched({});
+    setInvestorSubmitAttempted(false);
     // Reset any open date picker UI state when switching steps
     setShowDatePicker(false);
     setShowMonthDropdown(false);
@@ -228,9 +238,18 @@ export default function Home() {
       }
       setShowBorrowerErrors(true);
     }
-    // Show errors only after user starts typing in investor step
+    // Investor step: mark touched and show only touched-field errors while typing
     if (selectedRole === 'investor' && modalStep === 'investorSignUp') {
-      setShowInvestorErrors(true);
+      const relevant: InvestorField[] = ['fullName','dateOfBirth','email','phone','ssn','address1','address2','city','state','zip','country','password','repeatPassword','acceptedTerms'];
+      if ((relevant as string[]).includes(field)) {
+        const updatedTouched = { ...investorTouched, [field]: true } as Partial<Record<InvestorField, boolean>>;
+        setInvestorTouched(updatedTouched);
+        const map = computeInvestorErrorsByField();
+        const touchedFields = (Object.keys(updatedTouched) as InvestorField[]).filter(k => updatedTouched[k]);
+        const errs = flattenInvestorErrors(map, touchedFields);
+        setInvestorErrors(errs);
+        setShowInvestorErrors(errs.length > 0);
+      }
     }
   };
 
@@ -331,6 +350,56 @@ export default function Home() {
   };
 
   // ---------- Investor validation helpers ----------
+  type InvestorErrorMap = Partial<Record<InvestorField, string[]>>;
+  const computeInvestorErrorsByField = (): InvestorErrorMap => {
+    const errs: InvestorErrorMap = {};
+    // fullName (require first and last, only for individual for now)
+    if (!formData.fullName) {
+      errs.fullName = ['Full name is required'];
+    } else {
+      const name = formData.fullName.trim();
+      const parts = name.split(/\s+/).filter(Boolean);
+      const messages: string[] = [];
+      if (parts.length < 2) messages.push('Please enter your full name (first and last)');
+      if (!/^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(name)) messages.push('Name contains invalid characters');
+      if (messages.length) errs.fullName = messages;
+    }
+    // email
+    if (!isValidEmail(formData.email)) {
+      errs.email = ['Valid email required'];
+    }
+    // dateOfBirth
+    if (!formData.dateOfBirth) {
+      errs.dateOfBirth = ['Date of birth is required'];
+    } else if (!isAdult18(formData.dateOfBirth)) {
+      errs.dateOfBirth = ['You must be at least 18 years old'];
+    }
+    // phone (US 10-digit)
+    if (!isValidUSPhone10(formData.phone)) {
+      errs.phone = ['Enter a valid 10-digit US phone number'];
+    }
+    // ssn
+    if (!formData.ssn) errs.ssn = ['SSN is required'];
+    // address1
+    if (!formData.address1) errs.address1 = ['Address is required'];
+    // city/state/zip
+    if (!formData.city) errs.city = ['City is required'];
+    if (!formData.state) errs.state = ['State is required'];
+    if (!formData.zip) errs.zip = ['ZIP code is required'];
+    // password + repeat
+    const pw: string[] = [];
+    if (!formData.password || formData.password.length < 8) pw.push('Password must be at least 8 characters');
+    if (pw.length) errs.password = pw;
+    if (formData.password !== formData.repeatPassword) errs.repeatPassword = ['Passwords do not match'];
+    // terms
+    if (!acceptedTerms) errs.acceptedTerms = ['You must agree to the Terms of Service and Privacy Policy'];
+    return errs;
+  };
+
+  const flattenInvestorErrors = (map: InvestorErrorMap, onlyFields?: InvestorField[]) => {
+    const entries = Object.entries(map) as [InvestorField, string[]][];
+    return entries.filter(([f]) => !onlyFields || onlyFields.includes(f)).flatMap(([, msgs]) => msgs || []);
+  };
   const computeInvestorErrors = () => {
     const errs: string[] = [];
     if (!formData.fullName) {
@@ -377,17 +446,20 @@ export default function Home() {
     }
   }, [formData, acceptedTerms, selectedRole, modalStep, showBorrowerErrors, borrowerTouched, borrowerSubmitAttempted]);
 
-  // Recompute investor errors when relevant state changes while on investor step,
-  // but only after the user has interacted or submit attempt happened.
+  // Recompute investor errors depending on touched vs submitAttempted
   useEffect(() => {
     if (selectedRole === 'investor' && modalStep === 'investorSignUp') {
-      if (showInvestorErrors) {
-        setInvestorErrors(computeInvestorErrors());
+      const map = computeInvestorErrorsByField();
+      if (investorSubmitAttempted) {
+        setInvestorErrors(flattenInvestorErrors(map));
+      } else if (showInvestorErrors) {
+        const touchedFields = (Object.keys(investorTouched) as InvestorField[]).filter(k => investorTouched[k]);
+        setInvestorErrors(flattenInvestorErrors(map, touchedFields));
       } else {
         setInvestorErrors([]);
       }
     }
-  }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors]);
+  }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors, investorTouched, investorSubmitAttempted]);
 
   const handleSignUp = async () => {
     // On attempt to submit, if borrower step has errors, show them and stop
@@ -2433,23 +2505,30 @@ export default function Home() {
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', position: 'sticky', bottom: 0, background: 'white', paddingTop: 12, paddingBottom: 12}}>
                   <div
                     onClick={() => { 
-                      if(investorCanContinue){ 
-                        handleInvestorSignUp();
-                      } 
+                      const map = computeInvestorErrorsByField();
+                      const errs = flattenInvestorErrors(map);
+                      if (errs.length > 0) {
+                        setInvestorErrors(errs);
+                        setShowInvestorErrors(true);
+                        setInvestorSubmitAttempted(true);
+                        // mark all fields as touched to reveal all messages
+                        setInvestorTouched({ fullName:true, dateOfBirth:true, email:true, phone:true, ssn:true, address1:true, address2:true, city:true, state:true, zip:true, country:true, password:true, repeatPassword:true, acceptedTerms:true });
+                        return;
+                      }
+                      handleInvestorSignUp();
                     }}
                     style={{
                       paddingLeft:16,
                       paddingRight:16,
                       paddingTop:10,
                       paddingBottom:10,
-                      background: investorCanContinue ? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)':'var(--Inactive-Blue, #B8C5D7)',
+                      background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)',
                       borderRadius:12,
                       justifyContent:'center',
                       alignItems:'center',
                       gap:8,
                       display:'inline-flex',
-                      cursor: investorCanContinue ? 'pointer':'not-allowed',
-                      opacity: investorCanContinue ? 1 : 1
+                      cursor: 'pointer'
                     }}
                   >
                     <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Continue</div>
@@ -2469,7 +2548,7 @@ export default function Home() {
                   >
                     ← Back
                   </button>
-                  {/* Error list underneath everything */}
+                  {/* Error list underneath everything; shows after first error or submit attempt */}
                   {investorErrors.length > 0 && showInvestorErrors && (
                     <div style={{marginTop: 8, textAlign: 'center', alignSelf: 'stretch'}}>
                       {investorErrors.map((err, idx) => (

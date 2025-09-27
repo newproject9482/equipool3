@@ -59,19 +59,14 @@ export const InvestorForm: React.FC = () => {
   const update = (k: InvestorField, v: string) => {
     setForm(f => ({...f, [k]: v}));
     setTouched(t => ({...t, [k]: true}));
-    // Mark field as touched and show error area only after user starts typing
-    if (!showInvestorErrors && !submitAttempted) {
-      setShowInvestorErrors(true);
-    }
+    // Do not show the consolidated error area while typing; only after submit attempt
   };
 
   // Dedicated handler for terms checkbox to mark touched consistently
   const handleAcceptedTermsChange = (checked: boolean) => {
     setAcceptedTerms(checked);
     setTouched(t => ({...t, acceptedTerms: true}));
-    if (!showInvestorErrors && !submitAttempted) {
-      setShowInvestorErrors(true);
-    }
+    // Do not trigger global error display here
   };
 
   // Validators
@@ -178,27 +173,18 @@ export const InvestorForm: React.FC = () => {
   // but only after the user has interacted or submit attempt happened.
   useEffect(() => {
     const map = computeInvestorErrorsByField();
-    if (showInvestorErrors) {
-      if (submitAttempted) {
-        // After submit attempt, show all errors
-        setInvestorErrors(flattenErrors(map));
-      } else {
-        // Before submit, show only errors for fields the user interacted with
-        const touchedFields = (Object.keys(touched) as InvestorField[]).filter(k => touched[k]);
-        setInvestorErrors(flattenErrors(map, touchedFields));
-      }
+    if (submitAttempted || showInvestorErrors) {
+      // After submit attempt (or if explicitly enabled), show all errors
+      setInvestorErrors(flattenErrors(map));
     } else {
+      // Before submit, keep the consolidated error list hidden
       setInvestorErrors([]);
     }
-    // Debug logging
-    console.log('Investor validation debug:', {
-      showInvestorErrors,
-      submitAttempted,
-      errors: flattenErrors(map),
-      touchedFields: (Object.keys(touched) as InvestorField[]).filter(k => touched[k]),
-      form
-    });
-  }, [form, acceptedTerms, showInvestorErrors, touched, submitAttempted, emailAvailable]);
+  }, [form, acceptedTerms, showInvestorErrors, submitAttempted, emailAvailable]);
+
+  // Field-level error helper (mirror borrower UX)
+  const errorsByField = computeInvestorErrorsByField();
+  const fieldHasError = (field: InvestorField) => !!errorsByField[field] && (showInvestorErrors || touched[field] || submitAttempted);
 
   // Re-evaluate ability to continue without forcing errors to display
   const investorCanContinue = (() => {
@@ -324,10 +310,10 @@ export const InvestorForm: React.FC = () => {
     <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'row', gap: 10}}>
       <div style={{height: 320, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
         <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-          <Field placeholder="Full name" value={form.fullName} onChange={e=>update('fullName', e.target.value)} />
-          <Field type="date" placeholder="Date of Birth" value={form.dob} onChange={e=>update('dob', e.target.value)} />
+          <Field placeholder="Full name" value={form.fullName} onChange={e=>update('fullName', e.target.value)} wrapperStyle={{ outline: fieldHasError('fullName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('fullName') ? '-1px' : undefined }} />
+          <Field type="date" placeholder="Date of Birth" value={form.dob} onChange={e=>update('dob', e.target.value)} wrapperStyle={{ outline: fieldHasError('dob') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('dob') ? '-1px' : undefined }} />
           <div style={{display:'flex', flexDirection:'column', gap:4}}>
-            <Field type="email" placeholder="Email" value={form.email} onChange={e=>update('email', e.target.value)} />
+            <Field type="email" placeholder="Email" value={form.email} onChange={e=>update('email', e.target.value)} wrapperStyle={{ outline: fieldHasError('email') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('email') ? '-1px' : undefined }} />
             {(touched.email || submitAttempted) && (
               <div style={{fontSize:12, fontFamily:'var(--ep-font-avenir)'}}>
                 {!isValidEmail(form.email) ? (
@@ -340,7 +326,7 @@ export const InvestorForm: React.FC = () => {
               </div>
             )}
           </div>
-          <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+          <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: fieldHasError('phone') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('phone') ? '-1px' : undefined}}>
             <input
               type="text"
               inputMode="numeric"
@@ -367,7 +353,7 @@ export const InvestorForm: React.FC = () => {
             />
           </div>
           {/* SSN contextual field */}
-          <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+          <div data-righticon="true" data-state="contextualized" style={{width: 322, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', outline: fieldHasError('ssn') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('ssn') ? '-1px' : undefined}}>
             <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--White, white)', borderRadius: 10, outline: '1px var(--Grey, #767676) solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
               <input placeholder="SSN" inputMode="numeric" pattern="\d*" maxLength={9}
                 value={form.ssn}
@@ -385,23 +371,23 @@ export const InvestorForm: React.FC = () => {
       </div>
       <div style={{height: 320, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 48, display: 'inline-flex'}}>
         <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-          <Field placeholder="Address Line 1" value={form.address1} onChange={e=>update('address1', e.target.value)} />
-          <Field placeholder="Address Line 2" value={form.address2} onChange={e=>update('address2', e.target.value)} />
+          <Field placeholder="Address Line 1" value={form.address1} onChange={e=>update('address1', e.target.value)} wrapperStyle={{ outline: fieldHasError('address1') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('address1') ? '-1px' : undefined }} />
+          <Field placeholder="Address Line 2" value={form.address2} onChange={e=>update('address2', e.target.value)} wrapperStyle={{ outline: fieldHasError('address2') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('address2') ? '-1px' : undefined }} />
           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-            <Field placeholder="City" value={form.city} onChange={e=>update('city', e.target.value)} wrapperStyle={{flex: '1 1 0'}} />
+            <Field placeholder="City" value={form.city} onChange={e=>update('city', e.target.value)} wrapperStyle={{flex: '1 1 0', outline: fieldHasError('city') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('city') ? '-1px' : undefined}} />
             <Field placeholder="State" value={form.state} onChange={e=>{
               const letters = e.target.value.replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,2);
               update('state', letters);
-            }} wrapperStyle={{flex: '1 1 0'}} />
+            }} wrapperStyle={{flex: '1 1 0', outline: fieldHasError('state') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('state') ? '-1px' : undefined}} />
           </div>
           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
             <Field placeholder="Zip Code" value={form.zip} onChange={e=>{
               const digits = e.target.value.replace(/[^0-9]/g,'').slice(0,5);
               update('zip', digits);
-            }} wrapperStyle={{flex: '1 1 0'}} />
-            <Field placeholder="United States" value={form.country} onChange={e=>update('country', e.target.value)} wrapperStyle={{flex: '1 1 0', outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px'}} />
+            }} wrapperStyle={{flex: '1 1 0', outline: fieldHasError('zip') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('zip') ? '-1px' : undefined}} />
+            <Field placeholder="United States" value={form.country} onChange={e=>update('country', e.target.value)} wrapperStyle={{flex: '1 1 0', outline: fieldHasError('country') ? '1px var(--Error, #CC4747) solid' : '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px'}} />
           </div>
-          <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+          <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: fieldHasError('password') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('password') ? '-1px' : undefined}}>
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
@@ -413,7 +399,7 @@ export const InvestorForm: React.FC = () => {
               <Image src="/show_password.svg" alt="Toggle password visibility" width={16} height={16} />
             </button>
           </div>
-          <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+          <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex', outline: fieldHasError('repeat') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: fieldHasError('repeat') ? '-1px' : undefined}}>
             <input
               type={showRepeatPassword ? 'text' : 'password'}
               placeholder="Repeat"
@@ -425,9 +411,17 @@ export const InvestorForm: React.FC = () => {
               <Image src="/show_password.svg" alt="Toggle password visibility" width={16} height={16} />
             </button>
           </div>
+          {/* Investor error list right under the second password field */}
+          {investorErrors.length > 0 && (submitAttempted || showInvestorErrors) && (
+            <div style={{marginTop: 8, textAlign: 'left', alignSelf: 'stretch'}}>
+              {investorErrors.map((err, idx) => (
+                <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, alignSelf: 'stretch'}}>
+  <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, alignSelf: 'stretch'}}>
         {/* Terms of Service Checkbox */}
         <div style={{display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 8}}>
           <input
@@ -445,14 +439,7 @@ export const InvestorForm: React.FC = () => {
           <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: 500, wordWrap: 'break-word'}}>Continue</div>
         </button>
 
-        {/* Error list underneath everything */}
-        {investorErrors.length > 0 && showInvestorErrors && (
-          <div style={{marginTop: 8, textAlign: 'center', alignSelf: 'stretch'}}>
-            {investorErrors.map((err, idx) => (
-              <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
-            ))}
-          </div>
-        )}
+        {/* Error list moved under the second password field to preserve layout */}
       </div>
     </form>
   );
