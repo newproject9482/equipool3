@@ -10,7 +10,7 @@ const LoginModal = dynamic(()=> import('../components/LoginModal'), { ssr:false 
 
 export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
-  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'verifyContact', 'livenessCheck', 'emailVerification', 'accountCreated'
+  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'borrowerPhoneVerification', 'verifyContact', 'livenessCheck', 'emailVerification', 'accountCreated'
   const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -476,7 +476,8 @@ export default function Home() {
   }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors, investorTouched, investorSubmitAttempted, investorType]);
 
   const handleSignUp = async () => {
-    // On attempt to submit, if borrower step has errors, show them and stop
+    // TODO: RESTORE VALIDATION - On attempt to submit, if borrower step has errors, show them and stop
+    /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
     if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
       const map = computeBorrowerErrorsByField();
       const allErrs = flattenErrors(map);
@@ -498,7 +499,10 @@ export default function Home() {
         return;
       }
     }
+    */
     if(selectedRole === 'borrower') {
+      // TODO: RESTORE BACKEND CONNECTION - Simulate success for design work
+      /* BACKEND CALL TEMPORARILY DISABLED FOR DESIGN WORK
       try {
         // Construct full name from parts
         const fullNameParts = [formData.firstName, formData.middleName, formData.surname]
@@ -536,17 +540,29 @@ export default function Home() {
           if (data?.token) localStorage.setItem('ep-auth-token', data.token);
         }
         if (data?.role === 'borrower') setSelectedRole('borrower');
-  // Borrower flow: go straight to email verification step
-  setModalStep('emailVerification');
+  // Borrower flow: go to phone verification first, then email verification
+  setModalStep('borrowerPhoneVerification');
       } catch (e: unknown) {
         const errorMessage = e instanceof Error ? e.message : 'Network error';
         alert(errorMessage);
       }
+      */
+      
+      // TEMPORARY: Simulate successful signup for design work
+      setIsAuthenticated(true);
+      showSuccess('Account created successfully! Welcome to EquiPool!');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ep-auth','1');
+      }
+      setSelectedRole('borrower');
+      setModalStep('borrowerPhoneVerification');
       return;
     }
 
     // Investor signup path
     if(selectedRole === 'investor') {
+      // TODO: RESTORE BACKEND CONNECTION - Simulate success for design work
+      /* BACKEND CALL TEMPORARILY DISABLED FOR DESIGN WORK
       try {
         // Compose fullName: for individual from parts, for company from fullName field
         const composedFullName = investorType === 'individual'
@@ -596,11 +612,23 @@ export default function Home() {
         const errorMessage = e instanceof Error ? e.message : 'Network error';
         alert(errorMessage);
       }
+      */
+      
+      // TEMPORARY: Simulate successful signup for design work
+      setIsAuthenticated(true);
+      showSuccess('Investor account created successfully! Welcome to EquiPool!');
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ep-auth','1');
+      }
+      setSelectedRole('investor');
+      setModalStep('verifyContact');
       return;
     }
   };
 
   const handleInvestorSignUp = async () => {
+    // TODO: RESTORE BACKEND CONNECTION - Simulate success for design work
+    /* BACKEND CALL TEMPORARILY DISABLED FOR DESIGN WORK
     try {
       const composedFullName = [formData.firstName, formData.middleName, formData.surname].map(s => (s||'').trim()).filter(Boolean).join(' ');
       const payload = {
@@ -644,6 +672,16 @@ export default function Home() {
       const errorMessage = e instanceof Error ? e.message : 'Network error';
       showError(errorMessage);
     }
+    */
+    
+    // TEMPORARY: Simulate successful signup for design work
+    setSelectedRole('investor');
+    setIsAuthenticated(true);
+    showSuccess('Investor account created successfully! Welcome to EquiPool!');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ep-auth','1');
+    }
+    setModalStep('verifyContact');
   };
 
   const handleLogout = async () => {
@@ -687,19 +725,45 @@ export default function Home() {
 
   // Re-evaluate ability to continue without forcing errors to display
   const borrowerCanContinue = (() => {
+    // TODO: RESTORE VALIDATION - Basic form completeness check temporarily disabled
+    /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
     const map = computeBorrowerErrorsByField();
     return flattenErrors(map).length === 0;
+    */
+    
+    // TEMPORARY: Always allow continue for design work
+    return true;
   })();
 
+  // TODO: RESTORE VALIDATION - Investor validation temporarily disabled
+  /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
   const investorCanContinue = computeInvestorErrors().length === 0;
+  */
+  
+  // TEMPORARY: Always allow continue for design work
+  const investorCanContinue = true;
 
   // Borrower field errors for UI highlighting
+  // TODO: RESTORE VALIDATION - Field error checking temporarily disabled
+  /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
   const borrowerErrorsByField = computeBorrowerErrorsByField();
   const fieldHasError = (field: BorrowerField) => !!borrowerErrorsByField[field] && (showBorrowerErrors || borrowerTouched[field] || borrowerSubmitAttempted);
+  */
+  
+  // TEMPORARY: No field errors for design work
+  const borrowerErrorsByField = {};
+  const fieldHasError = (field: BorrowerField) => false;
 
   // Investor field-level errors for UI highlighting
+  // TODO: RESTORE VALIDATION - Field error checking temporarily disabled
+  /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
   const investorErrorsByField = computeInvestorErrorsByField();
   const investorFieldHasError = (field: InvestorField) => !!investorErrorsByField[field] && (showInvestorErrors || investorTouched[field] || investorSubmitAttempted);
+  */
+  
+  // TEMPORARY: No field errors for design work
+  const investorErrorsByField = {};
+  const investorFieldHasError = (field: InvestorField) => false;
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const currentMonthIndex = months.indexOf(selectedMonth);
@@ -2008,6 +2072,93 @@ export default function Home() {
                   </button>
                   {/* Error list was moved under second password field to preserve layout */}
                 </div>
+              </div>
+            )}
+
+            {modalStep === 'borrowerPhoneVerification' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</span>
+                    <span style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> </span>
+                  </div>
+                </div>
+                <div style={{alignSelf: 'stretch', height: 452, paddingLeft: 200, paddingRight: 200, paddingTop: 24, paddingBottom: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
+                  <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
+                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your email</div>
+                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your email</div>
+                      </div>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state={verificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="text"
+                            placeholder="_ _ _ _"
+                            value={verificationCode}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
+                              setVerificationCode(val);
+                            }}
+                            maxLength={4}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: verificationCode? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5em', textAlign:'center'}}
+                          />
+                        </div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn't receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
+                      </div>
+                    </div>
+                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your phone number</div>
+                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your phone</div>
+                      </div>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state={phoneVerificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="text"
+                            placeholder="_ _ _ _"
+                            value={phoneVerificationCode}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
+                              setPhoneVerificationCode(val);
+                            }}
+                            maxLength={4}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: phoneVerificationCode? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5em', textAlign:'center'}}
+                          />
+                        </div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn't receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
+                      </div>
+                    </div>
+                    <div style={{textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>By signing up, you agree to our </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span></div>
+                  </div>
+                </div>
+                <button 
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
+                {(() => { const canProceed = verificationCode.length===4 && phoneVerificationCode.length===4; return (
+                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
+                  <div 
+                    onClick={()=> { if(canProceed){ setModalStep('accountCreated'); } }}
+                    style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background: canProceed? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)':'var(--Inactive-Blue, #B8C5D7)', borderRadius:12, justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor: canProceed? 'pointer':'not-allowed'}}
+                  >
+                    <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Continue</div>
+                  </div>
+                  <button 
+                    onClick={() => setModalStep('borrowerSignUp')}
+                    style={{background:'transparent', border:'none', cursor:'pointer', color:'#4A5565', fontSize:12, fontFamily:'var(--ep-font-avenir)', fontWeight:400, textDecoration:'underline'}}
+                  >
+                    ← Back
+                  </button>
+                </div>
+                ) })()}
               </div>
             )}
 
