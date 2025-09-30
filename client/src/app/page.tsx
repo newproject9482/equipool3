@@ -2857,11 +2857,17 @@ export default function Home() {
 
             {modalStep === 'livenessCheck' && (
               <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'flex-start', gap:4, display:'flex'}}>
-                  <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:24, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Liveness check</div>
+                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'center', gap:4, display:'flex'}}>
+                  <div style={{display:'flex', alignItems:'center', gap:8}}>
+                    <Image src="/successful.svg" alt="Success" width={25} height={25} />
+                    <div style={{textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Account created successfully!</div>
+                  </div>
                 </div>
                 <div style={{alignSelf:'stretch', paddingLeft:200, paddingRight:200, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
-                  <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:20, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>To start investing we need to verify that you’re a human.</div>
+                  <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex', marginTop: 100}}>
+                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>To start investing, please complete 2 steps.</div>
+                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We need to verify you're human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
+                  </div>
                 </div>
                 <button 
                   onClick={closeSignUpModal}
@@ -2869,15 +2875,7 @@ export default function Home() {
                 >
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
-                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'center', alignItems:'center', gap:10, display:'flex'}}>
-                  <div onClick={()=> setModalStep('accountCreated')} data-left-icon="false" data-state="default" style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background:'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius:12, outline:'1px var(--Light-Grey, #F4F4F4) solid', justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor:'pointer'}}>
-                    <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Start the check</div>
-                  </div>
-                  <div data-left-icon="true" data-state="secondary" style={{paddingTop:8, paddingLeft:16, paddingRight:16, borderRadius:12, justifyContent:'center', alignItems:'center', gap:6, display:'inline-flex', cursor:'pointer'}}>
-                    <div style={{color:'var(--Black, black)', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Skip for now</div>
-                    <Image src="/skip.svg" alt="Skip" width={12} height={13} />
-                  </div>
-                </div>
+                {/* BLANK CANVAS - Add your design content here */}
               </div>
             )}
 
@@ -3000,21 +2998,8 @@ export default function Home() {
                 </button>
                 {selectedRole === 'investor' ? (
                   <>
-                    <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'flex-start', gap:4, display:'flex'}}>
-                      <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:24, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Account successfully created</div>
-                    </div>
-                    <div style={{alignSelf:'stretch', paddingLeft:200, paddingRight:200, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
-                      <div style={{alignSelf:'stretch', textAlign:'center', color:'black', fontSize:20, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>To start investing please make your first deposit.</div>
-                    </div>
-                    <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'center', alignItems:'center', gap:10, display:'flex'}}>
-                      <div data-left-icon="false" data-state="default" style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background:'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius:12, outline:'1px var(--Light-Grey, #F4F4F4) solid', justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor:'pointer'}}>
-                        <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Make a deposit</div>
-                      </div>
-                      <div data-left-icon="true" data-state="secondary" style={{paddingTop:8, paddingLeft:16, paddingRight:16, borderRadius:12, justifyContent:'center', alignItems:'center', gap:4, display:'inline-flex', cursor:'pointer'}}>
-                        <div style={{color:'var(--Black, black)', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Skip for now</div>
-                        <Image src="/skip.svg" alt="Skip" width={12} height={13} />
-                      </div>
-                    </div>
+                    {/* BLANK CANVAS FOR INVESTOR POST-VERIFICATION DESIGN */}
+                    {/* Design your investor post-verification page content here */}
                   </>
                 ) : (
                   <>
