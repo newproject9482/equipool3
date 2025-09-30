@@ -1542,7 +1542,7 @@ export default function Home() {
                       <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Choose your role</div>
                       <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>You can&apos;t switch roles later, but you can register a second account using a different email if needed.</div>
                     </div>
-                    <div style={{width: 452, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                    <div style={{width: 452, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex', marginTop: 40}}>
                       <div 
                         style={{
                           width: 220, 
