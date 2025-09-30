@@ -2868,6 +2868,44 @@ export default function Home() {
                     <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>To start investing, please complete 2 steps.</div>
                     <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We need to verify you're human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
                   </div>
+                  
+                  {/* Flex container for the two cards with + symbol */}
+                  <div style={{width: '100%', display: 'flex', alignItems: 'center', gap: 16, marginTop: 32}}>
+                    {/* Left card - Liveness check */}
+                    <div style={{flex: 1, minHeight: 140, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'flex'}}>
+                      <div style={{width: '100%', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
+                        <div style={{width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                          <Image src="/group.svg" alt="Liveness Check" width={23} height={21} />
+                        </div>
+                        <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: 'var(--Stroke-Grey, #E5E7EB)', borderRadius: 50, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
+                        </div>
+                      </div>
+                      <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 16}}>
+                        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Liveness check</div>
+                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you're a human</div>
+                      </div>
+                    </div>
+                    
+                    {/* Plus symbol between cards */}
+                    <div style={{textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'Avenir', fontWeight: '800', wordWrap: 'break-word', flexShrink: 0}}>+</div>
+                    
+                    {/* Right card - Deposit or Invitation code */}
+                    <div style={{flex: 1, minHeight: 140, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'flex'}}>
+                      <div style={{width: '100%', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
+                        <div style={{width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                          <Image src="/deposit.svg" alt="Deposit or Invitation" width={25} height={24} />
+                        </div>
+                        <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: 'var(--Stroke-Grey, #E5E7EB)', borderRadius: 50, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
+                        </div>
+                      </div>
+                      <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 16}}>
+                        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Deposit or Invitation code</div>
+                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Make a $5000 deposit or enter the invitation/promo code.</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <button 
                   onClick={closeSignUpModal}
