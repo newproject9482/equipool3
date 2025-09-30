@@ -2872,7 +2872,7 @@ export default function Home() {
                   {/* Flex container for the two cards with + symbol */}
                   <div style={{width: '100%', display: 'flex', alignItems: 'center', gap: 16, marginTop: 32}}>
                     {/* Left card - Liveness check */}
-                    <div style={{width: 200, height: 180, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'flex'}}>
+                    <div style={{width: 200, height: 180, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'flex', marginLeft: 60}}>
                       <div style={{width: '100%', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
                         <div style={{width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           <Image src="/group.svg" alt="Liveness Check" width={23} height={21} />
