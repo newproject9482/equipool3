@@ -22,8 +22,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  /* Prefer Avenir when available (per Figma). Fallbacks follow. */
-  font-family: Avenir, 'Avenir Next', Arial, Helvetica, sans-serif;
+  /* Prefer var(--ep-font-avenir) when available (per Figma). Fallbacks follow. */
+  font-family: var(--ep-font-avenir), 'var(--ep-font-avenir) Next', Arial, Helvetica, sans-serif;
 }
 
 /* --- Form UI polish to match design --- */
@@ -66,7 +66,7 @@ input, textarea, select {
   --ep-muted: #4A5565;
 
   /* Font stack */
-  --ep-font-avenir: Avenir, 'Avenir Next', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ep-font-avenir: var(--ep-font-avenir), 'var(--ep-font-avenir) Next', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
   /* Sizes */
   --ep-nav-brand-size: 24px;

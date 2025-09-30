@@ -2878,17 +2878,17 @@ export default function Home() {
                           <Image src="/group.svg" alt="Liveness Check" width={23} height={21} />
                         </div>
                         <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: 'var(--Stroke-Grey, #E5E7EB)', borderRadius: 50, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
+                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
                         </div>
                       </div>
                       <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 24}}>
-                        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Liveness check</div>
-                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you're a human</div>
+                        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Liveness check</div>
+                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you're a human</div>
                       </div>
                     </div>
                     
                     {/* Plus symbol between cards */}
-                    <div style={{textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'Avenir', fontWeight: '800', wordWrap: 'break-word', flexShrink: 0}}>+</div>
+                    <div style={{textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word', flexShrink: 0}}>+</div>
                     
                     {/* Right card - Deposit or Invitation code */}
                     <div style={{width: 200, height: 180, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'flex'}}>
@@ -2897,12 +2897,12 @@ export default function Home() {
                           <Image src="/deposit.svg" alt="Deposit or Invitation" width={25} height={24} />
                         </div>
                         <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: 'var(--Stroke-Grey, #E5E7EB)', borderRadius: 50, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
+                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
                         </div>
                       </div>
                       <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 16}}>
-                        <div style={{color: 'black', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Deposit or Invitation code</div>
-                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Make a $5000 deposit or enter the invitation/promo code.</div>
+                        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Deposit or Invitation code</div>
+                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Make a $5000 deposit or enter the invitation/promo code.</div>
                       </div>
                     </div>
                   </div>
