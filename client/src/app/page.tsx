@@ -98,6 +98,8 @@ export default function Home() {
   // Hover states for liveness/deposit cards
   const [livenessHover, setLivenessHover] = useState(false);
   const [depositHover, setDepositHover] = useState(false);
+  const [promoHover, setPromoHover] = useState(false);
+  const [depositSelection, setDepositSelection] = useState<'deposit' | 'code' | null>(null);
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -2986,7 +2988,11 @@ export default function Home() {
                     {/* Cards container (440px wide centered) */}
                     <div style={{width: 440, marginTop: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                       <div style={{width: '45%'}}>
-                        <div style={{width: '100%', height: '100%', padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                        <div
+                          onMouseEnter={() => setDepositHover(true)}
+                          onMouseLeave={() => setDepositHover(false)}
+                          onClick={() => setDepositSelection('deposit')}
+                          style={{width: '100%', height: '100%', padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex', cursor: 'pointer', boxShadow: (depositHover || depositSelection === 'deposit') ? '0 6px 30px rgba(0,0,0,0.12)' : undefined, transform: (depositHover || depositSelection === 'deposit') ? 'translateY(-2px)' : undefined, transition: 'box-shadow 120ms, transform 120ms'}}>
                           <Image src="/deposit_money.svg" alt="Make a deposit" width={24} height={24} />
                           <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
                             <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Make a deposit</div>
@@ -2999,7 +3005,11 @@ export default function Home() {
                       </div>
 
                       <div style={{width: '45%'}}>
-                        <div style={{width: '100%', height: '100%', padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                        <div
+                          onMouseEnter={() => setPromoHover(true)}
+                          onMouseLeave={() => setPromoHover(false)}
+                          onClick={() => setDepositSelection('code')}
+                          style={{width: '100%', height: '100%', padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex', cursor: 'pointer', boxShadow: (promoHover || depositSelection === 'code') ? '0 6px 30px rgba(0,0,0,0.12)' : undefined, transform: (promoHover || depositSelection === 'code') ? 'translateY(-2px)' : undefined, transition: 'box-shadow 120ms, transform 120ms'}}>
                           <Image src="/promo-code.svg" alt="Enter the code" width={24} height={24} />
                           <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
                             <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Enter the code</div>
