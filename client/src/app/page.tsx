@@ -3098,40 +3098,7 @@ export default function Home() {
               </div>
             )}
 
-            {modalStep === 'accountCreated' && (
-              <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0, background:'rgba(0,0,0,0.04)', zIndex:1000, display:'flex', justifyContent:'center', alignItems:'center'}}>
-                <div style={{background:'#fff', borderRadius:24, boxShadow:'0 2px 16px rgba(0,0,0,0.08)', padding:'2.5rem 3.5rem', minWidth:400, maxWidth:600, width:'100%', textAlign:'center', position:'relative', display:'flex', flexDirection:'column', alignItems:'center'}}>
-                  <button
-                    onClick={closeSignUpModal}
-                    style={{width:32, height:32, right:32, top:32, position:'absolute', background:'transparent', border:'none', cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center'}}
-                  >
-                    <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
-                  </button>
-                  <div style={{color:'#217a2b', fontSize:28, fontWeight:700, marginBottom:'1rem'}}>Account created successfully!</div>
-                  <div style={{fontWeight:'bold', fontSize:18, marginBottom:'0.5rem'}}>To start investing, please complete 2 steps.</div>
-                  <div style={{marginBottom:'2rem', color:'#333', fontSize:16}}>We need to verify you're human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
-                  <div style={{display:'flex', gap:'2rem', justifyContent:'center', alignItems:'center', marginBottom:'2rem'}}>
-                    <div style={{background:'#f8fafc', borderRadius:16, padding:'2rem 1.5rem', minWidth:220, boxShadow:'0 1px 8px rgba(0,0,0,0.04)', display:'flex', flexDirection:'column', alignItems:'center', position:'relative'}}>
-                      <span style={{fontSize:'2rem', marginBottom:'0.5rem'}}>📷</span>
-                      <span style={{position:'absolute', top:'1rem', right:'1rem', background:'#e5e7eb', color:'#6b7280', borderRadius:8, padding:'0.25rem 0.75rem', fontSize:'0.9rem'}}>Pending</span>
-                      <h3 style={{margin:'1rem 0 0.5rem 0'}}>Liveness check</h3>
-                      <p style={{color:'#6b7280', fontSize:'0.95rem'}}>To verify that you're a human</p>
-                    </div>
-                    <div style={{background:'#f8fafc', borderRadius:16, padding:'2rem 1.5rem', minWidth:220, boxShadow:'0 1px 8px rgba(0,0,0,0.04)', display:'flex', flexDirection:'column', alignItems:'center', position:'relative'}}>
-                      <span style={{fontSize:'2rem', marginBottom:'0.5rem'}}>🏠</span>
-                      <span style={{position:'absolute', top:'1rem', right:'1rem', background:'#e5e7eb', color:'#6b7280', borderRadius:8, padding:'0.25rem 0.75rem', fontSize:'0.9rem'}}>Pending</span>
-                      <h3 style={{margin:'1rem 0 0.5rem 0'}}>Deposit or Invitation code</h3>
-                      <p style={{color:'#6b7280', fontSize:'0.95rem'}}>Make a $5000 deposit or enter the invitation/promo code.</p>
-                    </div>
-                  </div>
-                  <div style={{flexDirection:'column', justifyContent:'center', alignItems:'center', gap:10, display:'flex'}}>
-                    <div onClick={closeSignUpModal} data-left-icon="false" data-state="default" style={{paddingLeft:16, paddingRight:16, paddingTop:10, paddingBottom:10, background:'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)', borderRadius:12, outline:'1px var(--Light-Grey, #F4F4F4) solid', justifyContent:'center', alignItems:'center', gap:8, display:'inline-flex', cursor:'pointer'}}>
-                      <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, wordWrap:'break-word'}}>Continue</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            // ...existing code...
           </div>
         </div>
       )}
