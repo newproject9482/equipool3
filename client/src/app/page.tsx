@@ -2978,27 +2978,36 @@ export default function Home() {
 
             {modalStep === 'depositOrInvitation' && (
               <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Deposit / Invitation Code</div>
+                <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Deposit / Invitation Code</div>
 
-                <div style={{alignSelf: 'stretch', paddingLeft: 100, paddingRight: 100, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, display: 'flex'}}>
-                  {/* Content area for deposit / invitation code - add fields or instructions here */}
-                  <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'transparent', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                    <input
-                      type="text"
-                      placeholder=""
-                      style={{
-                        flex: '1 1 0',
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        color: '#4A5565',
-                        fontSize: 14,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: 500
-                      }}
-                    />
+                  <div style={{width: 440, height: 44, marginTop: 167.5, marginLeft: 'auto', marginRight: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Make a $5,000 deposit or please enter your invitation/promo code.</div>
+
+                  <div style={{alignSelf: 'stretch', paddingLeft: 100, paddingRight: 100, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, display: 'flex'}}>
+                    {/* Cards container (440px wide centered) */}
+                    <div style={{width: 440, marginTop: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                      <div style={{width: '45%'}}>
+                        <div style={{width: '100%', height: '100%', padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                          <Image src="/deposit_money.svg" alt="Make a deposit" width={24} height={24} />
+                          <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                            <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Make a deposit</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{width: '10%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <div style={{textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>or</div>
+                      </div>
+
+                      <div style={{width: '45%'}}>
+                        <div style={{width: '100%', height: '100%', padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                          <Image src="/promo-code.svg" alt="Enter the code" width={24} height={24} />
+                          <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                            <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Enter the code</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
                 <button
                   onClick={closeSignUpModal}
