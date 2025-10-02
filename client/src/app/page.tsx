@@ -10,7 +10,18 @@ const LoginModal = dynamic(()=> import('../components/LoginModal'), { ssr:false 
 
 export default function Home() {
   const [showSignUpModal, setShowSignUpModal] = useState(false);
-  const [modalStep, setModalStep] = useState('roleSelection'); // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'borrowerPhoneVerification', 'verifyContact', 'livenessCheck', 'emailVerification', 'accountCreated'
+  // 'roleSelection', 'borrowerSignUp', 'investorSignUp', 'borrowerPhoneVerification', 'verifyContact', 'livenessCheck', 'emailVerification', 'accountCreated', 'depositOrInvitation'
+  type ModalStep =
+    | 'roleSelection'
+    | 'borrowerSignUp'
+    | 'investorSignUp'
+    | 'borrowerPhoneVerification'
+    | 'verifyContact'
+    | 'livenessCheck'
+    | 'emailVerification'
+    | 'accountCreated'
+    | 'depositOrInvitation';
+  const [modalStep, setModalStep] = useState<ModalStep>('roleSelection');
   const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -2920,7 +2931,7 @@ export default function Home() {
                     <div
                       role="button"
                       tabIndex={0}
-                      onClick={() => {/* TODO: handle deposit card click */}}
+                      onClick={() => setModalStep('depositOrInvitation')}
                       onMouseEnter={() => setDepositHover(true)}
                       onMouseLeave={() => setDepositHover(false)}
                       style={{
@@ -2953,6 +2964,19 @@ export default function Home() {
                         <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Make a $5000 deposit or enter the invitation/promo code.</div>
                       </div>
                     </div>
+            {/* Deposit/Invitation blank container modal */}
+            {modalStep === 'depositOrInvitation' && (
+              <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0, background:'rgba(0,0,0,0.04)', zIndex:1000, display:'flex', justifyContent:'center', alignItems:'center'}}>
+                <div style={{background:'#fff', borderRadius:24, boxShadow:'0 2px 16px rgba(0,0,0,0.08)', padding:'2.5rem 3.5rem', minWidth:400, maxWidth:600, width:'100%', textAlign:'center', position:'relative', display:'flex', flexDirection:'column', alignItems:'center'}}>
+                  <button
+                    onClick={closeSignUpModal}
+                    style={{width:32, height:32, right:32, top:32, position:'absolute', background:'transparent', border:'none', cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                    <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                  </button>
+                  {/* Blank container for Deposit/Invitation code step - design to be added later */}
+                </div>
+              </div>
+            )}
                   </div>
                 </div>
                 <button 
