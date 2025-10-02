@@ -84,6 +84,9 @@ export default function Home() {
   const [roleInvestorHover, setRoleInvestorHover] = useState(false);
   const [howItWorksView, setHowItWorksView] = useState<'borrower' | 'investor'>('borrower');
   const [newsletterEmail, setNewsletterEmail] = useState('');
+  // Hover states for liveness/deposit cards
+  const [livenessHover, setLivenessHover] = useState(false);
+  const [depositHover, setDepositHover] = useState(false);
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -2872,7 +2875,30 @@ export default function Home() {
                   {/* Flex container for the two cards with + symbol */}
                   <div style={{width: '100%', display: 'flex', alignItems: 'center', gap: 16, marginTop: 32}}>
                     {/* Left card - Liveness check */}
-                    <div style={{width: 200, height: 180, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'flex', marginLeft: 60}}>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {/* TODO: handle liveness card click */}}
+                      onMouseEnter={() => setLivenessHover(true)}
+                      onMouseLeave={() => setLivenessHover(false)}
+                      style={{
+                        width: 200,
+                        height: 180,
+                        padding: 24,
+                        background: 'var(--White, white)',
+                        borderRadius: 24,
+                        outline: '1px #E5E7EB solid',
+                        outlineOffset: '-1px',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        display: 'flex',
+                        marginLeft: 60,
+                        boxShadow: livenessHover ? '0 4px 24px 0 rgba(0,0,0,0.10)' : undefined,
+                        cursor: 'pointer',
+                        transition: 'box-shadow 0.2s',
+                      }}
+                    >
                       <div style={{width: '100%', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
                         <div style={{width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           <Image src="/group.svg" alt="Liveness Check" width={23} height={21} />
@@ -2891,7 +2917,29 @@ export default function Home() {
                     <div style={{textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word', flexShrink: 0}}>+</div>
                     
                     {/* Right card - Deposit or Invitation code */}
-                    <div style={{width: 200, height: 180, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', display: 'flex'}}>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {/* TODO: handle deposit card click */}}
+                      onMouseEnter={() => setDepositHover(true)}
+                      onMouseLeave={() => setDepositHover(false)}
+                      style={{
+                        width: 200,
+                        height: 180,
+                        padding: 24,
+                        background: 'var(--White, white)',
+                        borderRadius: 24,
+                        outline: '1px #E5E7EB solid',
+                        outlineOffset: '-1px',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        display: 'flex',
+                        boxShadow: depositHover ? '0 4px 24px 0 rgba(0,0,0,0.10)' : undefined,
+                        cursor: 'pointer',
+                        transition: 'box-shadow 0.2s',
+                      }}
+                    >
                       <div style={{width: '100%', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
                         <div style={{width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                           <Image src="/deposit.svg" alt="Deposit or Invitation" width={25} height={24} />
