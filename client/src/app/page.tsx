@@ -3009,12 +3009,28 @@ export default function Home() {
                     </div>
                   </div>
 
-                <button
-                  onClick={closeSignUpModal}
-                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-                >
-                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
-                </button>
+                  {/* Buttons area 167.5px below cards */}
+                  <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 120, gap: 8}}>
+                    <div data-icon="false" data-state="default" style={{width: 200, height: 'auto', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                      <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Back</div>
+                    </div>
+
+                    <div style={{height: 8}} />
+
+                    <div data-icon="true" data-state="secondary" style={{width: 200, height: 'auto', paddingTop: 8, paddingLeft: 16, paddingRight: 16, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
+                      <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Skip for now</div>
+                      <div data-icon="ic:arrowright" style={{width: 12, height: 12, position: 'relative', overflow: 'hidden'}}>
+                          <div style={{width: 4.5, height: 9, left: 3.75, top: 1.5, position: 'absolute', background: 'var(--Black, black)'}} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={closeSignUpModal}
+                    style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                  >
+                    <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                  </button>
               </div>
             )}
 
