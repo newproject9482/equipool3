@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -87,6 +88,9 @@ export default function Home() {
   // Hover states for liveness/deposit cards
   const [livenessHover, setLivenessHover] = useState(false);
   const [depositHover, setDepositHover] = useState(false);
+  // Step state for deposit/invitation code
+  const [showDepositStep, setShowDepositStep] = useState(false);
+
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -2860,109 +2864,54 @@ export default function Home() {
 
             {modalStep === 'livenessCheck' && (
               <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                <div style={{alignSelf:'stretch', flexDirection:'column', justifyContent:'flex-start', alignItems:'center', gap:4, display:'flex'}}>
-                  <div style={{display:'flex', alignItems:'center', gap:8}}>
-                    <Image src="/successful.svg" alt="Success" width={25} height={25} />
-                    <div style={{textAlign: 'center', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Account created successfully!</div>
+                {!showDepositStep && (
+                  <div>
+                    {/* ...existing code... */}
                   </div>
-                </div>
-                <div style={{alignSelf:'stretch', paddingLeft:100, paddingRight:100, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
-                  <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex', marginTop: 100}}>
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>To start investing, please complete 2 steps.</div>
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We need to verify you're human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
-                  </div>
-                  
-                  {/* Flex container for the two cards with + symbol */}
-                  <div style={{width: '100%', display: 'flex', alignItems: 'center', gap: 16, marginTop: 32}}>
-                    {/* Left card - Liveness check */}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {/* TODO: handle liveness card click */}}
-                      onMouseEnter={() => setLivenessHover(true)}
-                      onMouseLeave={() => setLivenessHover(false)}
-                      style={{
-                        width: 200,
-                        height: 180,
-                        padding: 24,
-                        background: 'var(--White, white)',
-                        borderRadius: 24,
-                        outline: '1px #E5E7EB solid',
-                        outlineOffset: '-1px',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        display: 'flex',
-                        marginLeft: 60,
-                        boxShadow: livenessHover ? '0 4px 24px 0 rgba(0,0,0,0.10)' : undefined,
-                        cursor: 'pointer',
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      <div style={{width: '100%', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
-                        <div style={{width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                          <Image src="/group.svg" alt="Liveness Check" width={23} height={21} />
-                        </div>
-                        <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: 'var(--Stroke-Grey, #E5E7EB)', borderRadius: 50, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
-                        </div>
-                      </div>
-                      <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 24}}>
-                        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Liveness check</div>
-                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you're a human</div>
-                      </div>
+                )}
+                {showDepositStep && (
+                  <div style={{width: '100%'}}>
+                    <div style={{width: '100%', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', marginBottom: 167.5}}>
+                      Deposit / Invitation Code
                     </div>
-                    
-                    {/* Plus symbol between cards */}
-                    <div style={{textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word', flexShrink: 0}}>+</div>
-                    
-                    {/* Right card - Deposit or Invitation code */}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {/* TODO: handle deposit card click */}}
-                      onMouseEnter={() => setDepositHover(true)}
-                      onMouseLeave={() => setDepositHover(false)}
-                      style={{
-                        width: 200,
-                        height: 180,
-                        padding: 24,
-                        background: 'var(--White, white)',
-                        borderRadius: 24,
-                        outline: '1px #E5E7EB solid',
-                        outlineOffset: '-1px',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        display: 'flex',
-                        boxShadow: depositHover ? '0 4px 24px 0 rgba(0,0,0,0.10)' : undefined,
-                        cursor: 'pointer',
-                        transition: 'box-shadow 0.2s',
-                      }}
-                    >
-                      <div style={{width: '100%', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
-                        <div style={{width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                          <Image src="/deposit.svg" alt="Deposit or Invitation" width={25} height={24} />
-                        </div>
-                        <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 4, paddingBottom: 4, background: 'var(--Stroke-Grey, #E5E7EB)', borderRadius: 50, justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pending</div>
+                    <div style={{width: '100%', textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', marginBottom: 32}}>
+                      Make a $5,000 deposit or please enter your invitation/promo code.
+                    </div>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 16, marginBottom: 32}}>
+                      {/* Left column */}
+                      <div style={{width: 197, height: 72, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                        {/* sign-up-investor-deposit.svg icon */}
+                        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" style={{display:'block'}}>
+                          <path d="M10.7863 13.6486C10.7863 13.9896 10.6508 14.3166 10.4097 14.5577C10.1686 14.7988 9.84155 14.9343 9.50056 14.9343C9.15957 14.9343 8.83254 14.7988 8.59142 14.5577C8.3503 14.3166 8.21484 13.9896 8.21484 13.6486C8.21484 13.3076 8.3503 12.9805 8.59142 12.7394C8.83254 12.4983 9.15957 12.3629 9.50056 12.3629C9.84155 12.3629 10.1686 12.4983 10.4097 12.7394C10.6508 12.9805 10.7863 13.3076 10.7863 13.6486Z" fill="#113D7B"/>
+                          <path d="M11.5117 0.5L14.2374 4.31943L16.0349 3.70657L17.6754 8.50571H18.5V18.7914H0.5V8.50571H0.937143V8.49714L1.49257 8.50229L11.5117 0.5ZM7.26886 8.50571H15.8643L14.9754 5.906L13.6709 6.32343L7.26886 8.50571ZM5.93343 7.14886L12.5429 4.89714L11.168 2.96857L5.93343 7.14886ZM3.92857 10.22H2.21429V11.9343C2.66894 11.9343 3.10498 11.7537 3.42647 11.4322C3.74796 11.1107 3.92857 10.6747 3.92857 10.22ZM12.5 13.6486C12.5 13.2546 12.4224 12.8645 12.2716 12.5005C12.1209 12.1365 11.8999 11.8058 11.6213 11.5273C11.3427 11.2487 11.012 11.0277 10.6481 10.8769C10.2841 10.7262 9.89397 10.6486 9.5 10.6486C9.10603 10.6486 8.71593 10.7262 8.35195 10.8769C7.98797 11.0277 7.65726 11.2487 7.37868 11.5273C7.1001 11.8058 6.87913 12.1365 6.72836 12.5005C6.5776 12.8645 6.5 13.2546 6.5 13.6486C6.5 14.4442 6.81607 15.2073 7.37868 15.7699C7.94129 16.3325 8.70435 16.6486 9.5 16.6486C10.2956 16.6486 11.0587 16.3325 11.6213 15.7699C12.1839 15.2073 12.5 14.4442 12.5 13.6486ZM16.7857 17.0771V15.3629C16.3311 15.3629 15.895 15.5435 15.5735 15.865C15.252 16.1865 15.0714 16.6225 15.0714 17.0771H16.7857ZM15.0714 10.22C15.0714 10.6747 15.252 11.1107 15.5735 11.4322C15.895 11.7537 16.3311 11.9343 16.7857 11.9343V10.22H15.0714ZM2.21429 17.0771H3.92857C3.92857 16.6225 3.74796 16.1865 3.42647 15.865C3.10498 15.5435 2.66894 15.3629 2.21429 15.3629V17.0771Z" fill="#113D7B"/>
+                        </svg>
+                        <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                          <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Make a deposit</div>
                         </div>
                       </div>
-                      <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 16}}>
-                        <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Deposit or Invitation code</div>
-                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Make a $5000 deposit or enter the invitation/promo code.</div>
+                      {/* Middle 'or' */}
+                      <div style={{textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>or</div>
+                      {/* Right column */}
+                      <div style={{width: 197, height: 72, padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                        {/* sign-up-investor-deposit-icons.svg icon */}
+                        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" style={{display:'block'}}>
+                          <path d="M5.16875 5C4.32835 5 3.52236 5.33018 2.92811 5.91791C2.33385 6.50563 2 7.30276 2 8.13393V15.3661C2 16.1972 2.33385 16.9944 2.92811 17.5821C3.52236 18.1698 4.32835 18.5 5.16875 18.5H18.3313C18.7474 18.5 19.1594 18.4189 19.5439 18.2614C19.9283 18.104 20.2777 17.8731 20.5719 17.5821C20.8661 17.2911 21.0996 16.9456 21.2588 16.5654C21.418 16.1851 21.5 15.7776 21.5 15.3661V8.13393C21.5 7.72238 21.418 7.31485 21.2588 6.93463C21.0996 6.5544 20.8661 6.20892 20.5719 5.91791C20.2777 5.62689 19.9283 5.39605 19.5439 5.23856C19.1594 5.08106 18.7474 5 18.3313 5H5.16875ZM6.173 10.0336L6.875 10.7279L7.577 10.0336C7.64395 9.96252 7.72468 9.90552 7.81438 9.866C7.90407 9.82647 8.00091 9.80521 8.09909 9.8035C8.19728 9.80179 8.2948 9.81965 8.38586 9.85602C8.47691 9.8924 8.55962 9.94654 8.62906 10.0152C8.6985 10.0839 8.75324 10.1657 8.79002 10.2557C8.8268 10.3458 8.84486 10.4423 8.84313 10.5394C8.84139 10.6365 8.8199 10.7322 8.77994 10.8209C8.73997 10.9097 8.68234 10.9895 8.6105 11.0557L7.90947 11.75L8.61148 12.4424C8.67946 12.5095 8.73341 12.5893 8.77023 12.6771C8.80705 12.7649 8.82602 12.859 8.82607 12.9541C8.82611 13.0491 8.80723 13.1432 8.77049 13.2311C8.73376 13.3189 8.67989 13.3987 8.61196 13.4659C8.54404 13.5332 8.46339 13.5865 8.37462 13.623C8.28584 13.6594 8.19069 13.6781 8.09458 13.6782C7.99848 13.6782 7.9033 13.6595 7.8145 13.6232C7.72569 13.5869 7.64499 13.5336 7.577 13.4664L6.875 12.7721L6.173 13.4664C6.03438 13.5942 5.85103 13.6637 5.66159 13.6604C5.47215 13.6571 5.2914 13.5812 5.15742 13.4487C5.02344 13.3162 4.9467 13.1374 4.94335 12.9501C4.94001 12.7627 5.01033 12.5814 5.1395 12.4443L5.8415 11.75L5.1395 11.0557C5.01033 10.9186 4.94001 10.7373 4.94335 10.5499C4.9467 10.3626 5.02344 10.1838 5.15742 10.0513C5.2914 9.91879 5.47215 9.84289 5.66159 9.83958C5.85103 9.83628 6.03438 9.90582 6.173 10.0336ZM11.5355 10.0336L12.2375 10.7279L12.9395 10.0336C13.0064 9.96252 13.0872 9.90552 13.1769 9.866C13.2666 9.82647 13.3634 9.80521 13.4616 9.8035C13.5598 9.80179 13.6573 9.81965 13.7484 9.85602C13.8394 9.8924 13.9221 9.94654 13.9916 10.0152C14.061 10.0839 14.1157 10.1657 14.1525 10.2557C14.1893 10.3458 14.2074 10.4423 14.2056 10.5394C14.2039 10.6365 14.1824 10.7322 14.1424 10.8209C14.1025 10.9097 14.0448 10.9895 13.973 11.0557L13.272 11.75L13.974 12.4424C14.1112 12.578 14.1882 12.762 14.1882 12.9539C14.1882 13.1458 14.1112 13.3298 13.974 13.4655C13.8368 13.6011 13.6507 13.6774 13.4567 13.6774C13.2627 13.6774 13.0767 13.6011 12.9395 13.4655L12.2375 12.7721L11.5355 13.4664C11.4686 13.5375 11.3878 13.5945 11.2981 13.634C11.2084 13.6735 11.1116 13.6948 11.0134 13.6965C10.9152 13.6982 10.8177 13.6803 10.7266 13.644C10.6356 13.6076 10.5529 13.5535 10.4834 13.4848C10.414 13.4161 10.3593 13.3343 10.3225 13.2443C10.2857 13.1542 10.2676 13.0577 10.2694 12.9606C10.2711 12.8635 10.2926 12.7678 10.3326 12.6791C10.3725 12.5903 10.4302 12.5105 10.502 12.4443L11.204 11.75L10.502 11.0557C10.3728 10.9186 10.3025 10.7373 10.3059 10.5499C10.3092 10.3626 10.3859 10.1838 10.5199 10.0513C10.6539 9.91879 10.8346 9.84289 11.0241 9.83958C11.2135 9.83628 11.3969 9.90582 11.5355 10.0336ZM15.4062 12.9554C15.4062 12.7635 15.4833 12.5796 15.6204 12.444C15.7576 12.3083 15.9436 12.2321 16.1375 12.2321H17.8438C18.0377 12.2321 18.2237 12.3083 18.3608 12.444C18.498 12.5796 18.575 12.7635 18.575 12.9554C18.575 13.1472 18.498 13.3311 18.3608 13.4667C18.2237 13.6024 18.0377 13.6786 17.8438 13.6786H16.1375C15.9436 13.6786 15.7576 13.6024 15.6204 13.4667C15.4833 13.3311 15.4062 13.1472 15.4062 12.9554Z" fill="#113D7B"/>
+                        </svg>
+                        <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                          <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Enter the code</div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <button 
-                  onClick={closeSignUpModal}
-                  style={{width:32, height:32, right:32, top:32, position:'absolute', background:'transparent', border:'none', cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center'}}
-                >
-                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
-                </button>
-                {/* BLANK CANVAS - Add your design content here */}
-              </div>
+                )}
+              <button 
+                onClick={closeSignUpModal}
+                style={{width:32, height:32, right:32, top:32, position:'absolute', background:'transparent', border:'none', cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center'}}
+              >
+                <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+              </button>
+              {/* BLANK CANVAS - Add your design content here */}
+            </div>
             )}
 
             {modalStep === 'emailVerification' && (
