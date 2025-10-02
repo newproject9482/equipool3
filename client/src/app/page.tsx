@@ -211,7 +211,7 @@ export default function Home() {
     }
     if (isAuthenticated && selectedRole === 'investor') {
       // User is authenticated as investor, show toast
-      showInfo("You're already logged in as an investor!");
+  showInfo("You\'re already logged in as an investor!");
       return;
     }
     // User is not authenticated, open signup modal for borrower
@@ -230,7 +230,7 @@ export default function Home() {
     }
     if (isAuthenticated && selectedRole === 'borrower') {
       // User is authenticated as borrower, show toast
-      showInfo("You're already logged in as a borrower!");
+  showInfo("You\'re already logged in as a borrower!");
       return;
     }
     // User is not authenticated, open signup modal for investor
@@ -2880,7 +2880,7 @@ export default function Home() {
                 <div style={{alignSelf:'stretch', paddingLeft:100, paddingRight:100, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
                   <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex', marginTop: 100}}>
                     <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>To start investing, please complete 2 steps.</div>
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We need to verify you're human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
+                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We need to verify you\'re human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
                   </div>
                   
                   {/* Flex container for the two cards with + symbol */}
@@ -2920,7 +2920,7 @@ export default function Home() {
                       </div>
                       <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 24}}>
                         <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Liveness check</div>
-                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you're a human</div>
+                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you\'re a human</div>
                       </div>
                     </div>
                     
@@ -2964,19 +2964,6 @@ export default function Home() {
                         <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Make a $5000 deposit or enter the invitation/promo code.</div>
                       </div>
                     </div>
-            {/* Deposit/Invitation blank container modal */}
-            {modalStep === 'depositOrInvitation' && (
-              <div style={{width:'100vw', height:'100vh', position:'fixed', top:0, left:0, background:'rgba(0,0,0,0.04)', zIndex:1000, display:'flex', justifyContent:'center', alignItems:'center'}}>
-                <div style={{background:'#fff', borderRadius:24, boxShadow:'0 2px 16px rgba(0,0,0,0.08)', padding:'2.5rem 3.5rem', minWidth:400, maxWidth:600, width:'100%', textAlign:'center', position:'relative', display:'flex', flexDirection:'column', alignItems:'center'}}>
-                  <button
-                    onClick={closeSignUpModal}
-                    style={{width:32, height:32, right:32, top:32, position:'absolute', background:'transparent', border:'none', cursor:'pointer', display:'flex', justifyContent:'center', alignItems:'center'}}>
-                    <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
-                  </button>
-                  {/* Blank container for Deposit/Invitation code step - design to be added later */}
-                </div>
-              </div>
-            )}
                   </div>
                 </div>
                 <button 
@@ -2986,6 +2973,39 @@ export default function Home() {
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
                 {/* BLANK CANVAS - Add your design content here */}
+              </div>
+            )}
+
+            {modalStep === 'depositOrInvitation' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Deposit / Invitation Code</div>
+
+                <div style={{alignSelf: 'stretch', paddingLeft: 100, paddingRight: 100, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, display: 'flex'}}>
+                  {/* Content area for deposit / invitation code - add fields or instructions here */}
+                  <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'transparent', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                    <input
+                      type="text"
+                      placeholder=""
+                      style={{
+                        flex: '1 1 0',
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        color: '#4A5565',
+                        fontSize: 14,
+                        fontFamily: 'var(--ep-font-avenir)',
+                        fontWeight: 500
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={closeSignUpModal}
+                  style={{width: 32, height: 32, right: 32, top: 32, position: 'absolute', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
+                </button>
               </div>
             )}
 
@@ -3097,12 +3117,9 @@ export default function Home() {
                 </div>
               </div>
             )}
-
-            // ...existing code...
           </div>
         </div>
       )}
-
       {/* Toaster */}
       <Toaster toasts={toasts} onRemoveToast={removeToast} />
 
