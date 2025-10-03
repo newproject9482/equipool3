@@ -20,7 +20,8 @@ export default function Home() {
     | 'livenessCheck'
     | 'emailVerification'
     | 'accountCreated'
-    | 'depositOrInvitation';
+    | 'depositOrInvitation'
+    | 'enterCode';
   const [modalStep, setModalStep] = useState<ModalStep>('roleSelection');
   const [selectedRole, setSelectedRole] = useState<'borrower' | 'investor' | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -100,6 +101,7 @@ export default function Home() {
   const [depositHover, setDepositHover] = useState(false);
   const [promoHover, setPromoHover] = useState(false);
   const [depositSelection, setDepositSelection] = useState<'deposit' | 'code' | null>(null);
+  const [inviteCode, setInviteCode] = useState('');
 
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 
                  'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1632,6 +1634,51 @@ export default function Home() {
               </div>
             )}
 
+            {modalStep === 'enterCode' && (
+              <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                <div style={{width: '100%', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Enter the Invitation/Promo code</div>
+
+                <div style={{height: 204}} />
+
+                <div style={{width: '100%', height: '100%', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
+                  <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Please enter the code</div>
+                </div>
+
+                <div style={{height: 8}} />
+
+                <div style={{width: '322px', height: 43, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                  <div data-righticon="false" data-state="focus" style={{width: '100%', height: '100%', paddingLeft: 12, paddingRight: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                    <input
+                      value={inviteCode}
+                      onChange={(e) => setInviteCode(e.target.value)}
+                      maxLength={64}
+                      placeholder="_ _ _ _ _ _ _"
+                      style={{flex: '1 1 0', background: 'transparent', border: 'none', outline: 'none', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', height: '100%'}}
+                    />
+                  </div>
+                </div>
+                <div style={{height: 206}} />
+
+                <div style={{width: 322, display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center'}}>
+                  <div data-icon="false" data-state="default" style={{width: 63, height: 39, paddingLeft: 0, paddingRight: 0, paddingTop: 0, paddingBottom: 0, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}>
+                    <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Back</div>
+                  </div>
+
+                  <div data-icon="false" data-state="inactive" style={{width: 121, height: 39, paddingLeft: 0, paddingRight: 0, paddingTop: 0, paddingBottom: 0, background: 'var(--Inactive-Blue, #B8C5D7)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}>
+                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                  </div>
+                </div>
+                <div style={{height: 10}} />
+
+                <div data-icon="true" data-state="secondary" style={{width: '322px', height: '100%', paddingTop: 8, paddingLeft: 16, paddingRight: 16, borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}>
+                  <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Skip for now</div>
+                  <div style={{width: 12, height: 13, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <Image src="/skip.svg" alt="skip" width={12} height={13} />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {modalStep === 'borrowerSignUp' && (
               <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
@@ -3008,7 +3055,7 @@ export default function Home() {
                         <div
                           onMouseEnter={() => setPromoHover(true)}
                           onMouseLeave={() => setPromoHover(false)}
-                          onClick={() => setDepositSelection('code')}
+                          onClick={() => { setDepositSelection('code'); setModalStep('enterCode'); }}
                           style={{width: '100%', height: '100%', padding: 24, background: 'var(--White, white)', borderRadius: 24, outline: '1px #E5E7EB solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex', cursor: 'pointer', boxShadow: (promoHover || depositSelection === 'code') ? '0 6px 30px rgba(0,0,0,0.12)' : undefined, transform: (promoHover || depositSelection === 'code') ? 'translateY(-2px)' : undefined, transition: 'box-shadow 120ms, transform 120ms'}}>
                           <Image src="/promo-code.svg" alt="Enter the code" width={24} height={24} />
                           <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
