@@ -173,8 +173,6 @@ export const InvestorForm: React.FC = () => {
   // Recompute investor errors when relevant state changes,
   // but only after the user has interacted or submit attempt happened.
   useEffect(() => {
-    // TODO: RESTORE VALIDATION - Validation temporarily disabled for design work
-    /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
     const map = computeInvestorErrorsByField();
     if (submitAttempted || showInvestorErrors) {
       // After submit attempt (or if explicitly enabled), show all errors
@@ -183,22 +181,11 @@ export const InvestorForm: React.FC = () => {
       // Before submit, keep the consolidated error list hidden
       setInvestorErrors([]);
     }
-    */
-    
-    // TEMPORARY: No errors for design work
-    setInvestorErrors([]);
   }, [form, acceptedTerms, showInvestorErrors, submitAttempted, emailAvailable]);
 
   // Field-level error helper (mirror borrower UX)
-  // TODO: RESTORE VALIDATION - Field error checking temporarily disabled
-  /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
   const errorsByField = computeInvestorErrorsByField();
   const fieldHasError = (field: InvestorField) => !!errorsByField[field] && (showInvestorErrors || touched[field] || submitAttempted);
-  */
-  
-  // TEMPORARY: No field errors for design work
-  const errorsByField = {};
-  const fieldHasError = (field: InvestorField) => false;
 
   // Re-evaluate ability to continue without forcing errors to display
   const investorCanContinue = (() => {
@@ -231,8 +218,6 @@ export const InvestorForm: React.FC = () => {
 
   // Debounced email availability check
   useEffect(() => {
-    // TODO: RESTORE BACKEND CONNECTION - Email availability check temporarily disabled
-    /* EMAIL AVAILABILITY CHECK TEMPORARILY DISABLED FOR DESIGN WORK
     let active = true;
     const email = form.email.trim();
     if (!isValidEmail(email)) { setEmailAvailable(null); return; }
@@ -252,18 +237,10 @@ export const InvestorForm: React.FC = () => {
       }
     }, 350);
     return () => { active = false; controller.abort(); clearTimeout(t); };
-    */
-    
-    // TEMPORARY: Always set email as available for design work
-    setEmailAvailable(true);
-    setCheckingEmail(false);
   }, [form.email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // TODO: RESTORE VALIDATION - Form validation temporarily disabled for design work
-    /* VALIDATION AND BACKEND CALL TEMPORARILY DISABLED FOR DESIGN WORK
     // On attempt to submit, if errors exist, show them and stop
     const map = computeInvestorErrorsByField();
     const allErrs = flattenErrors(map);
@@ -293,7 +270,7 @@ export const InvestorForm: React.FC = () => {
       });
       return;
     }
-    
+
     setSubmitAttempted(true);
     // Submit to backend
     try {
@@ -319,8 +296,11 @@ export const InvestorForm: React.FC = () => {
       });
       const data = await res.json().catch(()=>({}));
       if(!res.ok){
-        // Surface server error into form error area
-        const serverError = data.error || 'Signup failed';
+        // Surface server error into form error area with special handling for 409 Conflict
+        let serverError = data?.error || 'Signup failed';
+        if (res.status === 409) {
+          serverError = data?.error || 'An account with that email already exists. Please log in.';
+        }
         setInvestorErrors(prev => Array.from(new Set([...(prev||[]), serverError])));
         setShowInvestorErrors(true);
         alert(serverError);
@@ -336,12 +316,6 @@ export const InvestorForm: React.FC = () => {
       setShowInvestorErrors(true);
       alert(errorMessage);
     }
-    */
-    
-    // TEMPORARY: Simulate successful signup for design work
-    setSubmitAttempted(true);
-    alert('Investor account created! Welcome to EquiPool!');
-    router.push('/pools-investor');
   };
 
   return (

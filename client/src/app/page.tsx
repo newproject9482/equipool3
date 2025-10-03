@@ -495,7 +495,6 @@ export default function Home() {
 
   const handleSignUp = async () => {
     // TODO: RESTORE VALIDATION - On attempt to submit, if borrower step has errors, show them and stop
-    /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
     if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
       const map = computeBorrowerErrorsByField();
       const allErrs = flattenErrors(map);
@@ -517,10 +516,7 @@ export default function Home() {
         return;
       }
     }
-    */
     if(selectedRole === 'borrower') {
-      // TODO: RESTORE BACKEND CONNECTION - Simulate success for design work
-      /* BACKEND CALL TEMPORARILY DISABLED FOR DESIGN WORK
       try {
         // Construct full name from parts
         const fullNameParts = [formData.firstName, formData.middleName, formData.surname]
@@ -564,23 +560,11 @@ export default function Home() {
         const errorMessage = e instanceof Error ? e.message : 'Network error';
         alert(errorMessage);
       }
-      */
       
-      // TEMPORARY: Simulate successful signup for design work
-      setIsAuthenticated(true);
-      showSuccess('Account created successfully! Welcome to EquiPool!');
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('ep-auth','1');
-      }
-      setSelectedRole('borrower');
-      setModalStep('borrowerPhoneVerification');
-      return;
     }
 
     // Investor signup path
     if(selectedRole === 'investor') {
-      // TODO: RESTORE BACKEND CONNECTION - Simulate success for design work
-      /* BACKEND CALL TEMPORARILY DISABLED FOR DESIGN WORK
       try {
         // Compose fullName: for individual from parts, for company from fullName field
         const composedFullName = investorType === 'individual'
@@ -608,7 +592,11 @@ export default function Home() {
         });
         const data = await res.json().catch(()=>({}));
         if(!res.ok){
-          const msg = data.error || 'Signup failed';
+          // Prefer server-provided error, but give a clearer message for 409 Conflict
+          let msg = data?.error || 'Signup failed';
+          if (res.status === 409) {
+            msg = data?.error || 'An account with that email already exists. Please log in instead.';
+          }
           // Surface server error into form error area
           setInvestorErrors(prev => Array.from(new Set([...(prev||[]), msg])));
           setShowInvestorErrors(true);
@@ -630,76 +618,13 @@ export default function Home() {
         const errorMessage = e instanceof Error ? e.message : 'Network error';
         alert(errorMessage);
       }
-      */
       
-      // TEMPORARY: Simulate successful signup for design work
-      setIsAuthenticated(true);
-      showSuccess('Investor account created successfully! Welcome to EquiPool!');
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('ep-auth','1');
-      }
-      setSelectedRole('investor');
-      setModalStep('verifyContact');
-      return;
     }
   };
 
   const handleInvestorSignUp = async () => {
-    // TODO: RESTORE BACKEND CONNECTION - Simulate success for design work
-    /* BACKEND CALL TEMPORARILY DISABLED FOR DESIGN WORK
-    try {
-      const composedFullName = [formData.firstName, formData.middleName, formData.surname].map(s => (s||'').trim()).filter(Boolean).join(' ');
-      const payload = {
-        fullName: investorType === 'individual' ? composedFullName : (formData.fullName || '').trim(),
-        dateOfBirth: formData.dateOfBirth,
-        email: formData.email,
-        phone: formData.phone,
-        ssn: formData.ssn,
-        address1: formData.address1,
-        address2: formData.address2,
-        city: formData.city,
-        state: formData.state,
-        zip: formData.zip,
-        country: formData.country,
-        password: formData.password,
-      };
-      console.log('Sending investor signup payload:', payload);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/investors/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json().catch(()=>({}));
-      if(!res.ok){
-        showError(data.error || 'Signup failed');
-        return;
-      }
-      // On success mark authenticated and continue to verification
-      setSelectedRole('investor');
-      setIsAuthenticated(true);
-      showSuccess('Investor account created successfully! Welcome to EquiPool!');
-      // Persist simple flag (session cookie is real auth)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('ep-auth','1');
-        if (data?.token) localStorage.setItem('ep-auth-token', data.token);
-      }
-      // Investor flow: go to combined contact verification first
-      setModalStep('verifyContact');
-    } catch (e: unknown) {
-      const errorMessage = e instanceof Error ? e.message : 'Network error';
-      showError(errorMessage);
-    }
-    */
-    
-    // TEMPORARY: Simulate successful signup for design work
-    setSelectedRole('investor');
-    setIsAuthenticated(true);
-    showSuccess('Investor account created successfully! Welcome to EquiPool!');
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('ep-auth','1');
-    }
-    setModalStep('verifyContact');
+    // Delegate to the main signup handler so investor flow shares the same behavior
+    await handleSignUp();
   };
 
   const handleLogout = async () => {
@@ -743,45 +668,21 @@ export default function Home() {
 
   // Re-evaluate ability to continue without forcing errors to display
   const borrowerCanContinue = (() => {
-    // TODO: RESTORE VALIDATION - Basic form completeness check temporarily disabled
-    /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
+    // Basic form completeness check
     const map = computeBorrowerErrorsByField();
     return flattenErrors(map).length === 0;
-    */
-    
-    // TEMPORARY: Always allow continue for design work
-    return true;
   })();
 
   // TODO: RESTORE VALIDATION - Investor validation temporarily disabled
-  /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
   const investorCanContinue = computeInvestorErrors().length === 0;
-  */
-  
-  // TEMPORARY: Always allow continue for design work
-  const investorCanContinue = true;
 
   // Borrower field errors for UI highlighting
-  // TODO: RESTORE VALIDATION - Field error checking temporarily disabled
-  /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
   const borrowerErrorsByField = computeBorrowerErrorsByField();
   const fieldHasError = (field: BorrowerField) => !!borrowerErrorsByField[field] && (showBorrowerErrors || borrowerTouched[field] || borrowerSubmitAttempted);
-  */
-  
-  // TEMPORARY: No field errors for design work
-  const borrowerErrorsByField = {};
-  const fieldHasError = (field: BorrowerField) => false;
 
   // Investor field-level errors for UI highlighting
-  // TODO: RESTORE VALIDATION - Field error checking temporarily disabled
-  /* VALIDATION TEMPORARILY DISABLED FOR DESIGN WORK
   const investorErrorsByField = computeInvestorErrorsByField();
   const investorFieldHasError = (field: InvestorField) => !!investorErrorsByField[field] && (showInvestorErrors || investorTouched[field] || investorSubmitAttempted);
-  */
-  
-  // TEMPORARY: No field errors for design work
-  const investorErrorsByField = {};
-  const investorFieldHasError = (field: InvestorField) => false;
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const currentMonthIndex = months.indexOf(selectedMonth);
