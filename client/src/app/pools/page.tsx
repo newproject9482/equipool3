@@ -100,6 +100,10 @@ export default function PoolsPage() {
   const [otherPropertyLoans, setOtherPropertyLoans] = useState('');
   const [creditCardDebt, setCreditCardDebt] = useState('');
   const [monthlyDebtPayments, setMonthlyDebtPayments] = useState('');
+  const [liabilityType, setLiabilityType] = useState('');
+  const [liabilityAmount, setLiabilityAmount] = useState('');
+  const [liabilityMonthlyPayment, setLiabilityMonthlyPayment] = useState('');
+  const [liabilityRemainingBalance, setLiabilityRemainingBalance] = useState('');
 
   // Submitting state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1868,15 +1872,15 @@ export default function PoolsPage() {
                                       </div>
                                       <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                                           <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                          <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Amount</div>
+                                          <input type="text" value={liabilityAmount} onChange={(e) => setLiabilityAmount(e.target.value)} placeholder="Amount" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                                       </div>
                                       <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                                           <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                          <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Payment</div>
+                                          <input type="text" value={liabilityMonthlyPayment} onChange={(e) => setLiabilityMonthlyPayment(e.target.value)} placeholder="Monthly Payment" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                                       </div>
                                       <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                                           <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                          <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Remaining Balance (approx.)</div>
+                                          <input type="text" value={liabilityRemainingBalance} onChange={(e) => setLiabilityRemainingBalance(e.target.value)} placeholder="Remaining Balance (approx.)" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                                       </div>
                                   </div>
                                   <div style={{flex: '1 1 0', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
