@@ -94,6 +94,7 @@ export default function PoolsPage() {
   const [roiRate, setRoiRate] = useState('');
   const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
   const [customTermMonths, setCustomTermMonths] = useState('');
+  const [loanType, setLoanType] = useState(''); // 'interest-only' or 'maturity'
 
   // Step 5 - Liability & Credit Info state
   const [otherPropertyLoans, setOtherPropertyLoans] = useState('');
@@ -1525,7 +1526,7 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                            <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>e.g. 350 000</div>
+                            <input type="text" value={poolAmount} onChange={(e) => setPoolAmount(e.target.value)} placeholder="e.g. 350 000" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                         </div>
                     </div>
                     <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
@@ -1538,7 +1539,7 @@ export default function PoolsPage() {
                             </div>
                             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                                 <div style={{flex: '1 1 0', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                                    <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>%</div>
+                                    <input type="text" value={roiRate} onChange={(e) => setRoiRate(e.target.value)} placeholder="%" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                                 </div>
                                 <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 4, paddingBottom: 4, background: 'rgba(89.37, 59.38, 209.33, 0.16)', borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
                                     <div style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Recommended: 6% – 12%</div>
@@ -1602,7 +1603,7 @@ export default function PoolsPage() {
                         </div>
                         <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>or</div>
                         <div style={{flex: '1 1 0', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                            <div style={{color: '#B2B2B2', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Custom</div>
+                            <input type="text" value={customTermMonths} onChange={(e) => setCustomTermMonths(e.target.value)} placeholder="Custom" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                         </div>
                     </div>
                   </div>
