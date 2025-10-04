@@ -1300,8 +1300,8 @@ export default function PoolsPage() {
               <div style={{alignSelf: 'stretch', flex: '1 1 0', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex'}}>
                 <div 
                   style={{
-                    width: 300, 
-                    height: 280, 
+                    width: 277, 
+                    height: 256, 
                     padding: 32, 
                     background: 'white', 
                     borderRadius: 24, 
@@ -1321,7 +1321,7 @@ export default function PoolsPage() {
                   onClick={() => handlePoolTypeSelect('equity')}
                 >
                   <div style={{width: 48, height: 48, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                    <Image src="/window.svg" alt="Equity Pool icon" width={40} height={40} />
+                    <Image src="/mdi-house-edit.svg" alt="Equity Pool icon" width={40} height={40} />
                   </div>
                   <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                     <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity Pool</div>
@@ -1331,8 +1331,8 @@ export default function PoolsPage() {
                 </div>
                 <div 
                   style={{
-                    width: 300, 
-                    height: 280, 
+                    width: 277, 
+                    height: 256, 
                     padding: 32, 
                     background: 'white', 
                     borderRadius: 24, 
@@ -1352,7 +1352,7 @@ export default function PoolsPage() {
                   onClick={() => handlePoolTypeSelect('refinance')}
                 >
                   <div style={{width: 48, height: 48, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                    <Image src="/invest.svg" alt="Refinance Pool icon" width={40} height={40} />
+                    <Image src="/mdi-bank-plus.svg" alt="Refinance Pool icon" width={40} height={40} />
                   </div>
                   <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                     <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Refinance Pool</div>
