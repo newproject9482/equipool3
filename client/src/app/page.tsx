@@ -518,16 +518,13 @@ export default function Home() {
     }
     if(selectedRole === 'borrower') {
       try {
-        // Construct full name from parts
-        const fullNameParts = [formData.firstName, formData.middleName, formData.surname]
-          .map(s => (s || '').trim())
-          .filter(Boolean);
-        const fullName = fullNameParts.join(' ');
         const payload = {
-          fullName,
-            // Backend accepts YYYY-MM-DD; formData.dateOfBirth already stored as ISO string
-          dateOfBirth: formData.dateOfBirth,
+          firstName: formData.firstName.trim(),
+          middleName: formData.middleName.trim(),
+          lastName: formData.surname.trim(),
           email: formData.email,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
           password: formData.password,
         };
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/borrowers/signup`, {

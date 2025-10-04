@@ -10,7 +10,7 @@ from django.utils import timezone
 from .models import Borrower, Investor, Pool, AuthToken, Investment
 from django.contrib.auth.hashers import check_password
 
-REQUIRED_FIELDS = {"fullName", "email", "dateOfBirth", "password"}
+REQUIRED_FIELDS = {"firstName", "lastName", "email", "phone", "dateOfBirth", "password"}
 REQUIRED_INVESTOR_FIELDS = {"fullName", "email", "dateOfBirth", "phone", "ssn", "address1", "city", "state", "zip", "country", "password"}
 
 def _create_auth_token(user, role):
@@ -93,20 +93,35 @@ def borrower_signup(request: HttpRequest):
     if missing:
         return JsonResponse({"error": f"Missing fields: {', '.join(sorted(missing))}"}, status=400)
 
-    full_name = data.get("fullName", "").strip()
+    first_name = data.get("firstName", "").strip()
+    middle_name = data.get("middleName", "").strip()  # Optional
+    last_name = data.get("lastName", "").strip()
     email = data.get("email", "").lower().strip()
+    phone = data.get("phone", "").strip()
     dob_raw = data.get("dateOfBirth")
     password = data.get("password")
 
-    if not full_name:
-        return JsonResponse({"error": "Full name required"}, status=400)
-    # Require first and last name, only letters, spaces, hyphens and apostrophes; at least 2 words
-    name_parts = [p for p in full_name.split() if p]
-    if len(name_parts) < 2:
-        return JsonResponse({"error": "Please enter your full name (first and last)"}, status=400)
+    if not first_name:
+        return JsonResponse({"error": "First name required"}, status=400)
+    if not last_name:
+        return JsonResponse({"error": "Last name required"}, status=400)
+    if not phone:
+        return JsonResponse({"error": "Phone number required"}, status=400)
+    
+    # Validate name fields
     import re
-    if not re.fullmatch(r"[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}", full_name):
-        return JsonResponse({"error": "Name contains invalid characters"}, status=400)
+    name_pattern = r"[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{1,100}"
+    if not re.fullmatch(name_pattern, first_name):
+        return JsonResponse({"error": "First name contains invalid characters"}, status=400)
+    if not re.fullmatch(name_pattern, last_name):
+        return JsonResponse({"error": "Last name contains invalid characters"}, status=400)
+    if middle_name and not re.fullmatch(name_pattern, middle_name):
+        return JsonResponse({"error": "Middle name contains invalid characters"}, status=400)
+    
+    # Validate phone number (basic validation)
+    phone_pattern = r"[\d\-\+\(\)\s]{10,20}"
+    if not re.fullmatch(phone_pattern, phone):
+        return JsonResponse({"error": "Invalid phone number format"}, status=400)
     if not email or "@" not in email:
         return JsonResponse({"error": "Valid email required"}, status=400)
     if not password or len(password) < 8:
@@ -129,7 +144,14 @@ def borrower_signup(request: HttpRequest):
 
     try:
         with transaction.atomic():  # Ensure database transaction
-            b = Borrower(full_name=full_name, email=email, date_of_birth=dob)
+            b = Borrower(
+                first_name=first_name,
+                middle_name=middle_name,
+                last_name=last_name,
+                email=email,
+                phone=phone,
+                date_of_birth=dob
+            )
             b.set_password(password)
             b.save()
             
@@ -154,8 +176,12 @@ def borrower_signup(request: HttpRequest):
 
     return JsonResponse({
         "id": b.id,
-        "fullName": b.full_name,
+        "firstName": b.first_name,
+        "middleName": b.middle_name,
+        "lastName": b.last_name,
+        "fullName": b.full_name,  # Keep for compatibility
         "email": b.email,
+        "phone": b.phone,
         "dateOfBirth": b.date_of_birth.isoformat(),
         "createdAt": b.created_at.isoformat(),
         "role": "borrower",
@@ -235,13 +261,37 @@ def auth_me(request: HttpRequest):
     user, role = _get_user_from_request(request)
     
     if user and role:
-        return JsonResponse({
+        response_data = {
             'authenticated': True,
             'id': user.id,
-            'fullName': user.full_name,
             'email': user.email,
-            'role': role
-        })
+            'role': role,
+            'dateOfBirth': user.date_of_birth.isoformat() if user.date_of_birth else None
+        }
+        
+        # Add role-specific fields
+        if role == 'borrower':
+            response_data.update({
+                'firstName': user.first_name,
+                'middleName': user.middle_name,
+                'lastName': user.last_name,
+                'fullName': user.full_name,  # Keep for compatibility
+                'phone': user.phone
+            })
+        elif role == 'investor':
+            response_data.update({
+                'fullName': user.full_name,
+                'phone': user.phone,
+                'ssn': user.ssn,
+                'address1': user.address1,
+                'address2': user.address2,
+                'city': user.city,
+                'state': user.state,
+                'zipCode': user.zip_code,
+                'country': user.country
+            })
+        
+        return JsonResponse(response_data)
     
     return JsonResponse({'authenticated': False}, status=401)
 

@@ -4,14 +4,24 @@ from django.utils import timezone
 from datetime import timedelta
 
 class Borrower(models.Model):
-    full_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=100)
+    middle_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20)
     date_of_birth = models.DateField()
     password_hash = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def set_password(self, raw_password: str):
         self.password_hash = make_password(raw_password)
+
+    @property
+    def full_name(self):
+        """Helper property to get full name when needed"""
+        if self.middle_name:
+            return f"{self.first_name} {self.middle_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}"
 
     def __str__(self):
         return f"Borrower({self.email})"
