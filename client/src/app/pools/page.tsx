@@ -1804,6 +1804,84 @@ export default function PoolsPage() {
                         display: 'inline-flex',
                         cursor: 'pointer'
                       }}
+                      onClick={() => setCurrentStep(5)}
+                    >
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 5 && (
+                /* Liability & Credit Info Step */
+                <div style={{
+                  alignSelf: 'stretch', 
+                  flex: '1 1 0', 
+                  padding: '24px 32px', 
+                  flexDirection: 'column', 
+                  justifyContent: 'flex-start', 
+                  alignItems: 'flex-start', 
+                  gap: 24, 
+                  display: 'flex',
+                  overflow: 'auto'
+                }}>
+                  <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 32, display: 'flex'}}>
+                          <div style={{width: 658, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                              <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                                  <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Other existing liabilities</div>
+                                  <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                              </div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Give us a picture of your current financial obligations.</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Liability 1</div>
+                              <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                                  <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                                      <div data-righticon="true" data-state="dropdown closed" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
+                                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Select an option</div>
+                                          <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                                      </div>
+                                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                          <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Amount</div>
+                                      </div>
+                                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                          <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Payment</div>
+                                      </div>
+                                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                          <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Remaining Balance (approx.)</div>
+                                      </div>
+                                  </div>
+                                  <div style={{flex: '1 1 0', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                                      <div data-icon="true" data-state="Alternative" style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 52, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
+                                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
+                                          <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                              <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  {/* Continue Button */}
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 'auto'}}>
+                    <div 
+                      style={{
+                        paddingLeft: 24, 
+                        paddingRight: 24, 
+                        paddingTop: 12, 
+                        paddingBottom: 12, 
+                        background: '#113D7B', 
+                        borderRadius: 12, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 8, 
+                        display: 'inline-flex',
+                        cursor: 'pointer'
+                      }}
                       onClick={() => setCurrentStep(6)}
                     >
                       <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
@@ -1813,7 +1891,7 @@ export default function PoolsPage() {
               )}
 
               {currentStep === 6 && (
-                /* Review & Submit Step */
+                /* Liability & Credit Info Step */
                 <div style={{
                   alignSelf: 'stretch', 
                   flex: '1 1 0', 
@@ -1836,20 +1914,39 @@ export default function PoolsPage() {
                       gap: 8,
                       display: 'flex'
                     }}>
-                      <div style={{
-                        color: 'black',
-                        fontSize: 18,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '500',
-                        wordWrap: 'break-word'
-                      }}>Review your pool details</div>
-                      <div style={{
-                        color: '#767676',
-                        fontSize: 12,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '400',
-                        wordWrap: 'break-word'
-                      }}>Please review all information before submitting your pool request.</div>
+                      <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Other existing liabilities</div>
+                      <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                    </div>
+                    <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Give us a picture of your current financial obligations.</div>
+                    <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Liability 1</div>
+                    <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div data-righticon="true" data-state="dropdown closed" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
+                                <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Select an option</div>
+                                <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
+                            </div>
+                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Amount</div>
+                            </div>
+                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Payment</div>
+                            </div>
+                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Remaining Balance (approx.)</div>
+                            </div>
+                        </div>
+                        <div style={{flex: '1 1 0', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div data-icon="true" data-state="Alternative" style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 52, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
+                                <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                    <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     </div>
 
                     {/* Pool Type Summary */}
@@ -2059,51 +2156,32 @@ export default function PoolsPage() {
                           width: '100%',
                           display: 'flex'
                         }}>
-                          <div style={{
-                            color: '#6B7280',
-                            fontSize: 12,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '400',
-                            wordWrap: 'break-word'
-                          }}>Term:</div>
-                          <div style={{
-                            color: '#4B5563',
-                            fontSize: 12,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>{selectedTerm === 'custom' ? 'Custom' : `${selectedTerm} Months`}</div>
-                        </div>
                       </div>
                     </div>
-
                   </div>
                   
-                  {/* Submit Button */}
-                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 24}}>
+                  {/* Continue Button */}
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 'auto'}}>
                     <div 
                       style={{
                         paddingLeft: 24, 
                         paddingRight: 24, 
                         paddingTop: 12, 
                         paddingBottom: 12, 
-                        background: isSubmitting ? '#9CA3AF' : '#10B981', 
-                        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', 
+                        background: '#113D7B', 
                         borderRadius: 12, 
                         justifyContent: 'center', 
                         alignItems: 'center', 
                         gap: 8, 
                         display: 'inline-flex',
-                        cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                        opacity: isSubmitting ? 0.7 : 1
+                        cursor: 'pointer'
                       }}
                       onClick={() => {
-                        createPool();
+                        // For now, just show completion since there's no step 7
+                        alert('Pool creation flow completed!');
                       }}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
-                        {isSubmitting ? 'Creating Pool...' : 'Submit Pool Request'}
-                      </div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                     </div>
                   </div>
                 </div>
