@@ -83,6 +83,7 @@ export default function PoolsPage() {
   const [propertyAddressLine2, setPropertyAddressLine2] = useState('');
   const [propertyCity, setPropertyCity] = useState('');
   const [propertyZipCode, setPropertyZipCode] = useState('');
+  const [sameAsMailingAddress, setSameAsMailingAddress] = useState(false); // Track if property address same as mailing
   const [addressLine, setAddressLine] = useState('');
   const [state, setState] = useState('');
   const [percentOwned, setPercentOwned] = useState('');
@@ -433,6 +434,31 @@ export default function PoolsPage() {
       window.location.href = '/';
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  };
+
+  const handleSameAsMailingAddress = () => {
+    setSameAsMailingAddress(!sameAsMailingAddress);
+    
+    if (!sameAsMailingAddress) {
+      // Copy mailing address to property address
+      setPropertyAddressLine1(addressLine1);
+      setPropertyAddressLine2(addressLine2);
+      setPropertyCity(city);
+      setPropertyZipCode(zipCode);
+      // Also update the main address fields used for pool creation
+      setAddressLine(addressLine1);
+      setCity(city);
+      setZipCode(zipCode);
+    } else {
+      // Clear property address fields when unchecking
+      setPropertyAddressLine1('');
+      setPropertyAddressLine2('');
+      setPropertyCity('');
+      setPropertyZipCode('');
+      setAddressLine('');
+      setCity('');
+      setZipCode('');
     }
   };
 
@@ -1396,9 +1422,34 @@ export default function PoolsPage() {
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                       <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Address</div>
                     </div>
-                    <div style={{alignSelf: 'stretch', padding: 8, background: 'var(--White, white)', borderRadius: 8, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                    <div 
+                      style={{
+                        alignSelf: 'stretch', 
+                        padding: 8, 
+                        background: 'var(--White, white)', 
+                        borderRadius: 8, 
+                        outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+                        outlineOffset: '-1px', 
+                        justifyContent: 'flex-start', 
+                        alignItems: 'center', 
+                        gap: 8, 
+                        display: 'inline-flex',
+                        cursor: 'pointer'
+                      }}
+                      onClick={handleSameAsMailingAddress}
+                    >
                       <div style={{width: 20, height: 20, position: 'relative', overflow: 'hidden'}}>
-                        <div style={{width: 12.50, height: 12.50, left: 3.75, top: 3.75, position: 'absolute', outline: '1px var(--Grey, #767676) solid', outlineOffset: '-0.50px', borderRadius: '50%'}} />
+                        <div style={{
+                          width: 12.50, 
+                          height: 12.50, 
+                          left: 3.75, 
+                          top: 3.75, 
+                          position: 'absolute', 
+                          background: sameAsMailingAddress ? '#113D7B' : 'transparent',
+                          outline: `1px ${sameAsMailingAddress ? '#113D7B' : 'var(--Grey, #767676)'} solid`, 
+                          outlineOffset: '-0.50px', 
+                          borderRadius: '50%'
+                        }} />
                       </div>
                       <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 2, display: 'inline-flex'}}>
                         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
@@ -1412,19 +1463,48 @@ export default function PoolsPage() {
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={propertyAddressLine1} onChange={(e) => setPropertyAddressLine1(e.target.value)} placeholder="Address Line 1*" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                              <input 
+                                type="text" 
+                                value={propertyAddressLine1} 
+                                onChange={(e) => {
+                                  setPropertyAddressLine1(e.target.value);
+                                  setAddressLine(e.target.value);
+                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
+                                }} 
+                                placeholder="Address Line 1*" 
+                                style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                              />
                             </div>
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={propertyAddressLine2} onChange={(e) => setPropertyAddressLine2(e.target.value)} placeholder="Address Line 2" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                              <input 
+                                type="text" 
+                                value={propertyAddressLine2} 
+                                onChange={(e) => {
+                                  setPropertyAddressLine2(e.target.value);
+                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
+                                }} 
+                                placeholder="Address Line 2" 
+                                style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                              />
                             </div>
                           </div>
                         </div>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={propertyCity} onChange={(e) => setPropertyCity(e.target.value)} placeholder="City*" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                              <input 
+                                type="text" 
+                                value={propertyCity} 
+                                onChange={(e) => {
+                                  setPropertyCity(e.target.value);
+                                  setCity(e.target.value);
+                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
+                                }} 
+                                placeholder="City*" 
+                                style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                              />
                             </div>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
                               <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>California</div>
@@ -1432,7 +1512,17 @@ export default function PoolsPage() {
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={propertyZipCode} onChange={(e) => setPropertyZipCode(e.target.value)} placeholder="Zip Code*" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                              <input 
+                                type="text" 
+                                value={propertyZipCode} 
+                                onChange={(e) => {
+                                  setPropertyZipCode(e.target.value);
+                                  setZipCode(e.target.value);
+                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
+                                }} 
+                                placeholder="Zip Code*" 
+                                style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                              />
                             </div>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
                               <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>United States</div>
