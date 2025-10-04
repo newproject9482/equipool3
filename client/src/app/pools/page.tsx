@@ -381,7 +381,7 @@ export default function PoolsPage() {
     if (isAuthenticated) {
       fetchPools();
     }
-  }, [isAuthenticated, fetchPools]); // eslint-disable-line react-hooks/exhaustive-deps // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, fetchPools]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Function to create pool
   const createPool = async () => {
@@ -662,7 +662,7 @@ export default function PoolsPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [router]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [router]);
 
   const handleLogout = async () => {
     try {
