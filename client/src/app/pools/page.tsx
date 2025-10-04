@@ -76,6 +76,10 @@ export default function PoolsPage() {
   const [zipCode, setZipCode] = useState('');
 
   // Address form state
+  const [propertyAddressLine1, setPropertyAddressLine1] = useState('');
+  const [propertyAddressLine2, setPropertyAddressLine2] = useState('');
+  const [propertyCity, setPropertyCity] = useState('');
+  const [propertyZipCode, setPropertyZipCode] = useState('');
   const [addressLine, setAddressLine] = useState('');
   const [state, setState] = useState('');
   const [percentOwned, setPercentOwned] = useState('');
@@ -83,6 +87,9 @@ export default function PoolsPage() {
   const [propertyValue, setPropertyValue] = useState('');
   const [mortgageBalance, setMortgageBalance] = useState('');
   const [propertyLink, setPropertyLink] = useState('');
+  const [loanAmount, setLoanAmount] = useState('');
+  const [remainingBalance, setRemainingBalance] = useState('');
+  const [interestRate, setInterestRate] = useState('');
   const [poolAmount, setPoolAmount] = useState('');
   const [roiRate, setRoiRate] = useState('');
   const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
@@ -1316,19 +1323,19 @@ export default function PoolsPage() {
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Address Line 1*</div>
+                              <input type="text" value={propertyAddressLine1} onChange={(e) => setPropertyAddressLine1(e.target.value)} placeholder="Address Line 1*" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Address Line 2</div>
+                              <input type="text" value={propertyAddressLine2} onChange={(e) => setPropertyAddressLine2(e.target.value)} placeholder="Address Line 2" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                           </div>
                         </div>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>City*</div>
+                              <input type="text" value={propertyCity} onChange={(e) => setPropertyCity(e.target.value)} placeholder="City*" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
                               <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>California</div>
@@ -1336,7 +1343,7 @@ export default function PoolsPage() {
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Zip Code*</div>
+                              <input type="text" value={propertyZipCode} onChange={(e) => setPropertyZipCode(e.target.value)} placeholder="Zip Code*" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                             <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
                               <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>United States</div>
@@ -1401,7 +1408,8 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                             <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--White, white)', borderRadius: 10, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                                <div style={{width: 307, color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>% 100</div>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>%</div>
+                                <input type="text" value={percentOwned} onChange={(e) => setPercentOwned(e.target.value)} placeholder="100" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                         </div>
                     </div>
@@ -1417,7 +1425,7 @@ export default function PoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Provide your best estimate of the property's current <br/>market value. This helps us assess and underwrite your loan faster.</div>
                         <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                            <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>e.g. 100 000</div>
+                            <input type="text" value={propertyValue} onChange={(e) => setPropertyValue(e.target.value)} placeholder="e.g. 100 000" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                         </div>
                     </div>
                     <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
@@ -1427,7 +1435,7 @@ export default function PoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Add a listing link (e.g. Zillow, Redfin). If no valid link is provided, we may request an appraisal document in the next step.</div>
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>e.g. Zillow, Redfin etc.</div>
+                                <input type="text" value={propertyLink} onChange={(e) => setPropertyLink(e.target.value)} placeholder="e.g. Zillow, Redfin etc." style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                             <div data-icon="true" data-state="Alternative" style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 52, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'flex'}}>
                                 <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
@@ -1451,11 +1459,11 @@ export default function PoolsPage() {
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Loan amount</div>
+                                <input type="text" value={loanAmount} onChange={(e) => setLoanAmount(e.target.value)} placeholder="Loan amount" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                             <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Remaining Balance (approx.)</div>
+                                <input type="text" value={remainingBalance} onChange={(e) => setRemainingBalance(e.target.value)} placeholder="Remaining Balance (approx.)" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                         </div>
                         <div style={{flex: '1 1 0', height: 86, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
