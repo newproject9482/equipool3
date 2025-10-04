@@ -288,13 +288,13 @@ export default function Home() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const isValidName = (name: string) => {
-    if (!name) return false;
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length < 2) return false; // require first and last
-    // Allow letters incl. accents, spaces, hyphens and apostrophes
-    return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(name.trim());
-  };
+  // const isValidName = (name: string) => {
+  //   if (!name) return false;
+  //   const parts = name.trim().split(/\s+/).filter(Boolean);
+  //   if (parts.length < 2) return false; // require first and last
+  //   // Allow letters incl. accents, spaces, hyphens and apostrophes
+  //   return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,255}$/.test(name.trim());
+  // };
 
   // Name part validator (single field like first/surname)
   const isValidNamePart = (s: string) => {
@@ -476,7 +476,7 @@ export default function Home() {
         setBorrowerErrors([]);
       }
     }
-  }, [formData, acceptedTerms, selectedRole, modalStep, showBorrowerErrors, borrowerTouched, borrowerSubmitAttempted]);
+  }, [formData, acceptedTerms, selectedRole, modalStep, showBorrowerErrors, borrowerTouched, borrowerSubmitAttempted]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Recompute investor errors depending on touched vs submitAttempted
   useEffect(() => {
@@ -491,7 +491,7 @@ export default function Home() {
         setInvestorErrors([]);
       }
     }
-  }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors, investorTouched, investorSubmitAttempted, investorType]);
+  }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors, investorTouched, investorSubmitAttempted, investorType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSignUp = async () => {
     // TODO: RESTORE VALIDATION - On attempt to submit, if borrower step has errors, show them and stop
@@ -671,7 +671,7 @@ export default function Home() {
   })();
 
   // TODO: RESTORE VALIDATION - Investor validation temporarily disabled
-  const investorCanContinue = computeInvestorErrors().length === 0;
+  // const investorCanContinue = computeInvestorErrors().length === 0;
 
   // Borrower field errors for UI highlighting
   const borrowerErrorsByField = computeBorrowerErrorsByField();
@@ -2068,7 +2068,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn't receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn&apos;t receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
                       </div>
                     </div>
                     <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
@@ -2092,7 +2092,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn't receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn&apos;t receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
                       </div>
                     </div>
                     <div style={{textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>By signing up, you agree to our </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span></div>
@@ -2827,7 +2827,7 @@ export default function Home() {
                 <div style={{alignSelf:'stretch', paddingLeft:100, paddingRight:100, flexDirection:'column', justifyContent:'center', alignItems:'center', gap:16, display:'flex'}}>
                   <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex', marginTop: 100}}>
                     <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '700', wordWrap: 'break-word'}}>To start investing, please complete 2 steps.</div>
-                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We need to verify you\'re human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
+                    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We need to verify you&apos;re human, and a $5,000 deposit (or invitation/promo code) is required to start investing.</div>
                   </div>
                   
                   {/* Flex container for the two cards with + symbol */}
@@ -2867,7 +2867,7 @@ export default function Home() {
                       </div>
                       <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', marginTop: 24}}>
                         <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Liveness check</div>
-                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you\'re a human</div>
+                        <div style={{width: '100%', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>To verify that you&apos;re a human</div>
                       </div>
                     </div>
                     

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -181,7 +181,7 @@ export const InvestorForm: React.FC = () => {
       // Before submit, keep the consolidated error list hidden
       setInvestorErrors([]);
     }
-  }, [form, acceptedTerms, showInvestorErrors, submitAttempted, emailAvailable]);
+  }, [form, acceptedTerms, showInvestorErrors, submitAttempted, emailAvailable]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Field-level error helper (mirror borrower UX)
   const errorsByField = computeInvestorErrorsByField();

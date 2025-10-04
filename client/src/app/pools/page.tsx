@@ -34,7 +34,7 @@ export default function PoolsPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<'borrower' | 'investor' | null>(null);
-  const [userData, setUserData] = useState<any>(null); // Store authenticated user data
+  // const [userData, setUserData] = useState<{[key: string]: unknown} | null>(null); // Store authenticated user data
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showPoolTypeModal, setShowPoolTypeModal] = useState(false);
@@ -47,6 +47,10 @@ export default function PoolsPage() {
   const [selectedPoolType, setSelectedPoolType] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
   
+  // Hover states
+  const [equityHover, setEquityHover] = useState(false);
+  const [refinanceHover, setRefinanceHover] = useState(false);
+  
   // Review page toggle states
   const [expandedSections, setExpandedSections] = useState({
     personalInfo: true,
@@ -57,10 +61,6 @@ export default function PoolsPage() {
   });
   
   const { toasts, removeToast, showSuccess, showError } = useToaster();
-
-  // Hover states for pool type cards
-  const [equityHover, setEquityHover] = useState(false);
-  const [refinanceHover, setRefinanceHover] = useState(false);
 
 
 
@@ -253,16 +253,16 @@ export default function PoolsPage() {
   };
 
   const [state, setState] = useState('');
-  const [percentOwned, setPercentOwned] = useState('');
-  const [coOwner, setCoOwner] = useState('');
+  // const [percentOwned, setPercentOwned] = useState('');
+  // const [coOwner, setCoOwner] = useState('');
   const [propertyValue, setPropertyValue] = useState('');
   const [mortgageBalance, setMortgageBalance] = useState('');
   const [propertyLink, setPropertyLink] = useState('');
-  const [loanAmount, setLoanAmount] = useState('');
-  const [remainingBalance, setRemainingBalance] = useState('');
+  // const [loanAmount, setLoanAmount] = useState('');
+  // const [remainingBalance, setRemainingBalance] = useState('');
   const [propertyLinks, setPropertyLinks] = useState<string[]>([]);
   const [existingLoans, setExistingLoans] = useState([{ loanAmount: '', remainingBalance: '' }]);
-  const [interestRate, setInterestRate] = useState('');
+  // const [interestRate, setInterestRate] = useState('');
   const [poolAmount, setPoolAmount] = useState('');
   const [roiRate, setRoiRate] = useState('');
   const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
@@ -282,10 +282,10 @@ export default function PoolsPage() {
   ]);
   
   // Legacy state for backward compatibility
-  const [liabilityType, setLiabilityType] = useState('');
-  const [liabilityAmount, setLiabilityAmount] = useState('');
-  const [liabilityMonthlyPayment, setLiabilityMonthlyPayment] = useState('');
-  const [liabilityRemainingBalance, setLiabilityRemainingBalance] = useState('');
+  // const [liabilityType, setLiabilityType] = useState('');
+  // const [liabilityAmount, setLiabilityAmount] = useState('');
+  // const [liabilityMonthlyPayment, setLiabilityMonthlyPayment] = useState('');
+  // const [liabilityRemainingBalance, setLiabilityRemainingBalance] = useState('');
 
   // Submitting state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -381,7 +381,7 @@ export default function PoolsPage() {
     if (isAuthenticated) {
       fetchPools();
     }
-  }, [isAuthenticated, fetchPools]);
+  }, [isAuthenticated, fetchPools]); // eslint-disable-line react-hooks/exhaustive-deps // eslint-disable-line react-hooks/exhaustive-deps
 
   // Function to create pool
   const createPool = async () => {
@@ -444,9 +444,9 @@ export default function PoolsPage() {
         dateOfBirth: dateOfBirth,
         
         // Prior names (optional)
-        priorFirstName: priorFirstName,
-        priorMiddleName: priorMiddleName,
-        priorLastName: priorLastName,
+        // priorFirstName: priorFirstName,
+        // priorMiddleName: priorMiddleName,
+        // priorLastName: priorLastName,
         
         // Financial information
         ssn: ssn,
@@ -524,8 +524,8 @@ export default function PoolsPage() {
         setPrimaryAddressChoice('');
         setHasCoOwners(false);
         setCoOwners([{ firstName: '', middleName: '', lastName: '', percentage: '' }]);
-        setPercentOwned('');
-        setCoOwner('');
+        // setPercentOwned('');
+        // setCoOwner('');
         setPropertyValue('');
         setPropertyLink('');
         setPropertyLinks([]);
@@ -573,7 +573,7 @@ export default function PoolsPage() {
           if (!cancelled && data.authenticated) {
             setIsAuthenticated(true);
             setUserRole(data.role);
-            setUserData(data); // Store user data
+            // setUserData(data); // Store user data
             
             // Auto-fill form fields with user data
             console.log('[DEBUG] User data for auto-fill:', data);
@@ -662,7 +662,7 @@ export default function PoolsPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [router]);
+  }, [router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLogout = async () => {
     try {
@@ -1906,7 +1906,7 @@ export default function PoolsPage() {
                                   borderRadius: '50%'
                                 }} />
                             </div>
-                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It's vacant</div>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It&apos;s vacant</div>
                         </div>
                     </div>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
@@ -1940,7 +1940,7 @@ export default function PoolsPage() {
                                   borderRadius: '50%'
                                 }} />
                             </div>
-                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It's tenant-occupied</div>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It&apos;s tenant-occupied</div>
                         </div>
                         <div 
                           style={{
@@ -1972,7 +1972,7 @@ export default function PoolsPage() {
                                   borderRadius: '50%'
                                 }} />
                             </div>
-                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It's owner-occupied (not my primary home)</div>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It&apos;s owner-occupied (not my primary home)</div>
                         </div>
                     </div>
                   </div>
@@ -2129,7 +2129,7 @@ export default function PoolsPage() {
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property value</div>
                             <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                         </div>
-                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Provide your best estimate of the property's current <br/>market value. This helps us assess and underwrite your loan faster.</div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Provide your best estimate of the property&apos;s current <br/>market value. This helps us assess and underwrite your loan faster.</div>
                         <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
                             <input type="text" value={propertyValue} onChange={(e) => setPropertyValue(e.target.value)} placeholder="e.g. 100 000" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
@@ -3024,7 +3024,7 @@ export default function PoolsPage() {
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
                               <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Prior name</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{priorFirstName || priorMiddleName || priorLastName ? `${priorFirstName || ''} ${priorMiddleName || ''} ${priorLastName || ''}`.trim() : 'N/A'}</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{priorNames.length > 0 && priorNames[0].firstName ? `${priorNames[0].firstName} ${priorNames[0].middleName} ${priorNames[0].lastName}`.trim() : 'N/A'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
                               <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>SSN</div>
