@@ -198,6 +198,33 @@ export default function PoolsPage() {
     return '0';
   };
 
+  // Liability management functions
+  const liabilityTypes = [
+    'Credit Card Debt',
+    'Personal Loan',
+    'Auto Loan',
+    'Student Loan',
+    'Business Loan',
+    'Line of Credit',
+    'Other Debt'
+  ];
+
+  const addLiability = () => {
+    setLiabilities([...liabilities, { type: '', amount: '', monthlyPayment: '', remainingBalance: '' }]);
+  };
+
+  const removeLiability = (index) => {
+    if (liabilities.length > 1) {
+      setLiabilities(liabilities.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateLiability = (index, field, value) => {
+    const newLiabilities = [...liabilities];
+    newLiabilities[index] = { ...newLiabilities[index], [field]: value };
+    setLiabilities(newLiabilities);
+  };
+
   const [state, setState] = useState('');
   const [percentOwned, setPercentOwned] = useState('');
   const [coOwner, setCoOwner] = useState('');
@@ -223,6 +250,11 @@ export default function PoolsPage() {
   const [otherPropertyLoans, setOtherPropertyLoans] = useState('');
   const [creditCardDebt, setCreditCardDebt] = useState('');
   const [monthlyDebtPayments, setMonthlyDebtPayments] = useState('');
+  const [liabilities, setLiabilities] = useState([
+    { type: '', amount: '', monthlyPayment: '', remainingBalance: '' }
+  ]);
+  
+  // Legacy state for backward compatibility
   const [liabilityType, setLiabilityType] = useState('');
   const [liabilityAmount, setLiabilityAmount] = useState('');
   const [liabilityMonthlyPayment, setLiabilityMonthlyPayment] = useState('');
@@ -362,6 +394,9 @@ export default function PoolsPage() {
         otherPropertyLoans: otherPropertyLoans ? parseFloat(otherPropertyLoans.replace(/[,$]/g, '')) : null,
         creditCardDebt: creditCardDebt ? parseFloat(creditCardDebt.replace(/[,$]/g, '')) : null,
         monthlyDebtPayments: monthlyDebtPayments ? parseFloat(monthlyDebtPayments.replace(/[,$]/g, '')) : null,
+        
+        // Step 5 - Liabilities array
+        liabilities: liabilities.filter(liability => liability.type || liability.amount || liability.monthlyPayment || liability.remainingBalance),
         
         // Personal information
         firstName: firstName,
@@ -2628,45 +2663,134 @@ export default function PoolsPage() {
                   display: 'flex',
                   overflow: 'auto'
                 }}>
-                  <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
-                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 32, display: 'flex'}}>
-                          <div style={{width: 658, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                              <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                                  <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Other existing liabilities</div>
-                                  <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
-                              </div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Give us a picture of your current financial obligations.</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Liability 1</div>
-                              <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                                  <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                                      <div data-righticon="true" data-state="dropdown closed" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                                          <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Select an option</div>
-                                          <div data-icon="ic:arrowdown" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}} />
-                                      </div>
-                                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                                          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                          <input type="text" value={liabilityAmount} onChange={(e) => setLiabilityAmount(e.target.value)} placeholder="Amount" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
-                                      </div>
-                                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                                          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                          <input type="text" value={liabilityMonthlyPayment} onChange={(e) => setLiabilityMonthlyPayment(e.target.value)} placeholder="Monthly Payment" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
-                                      </div>
-                                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                                          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                          <input type="text" value={liabilityRemainingBalance} onChange={(e) => setLiabilityRemainingBalance(e.target.value)} placeholder="Remaining Balance (approx.)" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
-                                      </div>
-                                  </div>
-                                  <div style={{flex: '1 1 0', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                                      <div data-icon="true" data-state="Alternative" style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 52, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                                          <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
-                                          <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                              <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                    <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                      <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Other existing liabilities</div>
+                      <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                    </div>
+                    <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Give us a picture of your current financial obligations.</div>
+                    
+                    {/* Liabilities List */}
+                    {liabilities.map((liability, index) => (
+                      <div key={index} style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Liability {index + 1}</div>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            {/* Liability Type Dropdown */}
+                            <div style={{alignSelf: 'stretch', position: 'relative'}}>
+                              <select 
+                                value={liability.type} 
+                                onChange={(e) => updateLiability(index, 'type', e.target.value)}
+                                style={{
+                                  width: '100%',
+                                  height: 43, 
+                                  paddingLeft: 16, 
+                                  paddingRight: 16, 
+                                  paddingTop: 12, 
+                                  paddingBottom: 12, 
+                                  background: 'var(--Light-Grey, #F4F4F4)', 
+                                  borderRadius: 8, 
+                                  border: 'none',
+                                  outline: 'none',
+                                  color: liability.type ? 'var(--Black, black)' : '#B2B2B2',
+                                  fontSize: 14, 
+                                  fontFamily: 'var(--ep-font-avenir)', 
+                                  fontWeight: '500',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <option value="" disabled>Select an option</option>
+                                {liabilityTypes.map((type) => (
+                                  <option key={type} value={type}>{type}</option>
+                                ))}
+                              </select>
+                            </div>
+                            
+                            {/* Amount */}
+                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                              <input 
+                                type="text" 
+                                value={liability.amount} 
+                                onChange={(e) => updateLiability(index, 'amount', e.target.value)} 
+                                placeholder="Amount" 
+                                style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                              />
+                            </div>
+                            
+                            {/* Monthly Payment */}
+                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                              <input 
+                                type="text" 
+                                value={liability.monthlyPayment} 
+                                onChange={(e) => updateLiability(index, 'monthlyPayment', e.target.value)} 
+                                placeholder="Monthly Payment" 
+                                style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                              />
+                            </div>
+                            
+                            {/* Remaining Balance */}
+                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                              <input 
+                                type="text" 
+                                value={liability.remainingBalance} 
+                                onChange={(e) => updateLiability(index, 'remainingBalance', e.target.value)} 
+                                placeholder="Remaining Balance (approx.)" 
+                                style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                              />
+                            </div>
                           </div>
+                          
+                          {/* Add/Remove Buttons */}
+                          <div style={{flex: '0 0 auto', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div 
+                              onClick={addLiability}
+                              style={{
+                                paddingLeft: 20, 
+                                paddingRight: 20, 
+                                paddingTop: 12, 
+                                paddingBottom: 12, 
+                                background: 'var(--White, white)', 
+                                borderRadius: 52, 
+                                outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                gap: 4, 
+                                display: 'inline-flex',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
+                              <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                              </div>
+                            </div>
+                            {liabilities.length > 1 && (
+                              <div 
+                                onClick={() => removeLiability(index)}
+                                style={{
+                                  paddingLeft: 16, 
+                                  paddingRight: 16, 
+                                  paddingTop: 8, 
+                                  paddingBottom: 8, 
+                                  background: '#ff4444', 
+                                  borderRadius: 26, 
+                                  justifyContent: 'center', 
+                                  alignItems: 'center', 
+                                  gap: 4, 
+                                  display: 'inline-flex',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <div style={{color: 'white', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Remove</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                    ))}
                   </div>
                   
                   {/* Continue Button */}

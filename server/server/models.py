@@ -166,6 +166,7 @@ class Pool(models.Model):
     other_property_loans = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     credit_card_debt = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     monthly_debt_payments = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    liabilities = models.JSONField(default=list, blank=True, help_text="Array of liability objects with type, amount, monthlyPayment, remainingBalance")
     
     # Document uploads (we'll store file paths/URLs)
     home_insurance_doc = models.CharField(max_length=500, blank=True, null=True)

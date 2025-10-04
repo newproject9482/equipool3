@@ -677,6 +677,21 @@ def create_pool(request: HttpRequest):
     credit_card_debt = _safe_decimal(data.get('creditCardDebt'))
     monthly_debt_payments = _safe_decimal(data.get('monthlyDebtPayments'))
     
+    # Handle liabilities array
+    liabilities = data.get('liabilities', [])
+    processed_liabilities = []
+    for liability in liabilities:
+        if isinstance(liability, dict):
+            processed_liability = {
+                'type': liability.get('type', '').strip(),
+                'amount': liability.get('amount', '').strip(),
+                'monthlyPayment': liability.get('monthlyPayment', '').strip(),
+                'remainingBalance': liability.get('remainingBalance', '').strip()
+            }
+            # Only include if at least one field has data
+            if any(processed_liability.values()):
+                processed_liabilities.append(processed_liability)
+    
     try:
         pool = Pool.objects.create(
             borrower=borrower,
@@ -723,6 +738,7 @@ def create_pool(request: HttpRequest):
             other_property_loans=other_property_loans,
             credit_card_debt=credit_card_debt,
             monthly_debt_payments=monthly_debt_payments,
+            liabilities=processed_liabilities,
             status='active'  # Set as active when created
         )
         
