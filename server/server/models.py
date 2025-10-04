@@ -105,6 +105,32 @@ class Pool(models.Model):
     pool_type = models.CharField(max_length=20, choices=POOL_TYPE_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     
+    # Personal information (captured during pool creation)
+    # Name fields (current name)
+    first_name = models.CharField(max_length=100)
+    middle_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    date_of_birth = models.DateField()
+    
+    # Prior names (optional)
+    prior_first_name = models.CharField(max_length=100, blank=True)
+    prior_middle_name = models.CharField(max_length=100, blank=True)
+    prior_last_name = models.CharField(max_length=100, blank=True)
+    
+    # Financial information
+    ssn = models.CharField(max_length=11, help_text="Social Security Number for identity verification")
+    fico_score = models.PositiveIntegerField(blank=True, null=True, help_text="Credit score (optional)")
+    
+    # Mailing address
+    address_line_1 = models.CharField(max_length=255, help_text="Street address line 1")
+    address_line_2 = models.CharField(max_length=255, blank=True, help_text="Street address line 2 (optional)")
+    mailing_city = models.CharField(max_length=100, help_text="City")
+    mailing_state = models.CharField(max_length=50, help_text="State")
+    mailing_zip_code = models.CharField(max_length=10, help_text="ZIP code")
+    mailing_country = models.CharField(max_length=100, default='United States')
+    
     # Property information
     address_line = models.CharField(max_length=255)
     city = models.CharField(max_length=100)

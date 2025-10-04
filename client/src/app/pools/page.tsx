@@ -212,6 +212,7 @@ export default function PoolsPage() {
     
     try {
       const poolData = {
+        // Pool information
         poolType: selectedPoolType,
         addressLine: addressLine,
         city: city,
@@ -224,11 +225,35 @@ export default function PoolsPage() {
         mortgageBalance: mortgageBalance ? parseFloat(mortgageBalance.replace(/[,$]/g, '')) : null,
         amount: parseFloat(poolAmount.replace(/[,$]/g, '')) || 0,
         roiRate: parseFloat(roiRate) || 0,
-    term: selectedTerm,
-  customTermMonths: selectedTerm === 'custom' ? (parseInt(customTermMonths, 10) || null) : null,
-    otherPropertyLoans: otherPropertyLoans ? parseFloat(otherPropertyLoans.replace(/[,$]/g, '')) : null,
-    creditCardDebt: creditCardDebt ? parseFloat(creditCardDebt.replace(/[,$]/g, '')) : null,
-    monthlyDebtPayments: monthlyDebtPayments ? parseFloat(monthlyDebtPayments.replace(/[,$]/g, '')) : null
+        term: selectedTerm,
+        customTermMonths: selectedTerm === 'custom' ? (parseInt(customTermMonths, 10) || null) : null,
+        otherPropertyLoans: otherPropertyLoans ? parseFloat(otherPropertyLoans.replace(/[,$]/g, '')) : null,
+        creditCardDebt: creditCardDebt ? parseFloat(creditCardDebt.replace(/[,$]/g, '')) : null,
+        monthlyDebtPayments: monthlyDebtPayments ? parseFloat(monthlyDebtPayments.replace(/[,$]/g, '')) : null,
+        
+        // Personal information
+        firstName: firstName,
+        middleName: middleName,
+        lastName: lastName,
+        email: email,
+        phone: phoneNumber,
+        dateOfBirth: dateOfBirth,
+        
+        // Prior names (optional)
+        priorFirstName: priorFirstName,
+        priorMiddleName: priorMiddleName,
+        priorLastName: priorLastName,
+        
+        // Financial information
+        ssn: ssn,
+        ficoScore: ficoScore ? parseInt(ficoScore) : null,
+        
+        // Mailing address
+        addressLine1: addressLine1,
+        addressLine2: addressLine2,
+        mailingCity: city, // Using the same city for now, can be different if needed
+        mailingState: state, // Using the same state for now
+        mailingZipCode: zipCode // Using the same zip for now
       };
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';

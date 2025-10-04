@@ -517,7 +517,10 @@ def create_pool(request: HttpRequest):
     # Required fields validation
     required_fields = {
         'poolType', 'addressLine', 'city', 'state', 'zipCode', 
-        'percentOwned', 'amount', 'roiRate'
+        'percentOwned', 'amount', 'roiRate',
+        # Personal information fields
+        'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'ssn',
+        'addressLine1', 'mailingCity', 'mailingState', 'mailingZipCode'
     }
     missing = required_fields - set(data.keys())
     if missing:
@@ -535,6 +538,49 @@ def create_pool(request: HttpRequest):
     
     if not all([address_line, city, state, zip_code]):
         return JsonResponse({'error': 'Address information is required'}, status=400)
+    
+    # Extract and validate personal information
+    first_name = data.get('firstName', '').strip()
+    middle_name = data.get('middleName', '').strip()  # Optional
+    last_name = data.get('lastName', '').strip()
+    email = data.get('email', '').strip()
+    phone = data.get('phone', '').strip()
+    date_of_birth_str = data.get('dateOfBirth', '').strip()
+    ssn = data.get('ssn', '').strip()
+    
+    # Prior names (optional)
+    prior_first_name = data.get('priorFirstName', '').strip()
+    prior_middle_name = data.get('priorMiddleName', '').strip()
+    prior_last_name = data.get('priorLastName', '').strip()
+    
+    # FICO score (optional)
+    fico_score = data.get('ficoScore')
+    if fico_score:
+        try:
+            fico_score = int(fico_score)
+            if fico_score < 300 or fico_score > 850:
+                return JsonResponse({'error': 'FICO score must be between 300 and 850'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid FICO score'}, status=400)
+    else:
+        fico_score = None
+    
+    # Mailing address
+    address_line_1 = data.get('addressLine1', '').strip()
+    address_line_2 = data.get('addressLine2', '').strip()  # Optional
+    mailing_city = data.get('mailingCity', '').strip()
+    mailing_state = data.get('mailingState', '').strip()
+    mailing_zip_code = data.get('mailingZipCode', '').strip()
+    
+    # Validate required personal information
+    if not all([first_name, last_name, email, phone, date_of_birth_str, ssn, address_line_1, mailing_city, mailing_state, mailing_zip_code]):
+        return JsonResponse({'error': 'All personal information fields are required'}, status=400)
+    
+    # Parse date of birth
+    try:
+        date_of_birth = _parse_date(date_of_birth_str)
+    except ValidationError as e:
+        return JsonResponse({'error': f'Invalid date of birth: {str(e)}'}, status=400)
     
     # Convert and validate numeric fields
     percent_owned = _safe_decimal(data.get('percentOwned'))
@@ -579,6 +625,25 @@ def create_pool(request: HttpRequest):
         pool = Pool.objects.create(
             borrower=borrower,
             pool_type=pool_type,
+            # Personal information
+            first_name=first_name,
+            middle_name=middle_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+            date_of_birth=date_of_birth,
+            prior_first_name=prior_first_name,
+            prior_middle_name=prior_middle_name,
+            prior_last_name=prior_last_name,
+            ssn=ssn,
+            fico_score=fico_score,
+            # Mailing address
+            address_line_1=address_line_1,
+            address_line_2=address_line_2,
+            mailing_city=mailing_city,
+            mailing_state=mailing_state,
+            mailing_zip_code=mailing_zip_code,
+            # Property information
             address_line=address_line,
             city=city,
             state=state,
