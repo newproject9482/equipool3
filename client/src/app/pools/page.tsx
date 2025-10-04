@@ -47,6 +47,15 @@ export default function PoolsPage() {
   const [selectedPoolType, setSelectedPoolType] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
   
+  // Review page toggle states
+  const [expandedSections, setExpandedSections] = useState({
+    personalInfo: true,
+    propertyInfo: false,
+    poolTerms: false,
+    incomeFinancial: false,
+    liabilities: false
+  });
+  
   const { toasts, removeToast, showSuccess, showError } = useToaster();
 
   // Hover states for pool type cards
@@ -936,7 +945,7 @@ export default function PoolsPage() {
         >
           {/* Header */}
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px'}}>#{displayId}</div>
+            <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67}}>#{displayId}</div>
             <div style={{
               padding: '4px 10px',
               background: status.bgColor,
@@ -2819,20 +2828,321 @@ export default function PoolsPage() {
 
               {currentStep === 6 && (
                 /* Step 6 - Clean slate for new design */
-                <div style={{
-                  alignSelf: 'stretch', 
-                  flex: '1 1 0', 
-                  padding: '24px 32px', 
-                  flexDirection: 'column', 
-                  justifyContent: 'flex-start', 
-                  alignItems: 'flex-start', 
-                  gap: 24, 
-                  display: 'flex',
-                  overflow: 'auto'
-                }}>
-                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                (() => {
+                  // Calculate values for review section
+                  const calculatedLTV = (() => {
+                    const amount = parseFloat(poolAmount) || 0;
+                    const propValue = parseFloat(propertyValue) || 0;
+                    if (amount === 0 || propValue === 0) return 'N/A';
+                    return ((amount / propValue) * 100).toFixed(1);
+                  })();
+                  
+                  const calculatedRate = roiRate ? `${roiRate}` : 'N/A';
+                  
+                  const calculatedPayment = (() => {
+                    const amount = parseFloat(poolAmount) || 0;
+                    const roi = parseFloat(roiRate) || 0;
+                    if (amount === 0 || roi === 0) return 'N/A';
                     
-                    {/* New step 6 content will be added here */}
+                    if (loanType === 'interest-only') {
+                      return ((amount * roi / 100) / 12).toFixed(2);
+                    } else if (loanType === 'maturity') {
+                      return '0 (payment at maturity)';
+                    }
+                    return 'N/A';
+                  })();
+                  
+                  return (
+                    <div style={{
+                      alignSelf: 'stretch', 
+                      flex: '1 1 0', 
+                      padding: '24px 32px', 
+                      flexDirection: 'column', 
+                      justifyContent: 'flex-start', 
+                      alignItems: 'flex-start', 
+                      gap: 24, 
+                      display: 'flex',
+                      overflow: 'auto'
+                    }}>
+                      <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
+                        
+                        {/* Review Header */}
+                    <div style={{width: '100%', height: '100%', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 2, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Review Your Pool Details</div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Take a final look before submitting your request. You can edit any section if needed.</div>
+                      </div>
+                    </div>
+
+                    {/* Personal Info Section */}
+                    <div style={{width: '100%', height: '100%', padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+                          onClick={() => setExpandedSections({...expandedSections, personalInfo: !expandedSections.personalInfo})}
+                        >
+                          <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>1</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Personal Info</div>
+                          <div style={{transform: expandedSections.personalInfo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
+                        </div>
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+                          <div 
+                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            onClick={() => setCurrentStep(1)}
+                          >Edit</div>
+                        </div>
+                      </div>
+                      {expandedSections.personalInfo && (
+                        <>
+                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Name</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{`${firstName} ${middleName ? middleName + ' ' : ''}${lastName}`}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Date of birth</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{dateOfBirth}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Email</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{email}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Phone</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{phoneNumber}</div>
+                            </div>
+                          </div>
+                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Prior name</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{priorFirstName || priorMiddleName || priorLastName ? `${priorFirstName || ''} ${priorMiddleName || ''} ${priorLastName || ''}`.trim() : 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>SSN</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{ssn || 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Fico Score</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{ficoScore ? `${ficoScore}%` : 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Mailing Address</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{`${addressLine1}${addressLine2 ? ', ' + addressLine2 : ''}, ${city}, ${state}, ${zipCode}`}</div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Property Info Section */}
+                    <div style={{width: '100%', height: '100%', padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+                          onClick={() => setExpandedSections({...expandedSections, propertyInfo: !expandedSections.propertyInfo})}
+                        >
+                          <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>2</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Property Info</div>
+                          <div style={{transform: expandedSections.propertyInfo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
+                        </div>
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+                          <div 
+                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            onClick={() => setCurrentStep(2)}
+                          >Edit</div>
+                        </div>
+                      </div>
+                      {expandedSections.propertyInfo && (
+                        <>
+                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Property Address</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{`${propertyAddressLine1}${propertyAddressLine2 ? ', ' + propertyAddressLine2 : ''}, ${propertyCity}, ${propertyZipCode}`}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Primary Address</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{primaryAddressChoice === 'primary' ? 'Primary residence' : primaryAddressChoice === 'vacant' ? 'Vacant' : primaryAddressChoice === 'tenant' ? 'Tenant-occupied' : 'Owner-occupied'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Ownership %</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{calculateUserShare()}%</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Property Value</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${propertyValue || 'N/A'}</div>
+                            </div>
+                          </div>
+                          {existingLoans.length > 0 && (
+                            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                              <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Existing Loans</div>
+                                <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{existingLoans.length} loan(s) listed</div>
+                              </div>
+                              <div style={{flex: '3 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Property Links</div>
+                                <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{propertyLinks.length > 0 ? `${propertyLinks.length} link(s) provided` : 'No links provided'}</div>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    {/* Pool Terms Section */}
+                    <div style={{width: '100%', height: '100%', padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+                          onClick={() => setExpandedSections({...expandedSections, poolTerms: !expandedSections.poolTerms})}
+                        >
+                          <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>3</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Pool Terms</div>
+                          <div style={{transform: expandedSections.poolTerms ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
+                        </div>
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+                          <div 
+                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            onClick={() => setCurrentStep(3)}
+                          >Edit</div>
+                        </div>
+                      </div>
+                      {expandedSections.poolTerms && (
+                        <>
+                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Loan Type</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{loanType === 'bridge' ? 'Bridge Loan' : loanType === 'rental' ? 'Rental DSCR' : loanType === 'fix-flip' ? 'Fix & Flip' : 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Term</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{termMonths ? `${termMonths} months` : 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Funding Amount</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${poolAmount || 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>LTV Ratio</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{calculatedLTV}%</div>
+                            </div>
+                          </div>
+                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Interest Rate</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{calculatedRate}%</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Payment</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${calculatedPayment}</div>
+                            </div>
+                            <div style={{flex: '2 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Renovation Cost</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{'N/A'}</div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Income & Financial Section */}
+                    <div style={{width: '100%', height: '100%', padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+                          onClick={() => setExpandedSections({...expandedSections, incomeFinancial: !expandedSections.incomeFinancial})}
+                        >
+                          <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>4</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Income & Financial</div>
+                          <div style={{transform: expandedSections.incomeFinancial ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
+                        </div>
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+                          <div 
+                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            onClick={() => setCurrentStep(4)}
+                          >Edit</div>
+                        </div>
+                      </div>
+                      {expandedSections.incomeFinancial && (
+                        <>
+                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Income</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Credit Score</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{ficoScore || 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Other Property Loans</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${otherPropertyLoans || 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Credit Card Debt</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${creditCardDebt || 'N/A'}</div>
+                            </div>
+                          </div>
+                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Debt Payments</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${monthlyDebtPayments || 'N/A'}</div>
+                            </div>
+                            <div style={{flex: '3 1 0'}}></div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Liabilities Section */}
+                    <div style={{width: '100%', height: '100%', padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                        <div 
+                          style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
+                          onClick={() => setExpandedSections({...expandedSections, liabilities: !expandedSections.liabilities})}
+                        >
+                          <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>5</div>
+                          </div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Liabilities</div>
+                          <div style={{transform: expandedSections.liabilities ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
+                        </div>
+                        <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+                          <div 
+                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            onClick={() => setCurrentStep(5)}
+                          >Edit</div>
+                        </div>
+                      </div>
+                      {expandedSections.liabilities && (
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Liabilities Listed</div>
+                            <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{liabilities.length > 0 ? `${liabilities.length} liability(ies)` : 'No liabilities listed'}</div>
+                          </div>
+                          {liabilities.length > 0 && (
+                            <div style={{flex: '3 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Details</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>
+                                {liabilities.map((liability, index) => liability.type && (
+                                  <div key={index} style={{marginBottom: '4px'}}>
+                                    {liability.type}: ${liability.amount || '0'} (${liability.monthlyPayment || '0'}/month)
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
                   </div>
                   
                   {/* Continue Button */}
@@ -2860,6 +3170,8 @@ export default function PoolsPage() {
                     </div>
                   </div>
                 </div>
+                );
+              })()
               )}
             </div>
           </div>
