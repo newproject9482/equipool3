@@ -84,7 +84,41 @@ export default function PoolsPage() {
   const [propertyCity, setPropertyCity] = useState('');
   const [propertyZipCode, setPropertyZipCode] = useState('');
   const [sameAsMailingAddress, setSameAsMailingAddress] = useState(false); // Track if property address same as mailing
+  const [primaryAddressChoice, setPrimaryAddressChoice] = useState(''); // Track primary address selection
+  const [hasCoOwners, setHasCoOwners] = useState(false);
+  const [coOwners, setCoOwners] = useState([{ firstName: '', middleName: '', lastName: '', percentage: '' }]);
   const [addressLine, setAddressLine] = useState('');
+
+  // Calculate user's share based on co-owners' percentages
+  const calculateUserShare = () => {
+    if (!hasCoOwners) return '100';
+    const totalCoOwnerShare = coOwners.reduce((sum, owner) => {
+      const percentage = parseFloat(owner.percentage) || 0;
+      return sum + percentage;
+    }, 0);
+    const userShare = Math.max(0, 100 - totalCoOwnerShare);
+    return userShare.toString();
+  };
+
+  // Add new co-owner
+  const addCoOwner = () => {
+    setCoOwners([...coOwners, { firstName: '', middleName: '', lastName: '', percentage: '' }]);
+  };
+
+  // Remove co-owner
+  const removeCoOwner = (index) => {
+    if (coOwners.length > 1) {
+      const newCoOwners = coOwners.filter((_, i) => i !== index);
+      setCoOwners(newCoOwners);
+    }
+  };
+
+  // Update co-owner data
+  const updateCoOwner = (index, field, value) => {
+    const newCoOwners = [...coOwners];
+    newCoOwners[index] = { ...newCoOwners[index], [field]: value };
+    setCoOwners(newCoOwners);
+  };
   const [state, setState] = useState('');
   const [percentOwned, setPercentOwned] = useState('');
   const [coOwner, setCoOwner] = useState('');
@@ -1540,29 +1574,133 @@ export default function PoolsPage() {
                     </div>
                     <div style={{color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Tell us how the property is occupied. This helps us assess your loan profile accurately.</div>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                        <div style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          style={{
+                            flex: '1 1 0', 
+                            paddingLeft: 16, 
+                            paddingRight: 16, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'flex-start', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setPrimaryAddressChoice('primary')}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: primaryAddressChoice === 'primary' ? '#113D7B' : 'transparent',
+                                  outline: `1px ${primaryAddressChoice === 'primary' ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>I live here as my primary residence</div>
                         </div>
-                        <div style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          style={{
+                            flex: '1 1 0', 
+                            paddingLeft: 16, 
+                            paddingRight: 16, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'flex-start', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setPrimaryAddressChoice('vacant')}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: primaryAddressChoice === 'vacant' ? '#113D7B' : 'transparent',
+                                  outline: `1px ${primaryAddressChoice === 'vacant' ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It's vacant</div>
                         </div>
                     </div>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                        <div style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          style={{
+                            flex: '1 1 0', 
+                            paddingLeft: 16, 
+                            paddingRight: 16, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'flex-start', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setPrimaryAddressChoice('tenant')}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: primaryAddressChoice === 'tenant' ? '#113D7B' : 'transparent',
+                                  outline: `1px ${primaryAddressChoice === 'tenant' ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It's tenant-occupied</div>
                         </div>
-                        <div style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          style={{
+                            flex: '1 1 0', 
+                            paddingLeft: 16, 
+                            paddingRight: 16, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'flex-start', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setPrimaryAddressChoice('owner-occupied')}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: primaryAddressChoice === 'owner-occupied' ? '#113D7B' : 'transparent',
+                                  outline: `1px ${primaryAddressChoice === 'owner-occupied' ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>It's owner-occupied (not my primary home)</div>
                         </div>
@@ -1574,9 +1712,33 @@ export default function PoolsPage() {
                     <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Co - Owner(s)</div>
-                            <div style={{padding: 2, background: 'var(--Stroke-Grey, #E5E7EB)', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'center', gap: 2, display: 'flex'}}>
-                                <div style={{width: 18, height: 18, background: '#113D7B', borderRadius: 9999}} />
-                                <div style={{width: 18, height: 18, borderRadius: 9999}} />
+                            <div 
+                              style={{
+                                padding: 2, 
+                                background: 'var(--Stroke-Grey, #E5E7EB)', 
+                                borderRadius: 30, 
+                                justifyContent: 'flex-start', 
+                                alignItems: 'center', 
+                                gap: 2, 
+                                display: 'flex',
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => setHasCoOwners(!hasCoOwners)}
+                            >
+                                <div style={{
+                                  width: 18, 
+                                  height: 18, 
+                                  background: hasCoOwners ? '#113D7B' : 'transparent', 
+                                  borderRadius: 9999,
+                                  transition: 'all 0.2s ease'
+                                }} />
+                                <div style={{
+                                  width: 18, 
+                                  height: 18, 
+                                  background: !hasCoOwners ? '#113D7B' : 'transparent', 
+                                  borderRadius: 9999,
+                                  transition: 'all 0.2s ease'
+                                }} />
                             </div>
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>If you own less than 100% of the property, please list any co-owners.</div>
@@ -1588,11 +1750,109 @@ export default function PoolsPage() {
                         <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                             <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--White, white)', borderRadius: 10, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>%</div>
-                                <input type="text" value={percentOwned} onChange={(e) => setPercentOwned(e.target.value)} placeholder="100" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                                <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{calculateUserShare()}</div>
                             </div>
                         </div>
                     </div>
                   </div>
+
+                  {/* Co-Owner Details (shown when toggle is on) */}
+                  {hasCoOwners && (
+                    <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+                      {coOwners.map((coOwner, index) => (
+                        <div key={index} style={{width: '100%', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Co Owner {index + 1}</div>
+                              <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                                  <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                                      <input 
+                                        type="text" 
+                                        value={coOwner.firstName} 
+                                        onChange={(e) => updateCoOwner(index, 'firstName', e.target.value)}
+                                        placeholder="First name"
+                                        style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}}
+                                      />
+                                  </div>
+                                  <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                                      <input 
+                                        type="text" 
+                                        value={coOwner.middleName} 
+                                        onChange={(e) => updateCoOwner(index, 'middleName', e.target.value)}
+                                        placeholder="Middle name"
+                                        style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}}
+                                      />
+                                  </div>
+                              </div>
+                              <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                                  <input 
+                                    type="text" 
+                                    value={coOwner.lastName} 
+                                    onChange={(e) => updateCoOwner(index, 'lastName', e.target.value)}
+                                    placeholder="Last name"
+                                    style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}}
+                                  />
+                              </div>
+                              <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                  <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>%</div>
+                                  <input 
+                                    type="text" 
+                                    value={coOwner.percentage} 
+                                    onChange={(e) => updateCoOwner(index, 'percentage', e.target.value)}
+                                    placeholder="Ownership %"
+                                    style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}}
+                                  />
+                              </div>
+                          </div>
+                          <div style={{flex: '0 0 auto', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                              <div 
+                                onClick={addCoOwner}
+                                data-icon="true" 
+                                data-state="Alternative" 
+                                style={{
+                                  paddingLeft: 20, 
+                                  paddingRight: 20, 
+                                  paddingTop: 12, 
+                                  paddingBottom: 12, 
+                                  background: 'var(--White, white)', 
+                                  borderRadius: 52, 
+                                  outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+                                  justifyContent: 'center', 
+                                  alignItems: 'center', 
+                                  gap: 4, 
+                                  display: 'inline-flex',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                  <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
+                                  <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                      <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                                  </div>
+                              </div>
+                              {coOwners.length > 1 && (
+                                <div 
+                                  onClick={() => removeCoOwner(index)}
+                                  style={{
+                                    paddingLeft: 16, 
+                                    paddingRight: 16, 
+                                    paddingTop: 8, 
+                                    paddingBottom: 8, 
+                                    background: '#ff4444', 
+                                    borderRadius: 26, 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: 4, 
+                                    display: 'inline-flex',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                    <div style={{color: 'white', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Remove</div>
+                                </div>
+                              )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Property Value and Link Section */}
                   <div style={{width: '100%', height: '100%', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex'}}>
