@@ -56,6 +56,12 @@ export default function PoolsPage() {
 
 
 
+  // Personal info form state
+  const [firstName, setFirstName] = useState('Vahe');
+  const [middleName, setMiddleName] = useState('Zakari');
+  const [lastName, setLastName] = useState('Petrosyan');
+  const [email, setEmail] = useState('email@email.com');
+
   // Address form state
   const [addressLine, setAddressLine] = useState('');
   const [city, setCity] = useState('');
@@ -1022,7 +1028,7 @@ export default function PoolsPage() {
         >
           <div 
             style={{
-              width: 658,
+              width: 750,
               height: 592,
               backgroundColor: 'white',
               borderRadius: 24,
@@ -1103,15 +1109,15 @@ export default function PoolsPage() {
                       <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Vahe</div>
+                            <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Zakari</div>
+                            <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                              <input type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                           </div>
-                          <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
-                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Petrosyan</div>
+                          <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+                            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                           </div>
                           <div data-righticon="true" data-state="dropdown closed" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>11/09/2002</div>
@@ -1121,8 +1127,8 @@ export default function PoolsPage() {
                           </div>
                         </div>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                          <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
-                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>email@email.com</div>
+                          <div data-righticon="false" data-state="default" style={{width: 325, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                           </div>
                           <div data-righticon="false" data-state="phoneNumber" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
                             <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
