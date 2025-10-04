@@ -125,7 +125,7 @@ class Pool(models.Model):
     prior_last_name = models.CharField(max_length=100, blank=True)
     
     # Financial information
-    ssn = models.CharField(max_length=11, help_text="Social Security Number for identity verification")
+    ssn = models.CharField(max_length=15, help_text="Social Security Number for identity verification")
     fico_score = models.PositiveIntegerField(blank=True, null=True, help_text="Credit score (optional)")
     
     # Mailing address
@@ -184,13 +184,6 @@ class Pool(models.Model):
         # Calculate funding progress percentage
         # This would be calculated based on investments received
         return 0
-    
-    @property
-    def term_months(self):
-        """Get the term in months"""
-        if self.term == 'custom':
-            return self.custom_term_months or 12
-        return int(self.term)
     
     def __str__(self):
         return f"Pool({self.id}) - {self.pool_type} - ${self.amount} - {self.borrower.email}"

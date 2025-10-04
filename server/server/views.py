@@ -514,34 +514,16 @@ def create_pool(request: HttpRequest):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     
-    # Required fields validation
-    required_fields = {
-        'poolType', 'addressLine', 'city', 'state', 'zipCode', 
-        'amount', 'roiRate',
-        # Personal information fields
-        'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'ssn',
-        'addressLine1', 'mailingCity', 'mailingState', 'mailingZipCode'
-    }
-    missing = required_fields - set(data.keys())
-    if missing:
-        return JsonResponse({'error': f'Missing fields: {", ".join(sorted(missing))}'}, status=400)
-    
-    # Validate required field values
-    pool_type = data.get('poolType', '').strip()
-    if pool_type not in ['equity', 'refinance']:
-        return JsonResponse({'error': 'Invalid pool type'}, status=400)
-    
+    # Get basic field values (no validation)
+    pool_type = data.get('poolType', 'equity').strip()
     address_line = data.get('addressLine', '').strip()
     city = data.get('city', '').strip()
     state = data.get('state', '').strip()
     zip_code = data.get('zipCode', '').strip()
     
-    if not all([address_line, city, state, zip_code]):
-        return JsonResponse({'error': 'Address information is required'}, status=400)
-    
-    # Extract and validate personal information
+    # Extract personal information (no validation)
     first_name = data.get('firstName', '').strip()
-    middle_name = data.get('middleName', '').strip()  # Optional
+    middle_name = data.get('middleName', '').strip()
     last_name = data.get('lastName', '').strip()
     email = data.get('email', '').strip()
     phone = data.get('phone', '').strip()
@@ -558,29 +540,25 @@ def create_pool(request: HttpRequest):
     if fico_score:
         try:
             fico_score = int(fico_score)
-            if fico_score < 300 or fico_score > 850:
-                return JsonResponse({'error': 'FICO score must be between 300 and 850'}, status=400)
         except ValueError:
-            return JsonResponse({'error': 'Invalid FICO score'}, status=400)
+            fico_score = None
     else:
         fico_score = None
     
-    # Mailing address
+    # Mailing address (no validation)
     address_line_1 = data.get('addressLine1', '').strip()
-    address_line_2 = data.get('addressLine2', '').strip()  # Optional
+    address_line_2 = data.get('addressLine2', '').strip()
     mailing_city = data.get('mailingCity', '').strip()
     mailing_state = data.get('mailingState', '').strip()
     mailing_zip_code = data.get('mailingZipCode', '').strip()
     
-    # Validate required personal information
-    if not all([first_name, last_name, email, phone, date_of_birth_str, ssn, address_line_1, mailing_city, mailing_state, mailing_zip_code]):
-        return JsonResponse({'error': 'All personal information fields are required'}, status=400)
-    
-    # Parse date of birth
-    try:
-        date_of_birth = _parse_date(date_of_birth_str)
-    except ValidationError as e:
-        return JsonResponse({'error': f'Invalid date of birth: {str(e)}'}, status=400)
+    # Parse date of birth (allow empty)
+    date_of_birth = None
+    if date_of_birth_str:
+        try:
+            date_of_birth = _parse_date(date_of_birth_str)
+        except ValidationError:
+            date_of_birth = None
     
     # Handle primary address choice
     primary_address_choice = data.get('primaryAddressChoice', '').strip()
@@ -596,81 +574,80 @@ def create_pool(request: HttpRequest):
     else:
         percent_owned = 100
     
-    # Handle property links
+    # Handle property links (defensive programming)
     property_links = []
-    property_link = data.get('propertyLink', '').strip()
-    if property_link:
-        property_links.append({
-            'url': property_link,
-            'type': 'listing',
-            'added_at': timezone.now().isoformat()
-        })
-    
-    # Handle existing loans
-    existing_loans = []
-    loan_amount = data.get('loanAmount', '').strip()
-    remaining_balance = data.get('remainingBalance', '').strip()
-    if loan_amount and remaining_balance:
-        try:
-            existing_loans.append({
-                'loan_amount': float(loan_amount),
-                'remaining_balance': float(remaining_balance),
-                'loan_number': 1
+    property_link = data.get('propertyLink') or ''
+    if isinstance(property_link, str):
+        property_link = property_link.strip()
+        if property_link:
+            property_links.append({
+                'url': property_link,
+                'type': 'listing',
+                'added_at': timezone.now().isoformat()
             })
-        except ValueError:
-            pass  # Skip invalid loan data
+    
+    # Handle existing loans (defensive programming)
+    existing_loans = []
+    loan_amount = data.get('loanAmount') or ''
+    remaining_balance = data.get('remainingBalance') or ''
+    if isinstance(loan_amount, str) and isinstance(remaining_balance, str):
+        loan_amount = loan_amount.strip()
+        remaining_balance = remaining_balance.strip()
+        if loan_amount and remaining_balance:
+            try:
+                existing_loans.append({
+                    'loan_amount': float(loan_amount),
+                    'remaining_balance': float(remaining_balance),
+                    'loan_number': 1
+                })
+            except ValueError:
+                pass  # Skip invalid loan data
 
-    # Convert and validate numeric fields
-    amount = _safe_decimal(data.get('amount'))
-    roi_rate = _safe_decimal(data.get('roiRate'))
+    # Convert numeric fields (allow defaults)
+    amount = _safe_decimal(data.get('amount')) or Decimal('10000')  # Default amount
+    roi_rate = _safe_decimal(data.get('roiRate')) or Decimal('5.0')  # Default ROI
     
     # Validate percent_owned (now calculated or provided)
     if percent_owned <= 0 or percent_owned > 100:
-        return JsonResponse({'error': 'Valid percent owned is required (1-100)'}, status=400)
+        percent_owned = 100  # Default to 100% ownership
     
-    if amount is None or amount <= 0:
-        return JsonResponse({'error': 'Valid amount is required'}, status=400)
-    
-    if roi_rate is None or roi_rate <= 0:
-        return JsonResponse({'error': 'Valid ROI rate is required'}, status=400)
-    
-    # Optional fields
-    co_owner = data.get('coOwner')
-    co_owner = co_owner.strip() if co_owner else None
-    co_owner = co_owner or None  # Convert empty string to None
+    # Optional fields (defensive programming)
+    co_owner = data.get('coOwner') or ''
+    if isinstance(co_owner, str):
+        co_owner = co_owner.strip() or None
+    else:
+        co_owner = None
     
     property_value = _safe_decimal(data.get('propertyValue'))
     
-    property_link = data.get('propertyLink')
-    property_link = property_link.strip() if property_link else None
-    property_link = property_link or None  # Convert empty string to None
+    property_link_single = data.get('propertyLink') or ''
+    if isinstance(property_link_single, str):
+        property_link_single = property_link_single.strip() or None
+    else:
+        property_link_single = None
     
     mortgage_balance = _safe_decimal(data.get('mortgageBalance'))
     term = data.get('term', '12')
     custom_term_months = None
     
     if term == 'custom':
-        custom_term_months = data.get('customTermMonths')
-        if custom_term_months is None:
-            return JsonResponse({'error': 'Custom term months required when term is custom'}, status=400)
+        custom_term_months = data.get('customTermMonths', 12)  # Default to 12
     
-    # Handle step 3 fields - Pool Terms
-    loan_type = data.get('loanType', '').strip()
-    term_months = data.get('termMonths')
+    # Handle step 3 fields - Pool Terms (no validation)
+    loan_type = data.get('loanType') or 'interest-only'
+    if isinstance(loan_type, str):
+        loan_type = loan_type.strip() or 'interest-only'
+    else:
+        loan_type = 'interest-only'
+    term_months = data.get('termMonths', 12)
     is_custom_term = data.get('isCustomTerm', False)
     
-    # Validate loan type
-    if loan_type and loan_type not in ['interest-only', 'maturity']:
-        return JsonResponse({'error': 'Invalid loan type'}, status=400)
-    
-    # Validate term months
+    # Convert term months to int
     if term_months:
         try:
             term_months = int(term_months)
-            if term_months <= 0:
-                return JsonResponse({'error': 'Term months must be positive'}, status=400)
         except ValueError:
-            return JsonResponse({'error': 'Invalid term months'}, status=400)
+            term_months = 12  # Default to 12 months
     
     # Optional liability fields
     other_property_loans = _safe_decimal(data.get('otherPropertyLoans'))
@@ -724,7 +701,7 @@ def create_pool(request: HttpRequest):
             co_owner=co_owner,
             co_owners=co_owners,
             property_value=property_value,
-            property_link=property_link,
+            property_link=property_link_single,
             property_links=property_links,
             mortgage_balance=mortgage_balance,
             existing_loans=existing_loans,

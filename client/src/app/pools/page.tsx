@@ -52,7 +52,7 @@ export default function PoolsPage() {
     personalInfo: true,
     propertyInfo: false,
     poolTerms: false,
-    incomeFinancial: false,
+    documentsPhotos: false,
     liabilities: false
   });
   
@@ -115,7 +115,7 @@ export default function PoolsPage() {
   };
 
   // Remove co-owner
-  const removeCoOwner = (index) => {
+  const removeCoOwner = (index: number) => {
     if (coOwners.length > 1) {
       const newCoOwners = coOwners.filter((_, i) => i !== index);
       setCoOwners(newCoOwners);
@@ -123,7 +123,7 @@ export default function PoolsPage() {
   };
 
   // Update co-owner data
-  const updateCoOwner = (index, field, value) => {
+  const updateCoOwner = (index: number, field: string, value: string) => {
     const newCoOwners = [...coOwners];
     newCoOwners[index] = { ...newCoOwners[index], [field]: value };
     setCoOwners(newCoOwners);
@@ -138,7 +138,7 @@ export default function PoolsPage() {
   };
 
   // Remove property link
-  const removePropertyLink = (index) => {
+  const removePropertyLink = (index: number) => {
     setPropertyLinks(propertyLinks.filter((_, i) => i !== index));
   };
 
@@ -148,27 +148,27 @@ export default function PoolsPage() {
   };
 
   // Remove existing loan
-  const removeExistingLoan = (index) => {
+  const removeExistingLoan = (index: number) => {
     if (existingLoans.length > 1) {
       setExistingLoans(existingLoans.filter((_, i) => i !== index));
     }
   };
 
   // Update existing loan
-  const updateExistingLoan = (index, field, value) => {
+  const updateExistingLoan = (index: number, field: string, value: string) => {
     const newLoans = [...existingLoans];
     newLoans[index] = { ...newLoans[index], [field]: value };
     setExistingLoans(newLoans);
   };
 
   // Term selection functions
-  const selectTerm = (months) => {
+  const selectTerm = (months: string) => {
     setTermMonths(months);
     setIsCustomTerm(false);
     setCustomTermMonths('');
   };
 
-  const handleCustomTermChange = (value) => {
+  const handleCustomTermChange = (value: string) => {
     setCustomTermMonths(value);
     if (value.trim()) {
       setTermMonths(value);
@@ -222,13 +222,13 @@ export default function PoolsPage() {
     setLiabilities([...liabilities, { type: '', amount: '', monthlyPayment: '', remainingBalance: '' }]);
   };
 
-  const removeLiability = (index) => {
+  const removeLiability = (index: number) => {
     if (liabilities.length > 1) {
       setLiabilities(liabilities.filter((_, i) => i !== index));
     }
   };
 
-  const updateLiability = (index, field, value) => {
+  const updateLiability = (index: number, field: string, value: string) => {
     const newLiabilities = [...liabilities];
     newLiabilities[index] = { ...newLiabilities[index], [field]: value };
     setLiabilities(newLiabilities);
@@ -242,7 +242,7 @@ export default function PoolsPage() {
   const [propertyLink, setPropertyLink] = useState('');
   const [loanAmount, setLoanAmount] = useState('');
   const [remainingBalance, setRemainingBalance] = useState('');
-  const [propertyLinks, setPropertyLinks] = useState([]);
+  const [propertyLinks, setPropertyLinks] = useState<string[]>([]);
   const [existingLoans, setExistingLoans] = useState([{ loanAmount: '', remainingBalance: '' }]);
   const [interestRate, setInterestRate] = useState('');
   const [poolAmount, setPoolAmount] = useState('');
@@ -372,13 +372,23 @@ export default function PoolsPage() {
     setIsSubmitting(true);
     
     try {
+      // Debug: Log all address-related values before creating poolData
+      console.log('[DEBUG] Address values before poolData creation:');
+      console.log('propertyAddressLine1:', propertyAddressLine1);
+      console.log('addressLine:', addressLine);
+      console.log('propertyCity:', propertyCity);
+      console.log('city:', city);
+      console.log('state:', state);
+      console.log('sameAsMailingAddress:', sameAsMailingAddress);
+      console.log('addressLine1:', addressLine1);
+      
       const poolData = {
         // Pool information
         poolType: selectedPoolType,
-        addressLine: propertyAddressLine1 || addressLine,
-        city: propertyCity || city,
-        state: state,
-        zipCode: propertyZipCode || zipCode,
+        addressLine: propertyAddressLine1 || addressLine || '',
+        city: propertyCity || city || '',
+        state: state || 'California', // Default to California as shown in UI
+        zipCode: propertyZipCode || zipCode || '',
         primaryAddressChoice: primaryAddressChoice,
         hasCoOwners: hasCoOwners,
         coOwners: coOwners,
@@ -436,7 +446,36 @@ export default function PoolsPage() {
       const createPoolUrl = `${backendUrl}/api/pools/create`;
       
       console.log('[DEBUG] Creating pool with URL:', createPoolUrl);
-      console.log('[DEBUG] Pool data:', poolData);
+      console.log('[DEBUG] Personal info validation:', {
+        firstName: firstName?.trim(),
+        lastName: lastName?.trim(),
+        email: email?.trim(),
+        phoneNumber: phoneNumber?.trim(),
+        dateOfBirth: dateOfBirth?.trim(),
+        ssn: ssn?.trim() ? '***' : 'missing' // Mask SSN for security
+      });
+      console.log('[DEBUG] Address field values check:', {
+        propertyAddressLine1,
+        addressLine,
+        propertyCity,
+        city,
+        state,
+        propertyZipCode,
+        zipCode,
+        finalValues: {
+          addressLine: propertyAddressLine1 || addressLine || '',
+          city: propertyCity || city || '',
+          state: state || 'California',
+          zipCode: propertyZipCode || zipCode || ''
+        }
+      });
+      console.log('[DEBUG] Mailing address validation:', {
+        addressLine1: addressLine1?.trim(),
+        city: city?.trim(),
+        state: state?.trim(),
+        zipCode: zipCode?.trim()
+      });
+      console.log('[DEBUG] Pool data being sent:', poolData);
       console.log('[DEBUG] Authentication status:', isAuthenticated);
 
       const response = await fetch(createPoolUrl, getAuthenticatedFetchOptions({
@@ -485,7 +524,9 @@ export default function PoolsPage() {
         // Refresh the pools list
         await fetchPools();
       } else {
-        showError(result.error || 'Failed to create pool. Please try again.');
+        console.error('[DEBUG] Pool creation failed:', result);
+        const errorMsg = result.error || result.message || 'Failed to create pool. Please try again.';
+        showError(`Pool creation failed: ${errorMsg}`);
       }
     } catch (error) {
       console.error('Error creating pool:', error);
@@ -2869,8 +2910,8 @@ export default function PoolsPage() {
                         {/* Review Header */}
                     <div style={{width: '100%', height: '100%', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 2, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Review Your Pool Details</div>
-                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Take a final look before submitting your request. You can edit any section if needed.</div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Review Your Pool Details</div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Take a final look before submitting your request. You can edit any section if needed.</div>
                       </div>
                     </div>
 
@@ -2882,14 +2923,14 @@ export default function PoolsPage() {
                           onClick={() => setExpandedSections({...expandedSections, personalInfo: !expandedSections.personalInfo})}
                         >
                           <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>1</div>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>1</div>
                           </div>
-                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Personal Info</div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Personal Info</div>
                           <div style={{transform: expandedSections.personalInfo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
                         </div>
                         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
                           <div 
-                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
                             onClick={() => setCurrentStep(1)}
                           >Edit</div>
                         </div>
@@ -2898,38 +2939,38 @@ export default function PoolsPage() {
                         <>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Name</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{`${firstName} ${middleName ? middleName + ' ' : ''}${lastName}`}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Name</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{`${firstName} ${middleName ? middleName + ' ' : ''}${lastName}`}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Date of birth</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{dateOfBirth}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Date of birth</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{dateOfBirth}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Email</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{email}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Email</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{email}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Phone</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{phoneNumber}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Phone</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{phoneNumber}</div>
                             </div>
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Prior name</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{priorFirstName || priorMiddleName || priorLastName ? `${priorFirstName || ''} ${priorMiddleName || ''} ${priorLastName || ''}`.trim() : 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Prior name</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{priorFirstName || priorMiddleName || priorLastName ? `${priorFirstName || ''} ${priorMiddleName || ''} ${priorLastName || ''}`.trim() : 'N/A'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>SSN</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{ssn || 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>SSN</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{ssn || 'N/A'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Fico Score</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{ficoScore ? `${ficoScore}%` : 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Fico Score</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{ficoScore ? `${ficoScore}%` : 'N/A'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Mailing Address</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{`${addressLine1}${addressLine2 ? ', ' + addressLine2 : ''}, ${city}, ${state}, ${zipCode}`}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Mailing Address</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{`${addressLine1}${addressLine2 ? ', ' + addressLine2 : ''}, ${city}, ${state}, ${zipCode}`}</div>
                             </div>
                           </div>
                         </>
@@ -2944,14 +2985,14 @@ export default function PoolsPage() {
                           onClick={() => setExpandedSections({...expandedSections, propertyInfo: !expandedSections.propertyInfo})}
                         >
                           <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>2</div>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>2</div>
                           </div>
-                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Property Info</div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Property Info</div>
                           <div style={{transform: expandedSections.propertyInfo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
                         </div>
                         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
                           <div 
-                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
                             onClick={() => setCurrentStep(2)}
                           >Edit</div>
                         </div>
@@ -2960,31 +3001,31 @@ export default function PoolsPage() {
                         <>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Property Address</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{`${propertyAddressLine1}${propertyAddressLine2 ? ', ' + propertyAddressLine2 : ''}, ${propertyCity}, ${propertyZipCode}`}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property Address</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{`${propertyAddressLine1}${propertyAddressLine2 ? ', ' + propertyAddressLine2 : ''}, ${propertyCity}, ${propertyZipCode}`}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Primary Address</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{primaryAddressChoice === 'primary' ? 'Primary residence' : primaryAddressChoice === 'vacant' ? 'Vacant' : primaryAddressChoice === 'tenant' ? 'Tenant-occupied' : 'Owner-occupied'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Primary Address</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{primaryAddressChoice === 'primary' ? 'Primary residence' : primaryAddressChoice === 'vacant' ? 'Vacant' : primaryAddressChoice === 'tenant' ? 'Tenant-occupied' : 'Owner-occupied'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Ownership %</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{calculateUserShare()}%</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Ownership %</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{calculateUserShare()}%</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Property Value</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${propertyValue || 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property Value</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>${propertyValue || 'N/A'}</div>
                             </div>
                           </div>
                           {existingLoans.length > 0 && (
                             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                               <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Existing Loans</div>
-                                <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{existingLoans.length} loan(s) listed</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Existing Loans</div>
+                                <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{existingLoans.length} loan(s) listed</div>
                               </div>
                               <div style={{flex: '3 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Property Links</div>
-                                <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{propertyLinks.length > 0 ? `${propertyLinks.length} link(s) provided` : 'No links provided'}</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property Links</div>
+                                <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{propertyLinks.length > 0 ? `${propertyLinks.length} link(s) provided` : 'No links provided'}</div>
                               </div>
                             </div>
                           )}
@@ -3000,14 +3041,14 @@ export default function PoolsPage() {
                           onClick={() => setExpandedSections({...expandedSections, poolTerms: !expandedSections.poolTerms})}
                         >
                           <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>3</div>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>3</div>
                           </div>
-                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Pool Terms</div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Pool Terms</div>
                           <div style={{transform: expandedSections.poolTerms ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
                         </div>
                         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
                           <div 
-                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
                             onClick={() => setCurrentStep(3)}
                           >Edit</div>
                         </div>
@@ -3016,86 +3057,94 @@ export default function PoolsPage() {
                         <>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Loan Type</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{loanType === 'bridge' ? 'Bridge Loan' : loanType === 'rental' ? 'Rental DSCR' : loanType === 'fix-flip' ? 'Fix & Flip' : 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Loan Type</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{loanType === 'bridge' ? 'Bridge Loan' : loanType === 'rental' ? 'Rental DSCR' : loanType === 'fix-flip' ? 'Fix & Flip' : 'N/A'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Term</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{termMonths ? `${termMonths} months` : 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Term</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{termMonths ? `${termMonths} months` : 'N/A'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Funding Amount</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${poolAmount || 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Funding Amount</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>${poolAmount || 'N/A'}</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>LTV Ratio</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{calculatedLTV}%</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>LTV Ratio</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{calculatedLTV}%</div>
                             </div>
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Interest Rate</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{calculatedRate}%</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Interest Rate</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{calculatedRate}%</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Payment</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${calculatedPayment}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Payment</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>${calculatedPayment}</div>
                             </div>
                             <div style={{flex: '2 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Renovation Cost</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Renovation Cost</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{'N/A'}</div>
                             </div>
                           </div>
                         </>
                       )}
                     </div>
 
-                    {/* Income & Financial Section */}
+                    {/* Photos & Documents Section */}
                     <div style={{width: '100%', height: '100%', padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 12, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
                       <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                         <div 
                           style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}
-                          onClick={() => setExpandedSections({...expandedSections, incomeFinancial: !expandedSections.incomeFinancial})}
+                          onClick={() => setExpandedSections({...expandedSections, documentsPhotos: !expandedSections.documentsPhotos})}
                         >
                           <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>4</div>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>4</div>
                           </div>
-                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Income & Financial</div>
-                          <div style={{transform: expandedSections.incomeFinancial ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Photos & Documents</div>
+                          <div style={{transform: expandedSections.documentsPhotos ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
                         </div>
                         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
                           <div 
-                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
                             onClick={() => setCurrentStep(4)}
                           >Edit</div>
                         </div>
                       </div>
-                      {expandedSections.incomeFinancial && (
+                      {expandedSections.documentsPhotos && (
                         <>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Income</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Government ID</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Not uploaded</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Credit Score</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{ficoScore || 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Appraisal Report</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Not uploaded</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Other Property Loans</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${otherPropertyLoans || 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Home Insurance</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Not uploaded</div>
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Credit Card Debt</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${creditCardDebt || 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Tax Return</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Not uploaded</div>
                             </div>
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Monthly Debt Payments</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>${monthlyDebtPayments || 'N/A'}</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Mortgage Statement</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Not uploaded</div>
                             </div>
-                            <div style={{flex: '3 1 0'}}></div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Title Deed</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Not uploaded</div>
+                            </div>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property Photos</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>0 photos</div>
+                            </div>
+                            <div style={{flex: '1 1 0'}}></div>
                           </div>
                         </>
                       )}
@@ -3109,14 +3158,14 @@ export default function PoolsPage() {
                           onClick={() => setExpandedSections({...expandedSections, liabilities: !expandedSections.liabilities})}
                         >
                           <div style={{width: 16, height: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 50, outline: '1px var(--Success, #248326) solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>5</div>
+                            <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>5</div>
                           </div>
-                          <div style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Liabilities</div>
+                          <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Liabilities</div>
                           <div style={{transform: expandedSections.liabilities ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>▼</div>
                         </div>
                         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
                           <div 
-                            style={{color: 'black', fontSize: 12, fontFamily: 'Avenir', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
+                            style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}
                             onClick={() => setCurrentStep(5)}
                           >Edit</div>
                         </div>
@@ -3124,13 +3173,13 @@ export default function PoolsPage() {
                       {expandedSections.liabilities && (
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Liabilities Listed</div>
-                            <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>{liabilities.length > 0 ? `${liabilities.length} liability(ies)` : 'No liabilities listed'}</div>
+                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Liabilities Listed</div>
+                            <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{liabilities.length > 0 ? `${liabilities.length} liability(ies)` : 'No liabilities listed'}</div>
                           </div>
                           {liabilities.length > 0 && (
                             <div style={{flex: '3 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
-                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>Details</div>
-                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'Avenir', fontWeight: '500', wordWrap: 'break-word'}}>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Details</div>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
                                 {liabilities.map((liability, index) => liability.type && (
                                   <div key={index} style={{marginBottom: '4px'}}>
                                     {liability.type}: ${liability.amount || '0'} (${liability.monthlyPayment || '0'}/month)
@@ -3165,7 +3214,7 @@ export default function PoolsPage() {
                       onClick={createPool}
                     >
                       <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
-                        {isSubmitting ? 'Creating Pool...' : 'Create Pool'}
+                        {isSubmitting ? 'Submitting Pool Request...' : 'Submit Pool Request'}
                       </div>
                     </div>
                   </div>
