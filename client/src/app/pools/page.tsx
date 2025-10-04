@@ -151,6 +151,53 @@ export default function PoolsPage() {
     newLoans[index] = { ...newLoans[index], [field]: value };
     setExistingLoans(newLoans);
   };
+
+  // Term selection functions
+  const selectTerm = (months) => {
+    setTermMonths(months);
+    setIsCustomTerm(false);
+    setCustomTermMonths('');
+  };
+
+  const handleCustomTermChange = (value) => {
+    setCustomTermMonths(value);
+    if (value.trim()) {
+      setTermMonths(value);
+      setIsCustomTerm(true);
+    } else {
+      setIsCustomTerm(false);
+    }
+  };
+
+  // Calculator functions
+  const calculateMonthlyInterest = () => {
+    const amount = parseFloat(poolAmount) || 0;
+    const roi = parseFloat(roiRate) || 0;
+    if (amount === 0 || roi === 0) return '0';
+    return ((amount * roi / 100) / 12).toFixed(2);
+  };
+
+  const calculateFinalRepayment = () => {
+    const amount = parseFloat(poolAmount) || 0;
+    const roi = parseFloat(roiRate) || 0;
+    const term = parseFloat(isCustomTerm ? customTermMonths : termMonths) || 12;
+    
+    if (amount === 0 || roi === 0) return '0';
+    
+    if (loanType === 'interest-only') {
+      // Interest-only: monthly interest payments + full principal at end
+      const monthlyInterest = (amount * roi / 100) / 12;
+      const totalInterest = monthlyInterest * term;
+      return (amount + totalInterest).toFixed(2);
+    } else if (loanType === 'maturity') {
+      // Maturity: no payments during term, principal + full interest at end
+      const totalInterest = (amount * roi / 100) * (term / 12);
+      return (amount + totalInterest).toFixed(2);
+    }
+    
+    return '0';
+  };
+
   const [state, setState] = useState('');
   const [percentOwned, setPercentOwned] = useState('');
   const [coOwner, setCoOwner] = useState('');
@@ -166,8 +213,12 @@ export default function PoolsPage() {
   const [roiRate, setRoiRate] = useState('');
   const [selectedTerm, setSelectedTerm] = useState('12'); // Default to 12 months
   const [customTermMonths, setCustomTermMonths] = useState('');
-  const [loanType, setLoanType] = useState(''); // 'interest-only' or 'maturity'
 
+  // Step 3 - Pool Terms state
+  const [loanType, setLoanType] = useState(''); // 'interest-only' or 'maturity'
+  const [termMonths, setTermMonths] = useState(''); // '6', '12', '24', or custom number
+  const [isCustomTerm, setIsCustomTerm] = useState(false);
+  
   // Step 5 - Liability & Credit Info state
   const [otherPropertyLoans, setOtherPropertyLoans] = useState('');
   const [creditCardDebt, setCreditCardDebt] = useState('');
@@ -297,8 +348,15 @@ export default function PoolsPage() {
         existingLoans: existingLoans.filter(loan => loan.loanAmount || loan.remainingBalance),
         loanAmount: existingLoans[0]?.loanAmount || '',
         remainingBalance: existingLoans[0]?.remainingBalance || '',
+        
+        // Step 3 - Pool Terms data
         amount: parseFloat(poolAmount.replace(/[,$]/g, '')) || 0,
         roiRate: parseFloat(roiRate) || 0,
+        loanType: loanType,
+        termMonths: isCustomTerm ? parseInt(customTermMonths, 10) : parseInt(termMonths, 10),
+        isCustomTerm: isCustomTerm,
+        
+        // Legacy fields for compatibility
         term: selectedTerm,
         customTermMonths: selectedTerm === 'custom' ? (parseInt(customTermMonths, 10) || null) : null,
         otherPropertyLoans: otherPropertyLoans ? parseFloat(otherPropertyLoans.replace(/[,$]/g, '')) : null,
@@ -2132,18 +2190,70 @@ export default function PoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Loan Type</div>
                     </div>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                        <div style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          onClick={() => setLoanType('interest-only')}
+                          style={{
+                            flex: '1 1 0', 
+                            paddingLeft: 16, 
+                            paddingRight: 16, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'flex-start', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: loanType === 'interest-only' ? '#113D7B' : 'transparent',
+                                  outline: `1px ${loanType === 'interest-only' ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Interest-Only</div>
                                 <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Pay only interest each month. Full principal due at the end.</div>
                             </div>
                         </div>
-                        <div style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          onClick={() => setLoanType('maturity')}
+                          style={{
+                            flex: '1 1 0', 
+                            paddingLeft: 16, 
+                            paddingRight: 16, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'flex-start', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: loanType === 'maturity' ? '#113D7B' : 'transparent',
+                                  outline: `1px ${loanType === 'maturity' ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Maturity</div>
@@ -2160,27 +2270,117 @@ export default function PoolsPage() {
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>How long do you need to repay the loan?</div>
                     </div>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                        <div style={{paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          onClick={() => selectTerm('6')}
+                          style={{
+                            paddingLeft: 12, 
+                            paddingRight: 12, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: termMonths === '6' && !isCustomTerm ? '#113D7B' : 'transparent',
+                                  outline: `1px ${termMonths === '6' && !isCustomTerm ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>6 Months</div>
                         </div>
-                        <div style={{paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          onClick={() => selectTerm('12')}
+                          style={{
+                            paddingLeft: 12, 
+                            paddingRight: 12, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: termMonths === '12' && !isCustomTerm ? '#113D7B' : 'transparent',
+                                  outline: `1px ${termMonths === '12' && !isCustomTerm ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>12 Months</div>
                         </div>
-                        <div style={{paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 6, display: 'flex'}}>
-                            <div data-icon="ic:radio" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', outline: '1px var(--Black, black) solid', outlineOffset: '-0.50px'}} />
+                        <div 
+                          onClick={() => selectTerm('24')}
+                          style={{
+                            paddingLeft: 12, 
+                            paddingRight: 12, 
+                            paddingTop: 10, 
+                            paddingBottom: 10, 
+                            background: 'var(--Light-Grey, #F4F4F4)', 
+                            borderRadius: 10, 
+                            justifyContent: 'center', 
+                            alignItems: 'center', 
+                            gap: 6, 
+                            display: 'flex',
+                            cursor: 'pointer'
+                          }}
+                        >
+                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{
+                                  width: 10, 
+                                  height: 10, 
+                                  left: 3, 
+                                  top: 3, 
+                                  position: 'absolute', 
+                                  background: termMonths === '24' && !isCustomTerm ? '#113D7B' : 'transparent',
+                                  outline: `1px ${termMonths === '24' && !isCustomTerm ? '#113D7B' : 'var(--Black, black)'} solid`, 
+                                  outlineOffset: '-0.50px',
+                                  borderRadius: '50%'
+                                }} />
                             </div>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>24 Months</div>
                         </div>
                         <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>or</div>
                         <div style={{flex: '1 1 0', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                            <input type="text" value={customTermMonths} onChange={(e) => setCustomTermMonths(e.target.value)} placeholder="Custom" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                            <input 
+                              type="text" 
+                              value={customTermMonths} 
+                              onChange={(e) => handleCustomTermChange(e.target.value)} 
+                              placeholder="Custom" 
+                              style={{
+                                flex: '1 1 0', 
+                                color: 'var(--Black, black)', 
+                                fontSize: 14, 
+                                fontFamily: 'var(--ep-font-avenir)', 
+                                fontWeight: '500', 
+                                background: 'transparent', 
+                                border: 'none', 
+                                outline: 'none'
+                              }} 
+                            />
                         </div>
                     </div>
                   </div>
@@ -2201,7 +2401,7 @@ export default function PoolsPage() {
                                     <div style={{width: 13.33, height: 13.33, left: 1.34, top: 1.33, position: 'absolute', background: 'var(--Mid-Grey, #B2B2B2)'}} />
                                 </div>
                             </div>
-                            <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>--</div>
+                            <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>${calculateMonthlyInterest()}</div>
                         </div>
                         <div style={{flex: '1 1 0', paddingLeft: 12, paddingRight: 12, paddingTop: 8, paddingBottom: 8, background: '#EBE6E5', borderRadius: 10, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
                             <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
@@ -2210,7 +2410,7 @@ export default function PoolsPage() {
                                     <div style={{width: 13.33, height: 13.33, left: 1.34, top: 1.33, position: 'absolute', background: 'var(--Mid-Grey, #B2B2B2)'}} />
                                 </div>
                             </div>
-                            <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>--</div>
+                            <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>${calculateFinalRepayment()}</div>
                         </div>
                     </div>
                   </div>

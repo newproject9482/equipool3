@@ -99,6 +99,11 @@ class Pool(models.Model):
         ('24', '24 Months'),
         ('custom', 'Custom'),
     ]
+    
+    LOAN_TYPE_CHOICES = [
+        ('interest-only', 'Interest-Only'),
+        ('maturity', 'Maturity'),
+    ]
 
     # Basic pool information
     borrower = models.ForeignKey(Borrower, on_delete=models.CASCADE, related_name='pools')
@@ -151,7 +156,10 @@ class Pool(models.Model):
     # Pool terms
     amount = models.DecimalField(max_digits=12, decimal_places=2)  # Amount requested
     roi_rate = models.DecimalField(max_digits=5, decimal_places=2)  # Interest rate percentage
+    loan_type = models.CharField(max_length=20, choices=LOAN_TYPE_CHOICES, blank=True, null=True)  # Loan type
     term = models.CharField(max_length=10, choices=TERM_CHOICES, default='12')
+    term_months = models.PositiveIntegerField(blank=True, null=True)  # Actual term in months (for calculations)
+    is_custom_term = models.BooleanField(default=False)  # Whether custom term was used
     custom_term_months = models.PositiveIntegerField(blank=True, null=True)  # For custom terms
     
     # Liability information (optional)

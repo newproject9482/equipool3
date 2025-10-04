@@ -654,6 +654,24 @@ def create_pool(request: HttpRequest):
         if custom_term_months is None:
             return JsonResponse({'error': 'Custom term months required when term is custom'}, status=400)
     
+    # Handle step 3 fields - Pool Terms
+    loan_type = data.get('loanType', '').strip()
+    term_months = data.get('termMonths')
+    is_custom_term = data.get('isCustomTerm', False)
+    
+    # Validate loan type
+    if loan_type and loan_type not in ['interest-only', 'maturity']:
+        return JsonResponse({'error': 'Invalid loan type'}, status=400)
+    
+    # Validate term months
+    if term_months:
+        try:
+            term_months = int(term_months)
+            if term_months <= 0:
+                return JsonResponse({'error': 'Term months must be positive'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid term months'}, status=400)
+    
     # Optional liability fields
     other_property_loans = _safe_decimal(data.get('otherPropertyLoans'))
     credit_card_debt = _safe_decimal(data.get('creditCardDebt'))
@@ -697,7 +715,10 @@ def create_pool(request: HttpRequest):
             existing_loans=existing_loans,
             amount=amount,
             roi_rate=roi_rate,
+            loan_type=loan_type,
             term=term,
+            term_months=term_months,
+            is_custom_term=is_custom_term,
             custom_term_months=custom_term_months,
             other_property_loans=other_property_loans,
             credit_card_debt=credit_card_debt,
