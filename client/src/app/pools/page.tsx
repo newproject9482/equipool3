@@ -74,10 +74,8 @@ export default function PoolsPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   
-  // Prior names state
-  const [priorFirstName, setPriorFirstName] = useState('');
-  const [priorMiddleName, setPriorMiddleName] = useState('');
-  const [priorLastName, setPriorLastName] = useState('');
+  // Prior names state - now supporting multiple prior names
+  const [priorNames, setPriorNames] = useState([{ firstName: '', middleName: '', lastName: '' }]);
   
   // SSN and FICO state
   const [ssn, setSsn] = useState('');
@@ -127,6 +125,26 @@ export default function PoolsPage() {
     const newCoOwners = [...coOwners];
     newCoOwners[index] = { ...newCoOwners[index], [field]: value };
     setCoOwners(newCoOwners);
+  };
+
+  // Add new prior name
+  const addPriorName = () => {
+    setPriorNames([...priorNames, { firstName: '', middleName: '', lastName: '' }]);
+  };
+
+  // Remove prior name
+  const removePriorName = (index: number) => {
+    if (priorNames.length > 1) {
+      const newPriorNames = priorNames.filter((_, i) => i !== index);
+      setPriorNames(newPriorNames);
+    }
+  };
+
+  // Update prior name data
+  const updatePriorName = (index: number, field: string, value: string) => {
+    const newPriorNames = [...priorNames];
+    newPriorNames[index] = { ...newPriorNames[index], [field]: value };
+    setPriorNames(newPriorNames);
   };
 
   // Add property link
@@ -1512,28 +1530,89 @@ export default function PoolsPage() {
                         <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Prior name(s)</div>
                         <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                       </div>
-                      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                          <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={priorFirstName} onChange={(e) => setPriorFirstName(e.target.value)} placeholder="Name" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                      
+                      {/* Prior Names List */}
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
+                        {priorNames.map((priorName, index) => (
+                          <div key={index} style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                              <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Prior Name {index + 1}</div>
+                              <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                                <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                                  <input 
+                                    type="text" 
+                                    value={priorName.firstName} 
+                                    onChange={(e) => updatePriorName(index, 'firstName', e.target.value)} 
+                                    placeholder="Name" 
+                                    style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                                  />
+                                </div>
+                                <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                                  <input 
+                                    type="text" 
+                                    value={priorName.middleName} 
+                                    onChange={(e) => updatePriorName(index, 'middleName', e.target.value)} 
+                                    placeholder="Middle name" 
+                                    style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                                  />
+                                </div>
+                              </div>
+                              <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <input 
+                                  type="text" 
+                                  value={priorName.lastName} 
+                                  onChange={(e) => updatePriorName(index, 'lastName', e.target.value)} 
+                                  placeholder="Surname" 
+                                  style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                                />
+                              </div>
                             </div>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={priorMiddleName} onChange={(e) => setPriorMiddleName(e.target.value)} placeholder="Middle name" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                            <div style={{flex: '0 0 auto', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                              <div 
+                                onClick={addPriorName}
+                                data-icon="true" 
+                                data-state="Alternative" 
+                                style={{
+                                  paddingLeft: 20, 
+                                  paddingRight: 20, 
+                                  paddingTop: 12, 
+                                  paddingBottom: 12, 
+                                  background: 'var(--White, white)', 
+                                  borderRadius: 52, 
+                                  outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+                                  justifyContent: 'center', 
+                                  alignItems: 'center', 
+                                  gap: 4, 
+                                  display: 'inline-flex',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
+                                <Image src="/add.svg" alt="Add icon" width={16} height={16} />
+                              </div>
+                              {priorNames.length > 1 && (
+                                <div 
+                                  onClick={() => removePriorName(index)}
+                                  style={{
+                                    paddingLeft: 16, 
+                                    paddingRight: 16, 
+                                    paddingTop: 8, 
+                                    paddingBottom: 8, 
+                                    background: '#ff4444', 
+                                    borderRadius: 26, 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: 4, 
+                                    display: 'inline-flex',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  <div style={{color: 'white', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Remove</div>
+                                </div>
+                              )}
                             </div>
                           </div>
-                          <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
-                            <input type="text" value={priorLastName} onChange={(e) => setPriorLastName(e.target.value)} placeholder="Surname" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
-                          </div>
-                        </div>
-                        <div style={{flex: '1 1 0', alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                          <div data-icon="true" data-state="Alternative" style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 52, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                            <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
-                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                              <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                            </div>
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -1624,7 +1703,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(2)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
                   </div>
                 </div>
@@ -2015,9 +2094,7 @@ export default function PoolsPage() {
                                 }}
                               >
                                   <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
-                                  <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                      <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                                  </div>
+                                  <Image src="/add.svg" alt="Add icon" width={16} height={16} />
                               </div>
                               {coOwners.length > 1 && (
                                 <div 
@@ -2105,9 +2182,7 @@ export default function PoolsPage() {
                               }}
                             >
                                 <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
-                                <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                    <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                                </div>
+                                <Image src="/add.svg" alt="Add icon" width={16} height={16} />
                             </div>
                         </div>
                     </div>
@@ -2168,9 +2243,7 @@ export default function PoolsPage() {
                                   }}
                                 >
                                     <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
-                                    <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                        <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                                    </div>
+                                    <Image src="/add.svg" alt="Add icon" width={16} height={16} />
                                 </div>
                                 {existingLoans.length > 1 && (
                                   <div 
@@ -2216,7 +2289,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(3)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
                   </div>
                 </div>
@@ -2473,8 +2546,8 @@ export default function PoolsPage() {
                   {/* Calculator Section */}
                   <div style={{width: '100%', padding: 16, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                        <div style={{width: 14, height: 14, position: 'relative', overflow: 'hidden'}}>
-                            <div style={{width: 8.17, height: 11.67, left: 2.91, top: 1.17, position: 'absolute', background: 'black'}} />
+                        <div style={{width: 14, height: 14, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                            <Image src="/mdi-calculator.svg" alt="Calculator" width={14} height={14} />
                         </div>
                         <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Calculator</div>
                     </div>
@@ -2482,8 +2555,8 @@ export default function PoolsPage() {
                         <div style={{flex: '1 1 0', paddingLeft: 12, paddingRight: 12, paddingTop: 8, paddingBottom: 8, background: '#EAEBE5', borderRadius: 10, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
                             <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                                 <div style={{flex: '1 1 0', opacity: 0.70, color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Monthly Interest</div>
-                                <div data-icon="ic:tooltip" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                    <div style={{width: 13.33, height: 13.33, left: 1.34, top: 1.33, position: 'absolute', background: 'var(--Mid-Grey, #B2B2B2)'}} />
+                                <div data-icon="ic:tooltip" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                    <Image src="/cons.svg" alt="Info" width={16} height={16} />
                                 </div>
                             </div>
                             <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>${calculateMonthlyInterest()}</div>
@@ -2491,8 +2564,8 @@ export default function PoolsPage() {
                         <div style={{flex: '1 1 0', paddingLeft: 12, paddingRight: 12, paddingTop: 8, paddingBottom: 8, background: '#EBE6E5', borderRadius: 10, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
                             <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                                 <div style={{flex: '1 1 0', opacity: 0.70, color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Final Repayment</div>
-                                <div data-icon="ic:tooltip" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                    <div style={{width: 13.33, height: 13.33, left: 1.34, top: 1.33, position: 'absolute', background: 'var(--Mid-Grey, #B2B2B2)'}} />
+                                <div data-icon="ic:tooltip" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                    <Image src="/cons.svg" alt="Info" width={16} height={16} />
                                 </div>
                             </div>
                             <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>${calculateFinalRepayment()}</div>
@@ -2518,7 +2591,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(4)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
                   </div>
                 </div>
@@ -2553,9 +2626,8 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Upload a valid government ID. Required for verification.</div>
                         <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
-                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image src="/4th_step_files.svg" alt="File" width={16} height={16} />
                             </div>
                             <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
@@ -2571,9 +2643,8 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>This document validates the declared asset.</div>
                         <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
-                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image src="/4th_step_files.svg" alt="File" width={16} height={16} />
                             </div>
                             <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
@@ -2590,9 +2661,8 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Boosts credibility and may reduce approval friction.</div>
                         <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
-                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image src="/4th_step_files.svg" alt="File" width={16} height={16} />
                             </div>
                             <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
@@ -2609,8 +2679,8 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>To validate your financial profile and repayment capacity.</div>
                         <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                            <div data-icon="ic:image" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Black, black)'}} />
+                            <div data-icon="ic:image" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image src="/image.svg" alt="Image" width={16} height={16} />
                             </div>
                             <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload images</div>
@@ -2627,9 +2697,8 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Mortgage statement adds context to your liabilities.</div>
                         <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
-                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image src="/4th_step_files.svg" alt="File" width={16} height={16} />
                             </div>
                             <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
@@ -2646,9 +2715,8 @@ export default function PoolsPage() {
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Shows legal ownership of the property. </div>
                         <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
-                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                <Image src="/4th_step_files.svg" alt="File" width={16} height={16} />
                             </div>
                             <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
                                 <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
@@ -2666,8 +2734,8 @@ export default function PoolsPage() {
                       </div>
                       <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Clear photos (2–10) of the property improve trust and funding chances.</div>
                       <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-                          <div data-icon="ic:image" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                              <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Black, black)'}} />
+                          <div data-icon="ic:image" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                              <Image src="/image.svg" alt="Image" width={16} height={16} />
                           </div>
                           <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
                               <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload images</div>
@@ -2694,7 +2762,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(5)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
                   </div>
                 </div>
@@ -2813,9 +2881,7 @@ export default function PoolsPage() {
                               }}
                             >
                               <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
-                              <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
-                              </div>
+                              <Image src="/add.svg" alt="Add icon" width={16} height={16} />
                             </div>
                             {liabilities.length > 1 && (
                               <div 
@@ -2861,7 +2927,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => setCurrentStep(6)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
                   </div>
                 </div>
