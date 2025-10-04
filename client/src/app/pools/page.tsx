@@ -119,6 +119,38 @@ export default function PoolsPage() {
     newCoOwners[index] = { ...newCoOwners[index], [field]: value };
     setCoOwners(newCoOwners);
   };
+
+  // Add property link
+  const addPropertyLink = () => {
+    if (propertyLink.trim()) {
+      setPropertyLinks([...propertyLinks, propertyLink.trim()]);
+      setPropertyLink('');
+    }
+  };
+
+  // Remove property link
+  const removePropertyLink = (index) => {
+    setPropertyLinks(propertyLinks.filter((_, i) => i !== index));
+  };
+
+  // Add existing loan
+  const addExistingLoan = () => {
+    setExistingLoans([...existingLoans, { loanAmount: '', remainingBalance: '' }]);
+  };
+
+  // Remove existing loan
+  const removeExistingLoan = (index) => {
+    if (existingLoans.length > 1) {
+      setExistingLoans(existingLoans.filter((_, i) => i !== index));
+    }
+  };
+
+  // Update existing loan
+  const updateExistingLoan = (index, field, value) => {
+    const newLoans = [...existingLoans];
+    newLoans[index] = { ...newLoans[index], [field]: value };
+    setExistingLoans(newLoans);
+  };
   const [state, setState] = useState('');
   const [percentOwned, setPercentOwned] = useState('');
   const [coOwner, setCoOwner] = useState('');
@@ -127,6 +159,8 @@ export default function PoolsPage() {
   const [propertyLink, setPropertyLink] = useState('');
   const [loanAmount, setLoanAmount] = useState('');
   const [remainingBalance, setRemainingBalance] = useState('');
+  const [propertyLinks, setPropertyLinks] = useState([]);
+  const [existingLoans, setExistingLoans] = useState([{ loanAmount: '', remainingBalance: '' }]);
   const [interestRate, setInterestRate] = useState('');
   const [poolAmount, setPoolAmount] = useState('');
   const [roiRate, setRoiRate] = useState('');
@@ -249,15 +283,20 @@ export default function PoolsPage() {
       const poolData = {
         // Pool information
         poolType: selectedPoolType,
-        addressLine: addressLine,
-        city: city,
+        addressLine: propertyAddressLine1 || addressLine,
+        city: propertyCity || city,
         state: state,
-        zipCode: zipCode,
-        percentOwned: parseFloat(percentOwned) || 0,
-        coOwner: coOwner || null,
+        zipCode: propertyZipCode || zipCode,
+        primaryAddressChoice: primaryAddressChoice,
+        hasCoOwners: hasCoOwners,
+        coOwners: coOwners,
         propertyValue: propertyValue ? parseFloat(propertyValue.replace(/[,$]/g, '')) : null,
         propertyLink: propertyLink || null,
+        propertyLinks: propertyLinks,
         mortgageBalance: mortgageBalance ? parseFloat(mortgageBalance.replace(/[,$]/g, '')) : null,
+        existingLoans: existingLoans.filter(loan => loan.loanAmount || loan.remainingBalance),
+        loanAmount: existingLoans[0]?.loanAmount || '',
+        remainingBalance: existingLoans[0]?.remainingBalance || '',
         amount: parseFloat(poolAmount.replace(/[,$]/g, '')) || 0,
         roiRate: parseFloat(roiRate) || 0,
         term: selectedTerm,
@@ -286,9 +325,9 @@ export default function PoolsPage() {
         // Mailing address
         addressLine1: addressLine1,
         addressLine2: addressLine2,
-        mailingCity: city, // Using the same city for now, can be different if needed
-        mailingState: state, // Using the same state for now
-        mailingZipCode: zipCode // Using the same zip for now
+        mailingCity: city, // Using the city from mailing address section
+        mailingState: state, // Using the state from mailing address section
+        mailingZipCode: zipCode // Using the zip from mailing address section
       };
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
@@ -319,18 +358,27 @@ export default function PoolsPage() {
         setCity('');
         setState('');
         setZipCode('');
+        setPropertyAddressLine1('');
+        setPropertyAddressLine2('');
+        setPropertyCity('');
+        setPropertyZipCode('');
+        setPrimaryAddressChoice('');
+        setHasCoOwners(false);
+        setCoOwners([{ firstName: '', middleName: '', lastName: '', percentage: '' }]);
         setPercentOwned('');
         setCoOwner('');
         setPropertyValue('');
         setPropertyLink('');
+        setPropertyLinks([]);
         setMortgageBalance('');
+        setExistingLoans([{ loanAmount: '', remainingBalance: '' }]);
         setPoolAmount('');
         setRoiRate('');
         setSelectedTerm('12');
         setCustomTermMonths('');
-  setOtherPropertyLoans('');
-  setCreditCardDebt('');
-  setMonthlyDebtPayments('');
+        setOtherPropertyLoans('');
+        setCreditCardDebt('');
+        setMonthlyDebtPayments('');
 
         // Refresh the pools list
         await fetchPools();
@@ -1872,11 +1920,47 @@ export default function PoolsPage() {
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property link</div>
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Add a listing link (e.g. Zillow, Redfin). If no valid link is provided, we may request an appraisal document in the next step.</div>
+                        
+                        {/* Added property links list */}
+                        {propertyLinks.length > 0 && (
+                          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                            {propertyLinks.map((link, index) => (
+                              <div key={index} style={{alignSelf: 'stretch', padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 6, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                                <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>{link}</div>
+                                <div 
+                                  onClick={() => removePropertyLink(index)}
+                                  style={{width: 16, height: 16, background: '#ff4444', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                >
+                                  <div style={{color: 'white', fontSize: 10, fontWeight: 'bold'}}>×</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                             <div style={{flex: '1 1 0', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
                                 <input type="text" value={propertyLink} onChange={(e) => setPropertyLink(e.target.value)} placeholder="e.g. Zillow, Redfin etc." style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
-                            <div data-icon="true" data-state="Alternative" style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 52, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'flex'}}>
+                            <div 
+                              onClick={addPropertyLink}
+                              data-icon="true" 
+                              data-state="Alternative" 
+                              style={{
+                                paddingLeft: 20, 
+                                paddingRight: 20, 
+                                paddingTop: 12, 
+                                paddingBottom: 12, 
+                                background: 'var(--White, white)', 
+                                borderRadius: 52, 
+                                outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                gap: 4, 
+                                display: 'flex',
+                                cursor: 'pointer'
+                              }}
+                            >
                                 <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
                                 <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
                                     <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
@@ -1893,27 +1977,82 @@ export default function PoolsPage() {
                         <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                     </div>
                     <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Enter any active loans currently tied to this property. You can add multiple.</div>
-                    <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Loan 1</div>
-                    <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                <input type="text" value={loanAmount} onChange={(e) => setLoanAmount(e.target.value)} placeholder="Loan amount" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
-                            </div>
-                            <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                                <input type="text" value={remainingBalance} onChange={(e) => setRemainingBalance(e.target.value)} placeholder="Remaining Balance (approx.)" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
-                            </div>
-                        </div>
-                        <div style={{flex: '1 1 0', height: 86, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div data-icon="true" data-state="Alternative" style={{paddingLeft: 20, paddingRight: 20, paddingTop: 12, paddingBottom: 12, background: 'var(--White, white)', borderRadius: 52, outline: '1px var(--Stroke-Grey, #E5E7EB) solid', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                                <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
-                                <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                                    <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                    
+                    {existingLoans.map((loan, index) => (
+                      <div key={index} style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Loan {index + 1}</div>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                                <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                    <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                    <input 
+                                      type="text" 
+                                      value={loan.loanAmount} 
+                                      onChange={(e) => updateExistingLoan(index, 'loanAmount', e.target.value)} 
+                                      placeholder="Loan amount" 
+                                      style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                                    />
+                                </div>
+                                <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                                    <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
+                                    <input 
+                                      type="text" 
+                                      value={loan.remainingBalance} 
+                                      onChange={(e) => updateExistingLoan(index, 'remainingBalance', e.target.value)} 
+                                      placeholder="Remaining Balance (approx.)" 
+                                      style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
+                                    />
                                 </div>
                             </div>
+                            <div style={{flex: '0 0 auto', height: 86, flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                                <div 
+                                  onClick={addExistingLoan}
+                                  data-icon="true" 
+                                  data-state="Alternative" 
+                                  style={{
+                                    paddingLeft: 20, 
+                                    paddingRight: 20, 
+                                    paddingTop: 12, 
+                                    paddingBottom: 12, 
+                                    background: 'var(--White, white)', 
+                                    borderRadius: 52, 
+                                    outline: '1px var(--Stroke-Grey, #E5E7EB) solid', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    gap: 4, 
+                                    display: 'inline-flex',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                    <div style={{color: 'var(--Grey, #767676)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add</div>
+                                    <div data-icon="ic:x" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                        <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Grey, #767676)'}} />
+                                    </div>
+                                </div>
+                                {existingLoans.length > 1 && (
+                                  <div 
+                                    onClick={() => removeExistingLoan(index)}
+                                    style={{
+                                      paddingLeft: 16, 
+                                      paddingRight: 16, 
+                                      paddingTop: 8, 
+                                      paddingBottom: 8, 
+                                      background: '#ff4444', 
+                                      borderRadius: 26, 
+                                      justifyContent: 'center', 
+                                      alignItems: 'center', 
+                                      gap: 4, 
+                                      display: 'inline-flex',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                      <div style={{color: 'white', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Remove</div>
+                                  </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Continue Button */}
@@ -2380,20 +2519,20 @@ export default function PoolsPage() {
                         paddingRight: 24, 
                         paddingTop: 12, 
                         paddingBottom: 12, 
-                        background: '#113D7B', 
+                        background: isSubmitting ? '#888' : '#113D7B', 
                         borderRadius: 12, 
                         justifyContent: 'center', 
                         alignItems: 'center', 
                         gap: 8, 
                         display: 'inline-flex',
-                        cursor: 'pointer'
+                        cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                        opacity: isSubmitting ? 0.7 : 1
                       }}
-                      onClick={() => {
-                        // For now, just show completion since there's no step 7
-                        alert('Pool creation flow completed!');
-                      }}
+                      onClick={createPool}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                        {isSubmitting ? 'Creating Pool...' : 'Create Pool'}
+                      </div>
                     </div>
                   </div>
                 </div>

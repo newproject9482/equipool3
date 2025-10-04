@@ -517,7 +517,7 @@ def create_pool(request: HttpRequest):
     # Required fields validation
     required_fields = {
         'poolType', 'addressLine', 'city', 'state', 'zipCode', 
-        'percentOwned', 'amount', 'roiRate',
+        'amount', 'roiRate',
         # Personal information fields
         'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'ssn',
         'addressLine1', 'mailingCity', 'mailingState', 'mailingZipCode'
@@ -582,12 +582,50 @@ def create_pool(request: HttpRequest):
     except ValidationError as e:
         return JsonResponse({'error': f'Invalid date of birth: {str(e)}'}, status=400)
     
+    # Handle primary address choice
+    primary_address_choice = data.get('primaryAddressChoice', '').strip()
+    
+    # Handle co-owners
+    co_owners = data.get('coOwners', [])
+    has_co_owners = data.get('hasCoOwners', False)
+    
+    # Calculate percent owned based on co-owners if present
+    if has_co_owners and co_owners:
+        total_co_owner_percentage = sum(float(owner.get('percentage', 0) or 0) for owner in co_owners)
+        percent_owned = max(0, 100 - total_co_owner_percentage)
+    else:
+        percent_owned = 100
+    
+    # Handle property links
+    property_links = []
+    property_link = data.get('propertyLink', '').strip()
+    if property_link:
+        property_links.append({
+            'url': property_link,
+            'type': 'listing',
+            'added_at': timezone.now().isoformat()
+        })
+    
+    # Handle existing loans
+    existing_loans = []
+    loan_amount = data.get('loanAmount', '').strip()
+    remaining_balance = data.get('remainingBalance', '').strip()
+    if loan_amount and remaining_balance:
+        try:
+            existing_loans.append({
+                'loan_amount': float(loan_amount),
+                'remaining_balance': float(remaining_balance),
+                'loan_number': 1
+            })
+        except ValueError:
+            pass  # Skip invalid loan data
+
     # Convert and validate numeric fields
-    percent_owned = _safe_decimal(data.get('percentOwned'))
     amount = _safe_decimal(data.get('amount'))
     roi_rate = _safe_decimal(data.get('roiRate'))
     
-    if percent_owned is None or percent_owned <= 0 or percent_owned > 100:
+    # Validate percent_owned (now calculated or provided)
+    if percent_owned <= 0 or percent_owned > 100:
         return JsonResponse({'error': 'Valid percent owned is required (1-100)'}, status=400)
     
     if amount is None or amount <= 0:
@@ -648,11 +686,15 @@ def create_pool(request: HttpRequest):
             city=city,
             state=state,
             zip_code=zip_code,
+            primary_address_choice=primary_address_choice,
             percent_owned=percent_owned,
             co_owner=co_owner,
+            co_owners=co_owners,
             property_value=property_value,
             property_link=property_link,
+            property_links=property_links,
             mortgage_balance=mortgage_balance,
+            existing_loans=existing_loans,
             amount=amount,
             roi_rate=roi_rate,
             term=term,

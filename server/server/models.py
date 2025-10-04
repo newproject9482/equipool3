@@ -137,11 +137,16 @@ class Pool(models.Model):
     state = models.CharField(max_length=50)
     zip_code = models.CharField(max_length=10)
     country = models.CharField(max_length=100, default='United States')
+    primary_address_choice = models.CharField(max_length=50, blank=True, null=True, 
+                                              help_text="Primary residence choice: primary, vacant, tenant, owner-occupied")
     percent_owned = models.DecimalField(max_digits=5, decimal_places=2)  # e.g., 100.00 for 100%
     co_owner = models.CharField(max_length=255, blank=True, null=True)
+    co_owners = models.JSONField(default=list, blank=True, help_text="List of co-owner information")
     property_value = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     property_link = models.URLField(blank=True, null=True)
+    property_links = models.JSONField(default=list, blank=True, help_text="List of property links")
     mortgage_balance = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    existing_loans = models.JSONField(default=list, blank=True, help_text="List of existing loans on property")
     
     # Pool terms
     amount = models.DecimalField(max_digits=12, decimal_places=2)  # Amount requested
