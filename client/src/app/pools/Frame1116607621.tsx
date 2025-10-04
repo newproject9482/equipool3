@@ -35,7 +35,7 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
         >
           <div className={styles.text}>1</div>
         </div>
-        <div className={styles.investorsCardDescription}>Pool Type</div>
+        <div className={styles.investorsCardDescription}>Personal Info</div>
       </div>
   <Component1 />
 

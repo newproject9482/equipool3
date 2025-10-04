@@ -36,6 +36,7 @@ export default function PoolsPage() {
   const [userRole, setUserRole] = useState<'borrower' | 'investor' | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showPoolTypeModal, setShowPoolTypeModal] = useState(false);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -324,11 +325,14 @@ export default function PoolsPage() {
 
   const handlePoolTypeSelect = (poolType: string) => {
     setSelectedPoolType(poolType);
-    setCurrentStep(2);
+    setShowPoolTypeModal(false);
+    setShowCreatePoolModal(true);
+    setCurrentStep(1); // Start with Personal Info
   };
 
   const handleCloseModal = () => {
     setShowCreatePoolModal(false);
+    setShowPoolTypeModal(false);
     setCurrentStep(1);
     setSelectedPoolType('');
   setShowConfirmation(false);
@@ -501,7 +505,7 @@ export default function PoolsPage() {
             </div>
             <div 
               style={{alignSelf: 'stretch', paddingLeft: 40, paddingRight: 40, paddingTop: 24, paddingBottom: 24, background: '#E4EFFF', overflow: 'hidden', borderRadius: 24, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
-              onClick={() => setShowCreatePoolModal(true)}
+              onClick={() => setShowPoolTypeModal(true)}
             >
               <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                 <div style={{flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
@@ -874,6 +878,130 @@ export default function PoolsPage() {
         />
       )}
 
+      {/* Pool Type Selection Modal */}
+      {showPoolTypeModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}
+          onClick={() => setShowPoolTypeModal(false)}
+        >
+          <div 
+            style={{
+              width: 800,
+              height: 500,
+              backgroundColor: 'white',
+              borderRadius: 24,
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              width: '100%', 
+              height: '100%', 
+              padding: 32, 
+              flexDirection: 'column', 
+              justifyContent: 'flex-start', 
+              alignItems: 'flex-start', 
+              gap: 32, 
+              display: 'flex'
+            }}>
+              {/* Header */}
+              <div style={{alignSelf: 'stretch', justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
+                <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'flex'}}>
+                  <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.2, wordWrap: 'break-word'}}>Choose the pool type</div>
+                </div>
+                <div
+                  style={{width: 32, height: 32, position: 'relative', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                  onClick={() => setShowPoolTypeModal(false)}
+                >
+                  <Image src="/material-symbols-close.svg" alt="Close" width={18} height={18} />
+                </div>
+              </div>
+              
+              {/* Pool Type Cards */}
+              <div style={{alignSelf: 'stretch', flex: '1 1 0', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex'}}>
+                <div 
+                  style={{
+                    width: 300, 
+                    height: 280, 
+                    padding: 32, 
+                    background: 'white', 
+                    borderRadius: 24, 
+                    outline: '1px #E5E7EB solid', 
+                    outlineOffset: '-1px', 
+                    flexDirection: 'column', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start', 
+                    display: 'inline-flex', 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    transform: equityHover ? 'translateY(-4px)' : 'translateY(0)',
+                    boxShadow: equityHover ? '0px 12px 24px rgba(17, 61, 123, 0.2)' : '0px 4px 8px rgba(0, 0, 0, 0.1)'
+                  }}
+                  onMouseEnter={() => setEquityHover(true)}
+                  onMouseLeave={() => setEquityHover(false)}
+                  onClick={() => handlePoolTypeSelect('equity')}
+                >
+                  <div style={{width: 48, height: 48, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <Image src="/window.svg" alt="Equity Pool icon" width={40} height={40} />
+                  </div>
+                  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                    <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity Pool</div>
+                    <div style={{alignSelf: 'stretch', color: '#6B7280', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.5, wordWrap: 'break-word'}}>Borrowing against home value</div>
+                    <div style={{alignSelf: 'stretch', color: '#6B7280', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.5, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home&apos;s value for cash.</div>
+                  </div>
+                </div>
+                <div 
+                  style={{
+                    width: 300, 
+                    height: 280, 
+                    padding: 32, 
+                    background: 'white', 
+                    borderRadius: 24, 
+                    outline: '1px #E5E7EB solid', 
+                    outlineOffset: '-1px', 
+                    flexDirection: 'column', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start', 
+                    display: 'inline-flex', 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    transform: refinanceHover ? 'translateY(-4px)' : 'translateY(0)',
+                    boxShadow: refinanceHover ? '0px 12px 24px rgba(17, 61, 123, 0.2)' : '0px 4px 8px rgba(0, 0, 0, 0.1)'
+                  }}
+                  onMouseEnter={() => setRefinanceHover(true)}
+                  onMouseLeave={() => setRefinanceHover(false)}
+                  onClick={() => handlePoolTypeSelect('refinance')}
+                >
+                  <div style={{width: 48, height: 48, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <Image src="/invest.svg" alt="Refinance Pool icon" width={40} height={40} />
+                  </div>
+                  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                    <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Refinance Pool</div>
+                    <div style={{alignSelf: 'stretch', color: '#6B7280', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.5, wordWrap: 'break-word'}}>Pay off existing mortgage or debt</div>
+                    <div style={{alignSelf: 'stretch', color: '#6B7280', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.5, wordWrap: 'break-word'}}>(i) Refinance pools help you replace high-interest loans with smarter terms.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create Pool Modal */}
       {showCreatePoolModal && (
         <div 
@@ -954,72 +1082,44 @@ export default function PoolsPage() {
                   </div>
                 </div>
               ) : currentStep === 1 && (
-                /* Pool Type Cards */
-                <div style={{alignSelf: 'stretch', flex: '1 1 0', paddingLeft: 8, paddingRight: 8, paddingTop: 8, paddingBottom: 8, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex'}}>
-                    <div style={{width: 480, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                        <div 
-                          style={{
-                            width: 229, 
-                            height: 245, 
-                            padding: 24, 
-                            background: 'white', 
-                            borderRadius: 24, 
-                            outline: '1px #E5E7EB solid', 
-                            outlineOffset: '-1px', 
-                            flexDirection: 'column', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'flex-start', 
-                            display: 'inline-flex', 
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            transform: equityHover ? 'translateY(-2px)' : 'translateY(0)',
-                            boxShadow: equityHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
-                          }}
-                          onMouseEnter={() => setEquityHover(true)}
-                          onMouseLeave={() => setEquityHover(false)}
-                          onClick={() => handlePoolTypeSelect('equity')}
-                        >
-                          <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image src="/window.svg" alt="Equity Pool icon" width={32} height={32} />
-                          </div>
-                          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Equity Pool</div>
-                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Borrowing against home value</div>
-                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Equity pools are ideal when you want to tap into your home&apos;s value for cash.</div>
-                          </div>
-                        </div>
-                        <div 
-                          style={{
-                            width: 229, 
-                            height: 245, 
-                            padding: 24, 
-                            background: 'white', 
-                            borderRadius: 24, 
-                            outline: '1px #E5E7EB solid', 
-                            outlineOffset: '-1px', 
-                            flexDirection: 'column', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'flex-start', 
-                            display: 'inline-flex', 
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            transform: refinanceHover ? 'translateY(-2px)' : 'translateY(0)',
-                            boxShadow: refinanceHover ? '0px 8px 20px rgba(17, 61, 123, 0.15)' : '0px 2px 4px rgba(0, 0, 0, 0.05)'
-                          }}
-                          onMouseEnter={() => setRefinanceHover(true)}
-                          onMouseLeave={() => setRefinanceHover(false)}
-                          onClick={() => handlePoolTypeSelect('refinance')}
-                        >
-                          <div style={{width: 40, height: 40, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Image src="/invest.svg" alt="Refinance Pool icon" width={32} height={32} />
-                          </div>
-                          <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                            <div style={{textAlign: 'center', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Refinance Pool</div>
-                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Pay off existing mortgage or debt</div>
-                            <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>(i) Refinance pools help you replace high-interest loans with smarter terms.</div>
-                          </div>
-                        </div>
+                /* Personal Info Form */
+                <div style={{
+                  alignSelf: 'stretch', 
+                  flex: '1 1 0', 
+                  padding: '24px 32px', 
+                  flexDirection: 'column', 
+                  justifyContent: 'flex-start', 
+                  alignItems: 'flex-start', 
+                  gap: 24, 
+                  display: 'flex',
+                  overflow: 'auto'
+                }}>
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+                    <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Personal Information</div>
+                    <div style={{color: '#6B7280', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', wordWrap: 'break-word'}}>Please provide your basic information to continue.</div>
+                  </div>
+                  
+                  {/* Continue Button */}
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 'auto'}}>
+                    <div 
+                      style={{
+                        paddingLeft: 24, 
+                        paddingRight: 24, 
+                        paddingTop: 12, 
+                        paddingBottom: 12, 
+                        background: '#113D7B', 
+                        borderRadius: 12, 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: 8, 
+                        display: 'inline-flex',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => setCurrentStep(2)}
+                    >
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                     </div>
+                  </div>
                 </div>
               )}
 
@@ -1285,7 +1385,7 @@ export default function PoolsPage() {
                         }}
                         onClick={() => {
                           if (addressLine && city && state && zipCode && percentOwned) {
-                            setCurrentStep(3);
+                            setCurrentStep(2);
                           }
                         }}
                       >
@@ -1300,7 +1400,7 @@ export default function PoolsPage() {
                 </div>
               )}
 
-              {currentStep === 3 && (
+              {currentStep === 2 && (
                 /* Pool Terms - Form Content */
                 <div style={{
                   alignSelf: 'stretch', 
@@ -1477,7 +1577,7 @@ export default function PoolsPage() {
                       }}
                       onClick={() => {
                         if (poolAmount && roiRate) {
-                          setCurrentStep(4);
+                          setCurrentStep(3);
                         }
                       }}
                     >
@@ -1487,7 +1587,7 @@ export default function PoolsPage() {
                 </div>
               )}
 
-              {currentStep === 4 && (
+              {currentStep === 3 && (
                 /* Documents Step - 2x2 Grid Layout */
                 <div style={{
                   alignSelf: 'stretch', 
@@ -1882,7 +1982,7 @@ export default function PoolsPage() {
                         display: 'inline-flex',
                         cursor: 'pointer'
                       }}
-                      onClick={() => setCurrentStep(5)}
+                      onClick={() => setCurrentStep(4)}
                     >
                       <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Save and Continue</div>
                     </div>
@@ -1890,7 +1990,7 @@ export default function PoolsPage() {
                 </div>
               )}
 
-              {currentStep === 5 && (
+              {currentStep === 4 && (
                 /* Liability & Credit Info Step */
                 <div style={{
                   alignSelf: 'stretch', 
