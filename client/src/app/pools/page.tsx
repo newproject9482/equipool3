@@ -1637,7 +1637,7 @@ export default function PoolsPage() {
               )}
 
               {currentStep === 4 && (
-                /* Liability & Credit Info Step */
+                /* Documents Step - Clean slate for new design */
                 <div style={{
                   alignSelf: 'stretch', 
                   flex: '1 1 0', 
@@ -1649,298 +1649,164 @@ export default function PoolsPage() {
                   display: 'flex',
                   overflow: 'auto'
                 }}>
-                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
-                    
-                    {/* Header Section */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      alignItems: 'flex-start',
-                      gap: 8,
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        color: 'black',
-                        fontSize: 16,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '500',
-                        wordWrap: 'break-word'
-                      }}>Other existing liabilities</div>
-                      <div style={{
-                        color: '#767676',
-                        fontSize: 12,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '400',
-                        wordWrap: 'break-word'
-                      }}>Give us a picture of your current financial obligations.</div>
+                  {/* Documents Grid - 3 rows x 2 columns */}
+                  <div style={{
+                    width: '100%',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateRows: 'auto auto auto',
+                    gap: 24,
+                    alignItems: 'start'
+                  }}>
+                    {/* Top Left - Government-issued ID */}
+                    <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Government-issued ID</div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Upload a valid government ID. Required for verification.</div>
+                        <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            </div>
+                            <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Other Property-Secured Loans */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      alignItems: 'flex-start',
-                      gap: 8,
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 8,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          color: 'black',
-                          fontSize: 14,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>Other property-secured loans</div>
-                        <div style={{
-                          color: '#767676',
-                          fontSize: 12,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '400',
-                          wordWrap: 'break-word'
-                        }}>(Optional)</div>
-                      </div>
-                      <div style={{
-                        color: '#767676',
-                        fontSize: 12,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '400',
-                        lineHeight: 1.4,
-                        wordWrap: 'break-word'
-                      }}>Include any outstanding loans backed by real estate you own.</div>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        height: 39,
-                        paddingLeft: 12,
-                        paddingRight: 12,
-                        paddingTop: 10,
-                        paddingBottom: 10,
-                        background: '#F4F4F4',
-                        borderRadius: 10,
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 10,
-                        display: 'inline-flex'
-                      }}>
-                        <div style={{
-                          color: 'black',
-                          fontSize: 14,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>$</div>
-                        <input
-                          type="text"
-                          value={otherPropertyLoans}
-                          onChange={(e) => setOtherPropertyLoans(e.target.value)}
-                          placeholder="e.g. 100 000"
-                          style={{
-                            flex: '1 1 0',
-                            color: otherPropertyLoans ? 'black' : '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word',
-                            border: 'none',
-                            background: 'transparent',
-                            outline: 'none',
-                            width: '100%'
-                          }}
-                        />
-                      </div>
+                    {/* Top Right - Appraisal Report */}
+                    <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Appraisal Report (PDF)</div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>This document validates the declared asset.</div>
+                        <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            </div>
+                            <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Credit Card Debt / Consumer Loans */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      alignItems: 'flex-start',
-                      gap: 8,
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 8,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          color: 'black',
-                          fontSize: 14,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>Credit card debt / consumer loans</div>
-                        <div style={{
-                          color: '#767676',
-                          fontSize: 12,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '400',
-                          wordWrap: 'break-word'
-                        }}>(Optional)</div>
-                      </div>
-                      <div style={{
-                        color: '#767676',
-                        fontSize: 12,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '400',
-                        lineHeight: 1.4,
-                        wordWrap: 'break-word'
-                      }}>Include credit card balances, personal loans, car loans, or buy-now-pay-later programs.</div>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        height: 39,
-                        paddingLeft: 12,
-                        paddingRight: 12,
-                        paddingTop: 10,
-                        paddingBottom: 10,
-                        background: '#F4F4F4',
-                        borderRadius: 10,
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 10,
-                        display: 'inline-flex'
-                      }}>
-                        <div style={{
-                          color: 'black',
-                          fontSize: 14,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>$</div>
-                        <input
-                          type="text"
-                          value={creditCardDebt}
-                          onChange={(e) => setCreditCardDebt(e.target.value)}
-                          placeholder="e.g. 100 000"
-                          style={{
-                            flex: '1 1 0',
-                            color: creditCardDebt ? 'black' : '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word',
-                            border: 'none',
-                            background: 'transparent',
-                            outline: 'none',
-                            width: '100%'
-                          }}
-                        />
-                      </div>
+                    {/* Middle Left - Home Insurance */}
+                    <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Home Insurance (PDF)</div>
+                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Boosts credibility and may reduce approval friction.</div>
+                        <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            </div>
+                            <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Monthly Debt Payments */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      alignItems: 'flex-start',
-                      gap: 8,
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 8,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          color: 'black',
-                          fontSize: 14,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>Monthly debt payments</div>
-                        <div style={{
-                          color: '#767676',
-                          fontSize: 12,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '400',
-                          wordWrap: 'break-word'
-                        }}>(Optional)</div>
-                      </div>
-                      <div style={{
-                        color: '#767676',
-                        fontSize: 12,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '400',
-                        lineHeight: 1.4,
-                        wordWrap: 'break-word'
-                      }}>Estimate your total monthly debt payments across all loans and credit.</div>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        height: 39,
-                        paddingLeft: 12,
-                        paddingRight: 12,
-                        paddingTop: 10,
-                        paddingBottom: 10,
-                        background: '#F4F4F4',
-                        borderRadius: 10,
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 10,
-                        display: 'inline-flex'
-                      }}>
-                        <div style={{
-                          color: 'black',
-                          fontSize: 14,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>Monthly</div>
-                        <input
-                          type="text"
-                          value={monthlyDebtPayments}
-                          onChange={(e) => setMonthlyDebtPayments(e.target.value)}
-                          placeholder="e.g. 100 000"
-                          style={{
-                            flex: '1 1 0',
-                            color: monthlyDebtPayments ? 'black' : '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word',
-                            border: 'none',
-                            background: 'transparent',
-                            outline: 'none',
-                            width: '100%'
-                          }}
-                        />
-                      </div>
+                    {/* Middle Right - Recent Tax Return */}
+                    <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Recent Tax Return (PDF)</div>
+                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>To validate your financial profile and repayment capacity.</div>
+                        <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                            <div data-icon="ic:image" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Black, black)'}} />
+                            </div>
+                            <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload images</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
+                            </div>
+                        </div>
                     </div>
 
+                    {/* Bottom Left - Mortgage Statement */}
+                    <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Mortgage Statement (PDF)</div>
+                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Mortgage statement adds context to your liabilities.</div>
+                        <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            </div>
+                            <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bottom Right - Grant or Title Deed */}
+                    <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                            <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Grant or Title Deed (PDF)</div>
+                            <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                        </div>
+                        <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Shows legal ownership of the property. </div>
+                        <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                            <div data-icon="ic:file" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                                <div style={{width: 10, height: 12, left: 3, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                                <div style={{width: 2, height: 3, left: 11, top: 2, position: 'absolute', background: 'var(--Black, black)'}} />
+                            </div>
+                            <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+                                <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload a file</div>
+                                <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                  
+                  {/* Property Photos Section - Full Width Below Grid */}
+                  <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+                      <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+                          <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Property Photos (JPG, PNG)</div>
+                          <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Clear photos (2–10) of the property improve trust and funding chances.</div>
+                      <div data-property-1="Dropzone/File upload" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                          <div data-icon="ic:image" style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
+                              <div style={{width: 10, height: 10, left: 3, top: 3, position: 'absolute', background: 'var(--Black, black)'}} />
+                          </div>
+                          <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', display: 'inline-flex'}}>
+                              <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Upload images</div>
+                              <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Drag and drop or click to upload</div>
+                          </div>
+                      </div>
                   </div>
                   
                   {/* Continue Button */}
-                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 24}}>
+                  <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 'auto'}}>
                     <div 
                       style={{
-                        paddingLeft: 16, 
-                        paddingRight: 16, 
-                        paddingTop: 10, 
-                        paddingBottom: 10, 
+                        paddingLeft: 24, 
+                        paddingRight: 24, 
+                        paddingTop: 12, 
+                        paddingBottom: 12, 
                         background: '#113D7B', 
-                        boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
                         borderRadius: 12, 
                         justifyContent: 'center', 
                         alignItems: 'center', 
-                        gap: 6, 
+                        gap: 8, 
                         display: 'inline-flex',
                         cursor: 'pointer'
                       }}
                       onClick={() => setCurrentStep(6)}
                     >
-                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Save and Continue</div>
+                      <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                     </div>
                   </div>
                 </div>
