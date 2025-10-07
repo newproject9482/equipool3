@@ -842,7 +842,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="w-full px-4 sm:px-6 py-4 sm:py-6">
+      <header className="w-full px-4 sm:px-6 py-4 sm:py-6 relative">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
@@ -953,15 +953,15 @@ export default function Home() {
         
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 mt-0">
             <div className="px-4 py-4 space-y-4">
               {/* Navigation Links */}
               <div className="space-y-3">
-                <a className="block ep-nav-link cursor-pointer py-2">About Us</a>
-                <a className="block ep-nav-link cursor-pointer py-2">Security</a>
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
                 <div className="flex items-center gap-2 py-2">
-                  <a className="ep-nav-link cursor-pointer">Learn</a>
-                  <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+                  <a className="text-gray-700 hover:text-blue-900 cursor-pointer text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
+                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
                 </div>
               </div>
               
@@ -1006,7 +1006,8 @@ export default function Home() {
                 ) : (
                   <div className="space-y-3">
                     <button 
-                      className="w-full ep-nav-login text-center py-3 border border-gray-200 rounded-lg"
+                      className="w-full text-center py-3 border border-gray-200 rounded-lg text-gray-700 font-medium bg-white hover:bg-gray-50"
+                      style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}}
                       onClick={() => {
                         setShowLoginModal(true);
                         setShowMobileMenu(false);
@@ -1015,7 +1016,12 @@ export default function Home() {
                       Login
                     </button>
                     <button 
-                      className="w-full ep-cta-join text-center py-3 rounded-lg"
+                      className="w-full text-center py-3 rounded-lg text-white font-medium"
+                      style={{
+                        fontFamily: 'var(--ep-font-avenir)', 
+                        fontSize: '14px',
+                        background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)'
+                      }}
                       onClick={() => {
                         openSignUpModal();
                         setShowMobileMenu(false);
