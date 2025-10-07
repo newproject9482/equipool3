@@ -741,20 +741,20 @@ export default function PoolsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="w-full px-4 sm:px-6 py-4 sm:py-6 relative">
+      <header className="fixed top-0 left-0 w-full px-4 sm:px-6 py-4 sm:py-6 bg-white border-b border-gray-100 z-50">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
             <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-            <span className="ep-nav-brand">EquiPool</span>
+            <span className="text-black text-xl font-bold" style={{fontFamily: 'var(--ep-font-avenir)'}}>EquiPool</span>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
-            <a className="ep-nav-link cursor-pointer">About Us</a>
-            <a className="ep-nav-link cursor-pointer">Security</a>
+            <a className="text-gray-700 text-sm font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
+            <a className="text-gray-700 text-sm font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
             <div className="flex items-center gap-2">
-              <a className="ep-nav-link cursor-pointer">Learn</a>
-              <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+              <a className="text-gray-700 text-sm font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
+              <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
             </div>
           </nav>
 
@@ -803,8 +803,8 @@ export default function PoolsPage() {
               </>
             ) : (
               <>
-                <button className="ep-nav-login" onClick={() => setShowLoginModal(true)} style={{cursor: 'pointer'}}>Login</button>
-                <button className="ep-cta-join" onClick={() => window.location.href = '/'}>Join Equipool</button>
+                <button className="px-4 py-2 text-gray-700 font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}} onClick={() => setShowLoginModal(true)}>Login</button>
+                <button className="px-4 py-2 bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800" style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}} onClick={() => window.location.href = '/'}>Join Equipool</button>
               </>
             )}
           </div>
@@ -886,7 +886,7 @@ export default function PoolsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         <div className="w-full pt-8 sm:pt-16 lg:pt-24 flex flex-col justify-start items-start">
           <div className="w-full flex flex-col justify-start items-start gap-4 lg:gap-6">
             {/* Breadcrumb */}

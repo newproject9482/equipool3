@@ -394,8 +394,8 @@ export default function InvestorPoolsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="max-w-6xl mx-auto px-6 py-6">
-        <div className="flex items-center justify-between">
+      <header className="w-full px-4 sm:px-6 py-4 sm:py-6 relative">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
             <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
             <span className="ep-nav-brand">EquiPool</span>
