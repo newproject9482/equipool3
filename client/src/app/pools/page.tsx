@@ -382,7 +382,7 @@ export default function PoolsPage() {
     if (isAuthenticated) {
       fetchPools();
     }
-  }, [isAuthenticated, fetchPools]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, fetchPools]);
 
   // Function to create pool
   const createPool = async () => {

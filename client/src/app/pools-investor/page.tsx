@@ -697,7 +697,7 @@ export default function InvestorPoolsPage() {
                     </div>
                     {investmentPools.length > 0 && (
                       <div className="text-gray-400 text-sm font-medium text-center" style={{fontFamily: 'var(--ep-font-avenir)'}}>
-                        You have already invested in all available pools. Check "My Investments" tab.
+                        You have already invested in all available pools. Check &ldquo;My Investments&rdquo; tab.
                       </div>
                     )}
                   </div>
