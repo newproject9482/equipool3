@@ -41,6 +41,7 @@ export default function PoolsPage() {
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   // Pool creation states
   const [currentStep, setCurrentStep] = useState(1);
@@ -740,164 +741,229 @@ export default function PoolsPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
-          <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-          <span className="ep-nav-brand">EquiPool</span>
-        </div>
-
-        <nav className="hidden md:flex items-center gap-6">
-          <a className="ep-nav-link">About Us</a>
-          <a className="ep-nav-link">Security</a>
-          <div className="flex items-center gap-2">
-            <a className="ep-nav-link">Learn</a>
-            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+      <header className="w-full px-4 sm:px-6 py-4 sm:py-6 relative">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
+            <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
+            <span className="ep-nav-brand">EquiPool</span>
           </div>
-        </nav>
 
-        {/* Auth Section */}
-        <div className="flex items-center gap-4" style={{position:'relative'}}>
-          {isAuthenticated ? (
-            <>
-              {/* Notifications Icon */}
-              <div
-                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
-              >
-                <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-6">
+            <a className="ep-nav-link cursor-pointer">About Us</a>
+            <a className="ep-nav-link cursor-pointer">Security</a>
+            <div className="flex items-center gap-2">
+              <a className="ep-nav-link cursor-pointer">Learn</a>
+              <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+            </div>
+          </nav>
+
+          {/* Mobile menu button */}
+          <button 
+            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label="Toggle menu"
+          >
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'opacity-0' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+          </button>
+
+          {/* Desktop Auth Section */}
+          <div className="hidden lg:flex items-center gap-4" style={{position:'relative'}}>
+            {isAuthenticated ? (
+              <>
+                {/* Notifications Icon */}
+                <div
+                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
+                >
+                  <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+                </div>
+                {/* Profile Icon (right / opens menu) */}
+                <div
+                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
+                  onClick={() => setShowProfileMenu(v => !v)}
+                  aria-haspopup="menu"
+                  aria-expanded={showProfileMenu}
+                >
+                  <Image src="/profile.svg" alt="Profile" width={16} height={16} />
+                  {showProfileMenu && (
+                    <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => {
+                        console.log('Pools & Dashboard clicked. userRole:', userRole);
+                        const targetUrl = getSmartPoolsUrl(userRole);
+                        console.log('Redirecting to:', targetUrl);
+                        window.location.href = targetUrl;
+                      }}>Pools & Dashboard</button>
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <button className="ep-nav-login" onClick={() => setShowLoginModal(true)} style={{cursor: 'pointer'}}>Login</button>
+                <button className="ep-cta-join" onClick={() => window.location.href = '/'}>Join Equipool</button>
+              </>
+            )}
+          </div>
+        </div>
+        
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 mt-0">
+            <div className="px-4 py-4 space-y-4">
+              {/* Navigation Links */}
+              <div className="space-y-3">
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
+                <div className="flex items-center gap-2 py-2">
+                  <a className="text-gray-700 hover:text-blue-900 cursor-pointer text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
+                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
+                </div>
               </div>
-              {/* Profile Icon (right / opens menu) */}
-              <div
-                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
-                onClick={() => setShowProfileMenu(v => !v)}
-                aria-haspopup="menu"
-                aria-expanded={showProfileMenu}
-              >
-                <Image src="/profile.svg" alt="Profile" width={16} height={16} />
-                {showProfileMenu && (
-                  <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => {
-                      console.log('Pools & Dashboard clicked. userRole:', userRole);
-                      const targetUrl = getSmartPoolsUrl(userRole);
-                      console.log('Redirecting to:', targetUrl);
-                      window.location.href = targetUrl;
-                    }}>Pools & Dashboard</button>
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+              
+              {/* Auth Section */}
+              <div className="pt-4 border-t border-gray-200">
+                {isAuthenticated ? (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full text-left py-2 text-black text-base font-medium"
+                      onClick={() => {
+                        console.log('Pools & Dashboard clicked (mobile). userRole:', userRole);
+                        const targetUrl = getSmartPoolsUrl(userRole);
+                        console.log('Redirecting to:', targetUrl);
+                        window.location.href = targetUrl;
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Pools & Dashboard
+                    </button>
+                    <button className="w-full text-left py-2 text-gray-500 text-base font-medium">Profile</button>
+                    <button 
+                      className="w-full text-left py-2 text-red-600 text-base font-medium"
+                      onClick={() => {
+                        handleLogout();
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Log out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full text-center py-3 border border-gray-200 rounded-lg text-gray-700 font-medium bg-white hover:bg-gray-50"
+                      style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}}
+                      onClick={() => {
+                        setShowLoginModal(true);
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button 
+                      className="w-full text-center py-3 rounded-lg text-white font-medium"
+                      style={{
+                        fontFamily: 'var(--ep-font-avenir)', 
+                        fontSize: '14px',
+                        background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)'
+                      }}
+                      onClick={() => {
+                        window.location.href = '/';
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Join Equipool
+                    </button>
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            <>
-              <button className="ep-nav-login" onClick={() => setShowLoginModal(true)} style={{cursor: 'pointer'}}>Login</button>
-              <button className="ep-cta-join" onClick={() => window.location.href = '/'}>Join Equipool</button>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main style={{width: '100%', maxWidth: 1440, height: 515, margin: '0 auto'}}>
-        <div style={{width: '100%', height: '100%', paddingTop: 120, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
-          <div style={{alignSelf: 'stretch', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full pt-8 sm:pt-16 lg:pt-24 flex flex-col justify-start items-start">
+          <div className="w-full flex flex-col justify-start items-start gap-4 lg:gap-6">
             {/* Breadcrumb */}
-            <div style={{alignSelf: 'stretch', paddingBottom: 16}}>
+            <div className="w-full pb-4">
               <div>
                 <span style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pools & Dashboard</span>
               </div>
             </div>
-            <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+            <div className="w-full flex justify-start items-center gap-2 lg:gap-4">
               <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Overview</div>
             </div>
-            <div style={{width: 1080, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 20, display: 'inline-flex'}}>
-              <div style={{width: 350, height: 280, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', textAlign: 'center'}}>Total Borrowed</div>
+            
+            {/* Overview Cards - Responsive Grid */}
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+              {/* Total Borrowed Card */}
+              <div className="w-full p-6 lg:p-8 bg-gray-50 overflow-hidden rounded-3xl flex flex-col justify-between items-center min-h-[220px] lg:min-h-[280px]">
+                <div className="w-full flex flex-col justify-end items-center gap-2">
+                  <div className="text-center text-black text-lg lg:text-2xl font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Total Borrowed</div>
                 </div>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{
-                    alignSelf: 'center',
-                    color: 'black',
-                    fontSize: 48,
-                    fontFamily: 'var(--ep-font-avenir)',
-                    fontWeight: '500',
-                    wordWrap: 'break-word',
-                    textAlign: 'center'
-                  }}>
+                <div className="w-full flex flex-col justify-end items-center gap-2">
+                  <div className="text-center text-black text-3xl lg:text-5xl font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>
                     {summaryStats.totalBorrowed}
                   </div>
                 </div>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', textAlign: 'center'}}>(i) Total amount you&apos;ve received across all funded pools.</div>
+                <div className="w-full flex flex-col justify-end items-center gap-2">
+                  <div className="text-center text-black text-xs lg:text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>(i) Total amount you&apos;ve received across all funded pools.</div>
                 </div>
               </div>
-              <div style={{width: 350, height: 280, padding: 32, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', textAlign: 'center'}}>Next Payment</div>
+              
+              {/* Next Payment Card */}
+              <div className="w-full p-6 lg:p-8 bg-gray-50 overflow-hidden rounded-3xl flex flex-col justify-between items-center min-h-[220px] lg:min-h-[280px]">
+                <div className="w-full flex flex-col justify-end items-center gap-2">
+                  <div className="text-center text-black text-lg lg:text-2xl font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Next Payment</div>
                 </div>
-                <div style={{alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                  <div style={{
-                    alignSelf: 'center',
-                    color: 'var(--Black, black)',
-                    fontSize: 24,
-                    fontFamily: 'var(--ep-font-avenir)',
-                    fontWeight: '500',
-                    wordWrap: 'break-word',
-                    textAlign: 'center'
-                  }}>
+                <div className="w-full flex-1 flex flex-col justify-center items-center">
+                  <div className="text-center text-black text-lg lg:text-2xl font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>
                     {summaryStats.nextPaymentDate}
                   </div>
-                  <div style={{
-                    alignSelf: 'center',
-                    color: 'black',
-                    fontSize: 48,
-                    fontFamily: 'var(--ep-font-avenir)',
-                    fontWeight: '500',
-                    wordWrap: 'break-word',
-                    textAlign: 'center'
-                  }}>
+                  <div className="text-center text-black text-3xl lg:text-5xl font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>
                     {summaryStats.nextPaymentAmount}
                   </div>
                 </div>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', textAlign: 'center'}}>(i) Your upcoming repayment amount and due date.</div>
+                <div className="w-full flex flex-col justify-end items-center gap-2">
+                  <div className="text-center text-black text-xs lg:text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>(i) Your upcoming repayment amount and due date.</div>
                 </div>
               </div>
-              <div style={{width: 350, height: 280, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', textAlign: 'center'}}>Active pools</div>
+              
+              {/* Active Pools Card */}
+              <div className="w-full p-6 lg:p-8 bg-gray-50 overflow-hidden rounded-3xl flex flex-col justify-between items-center min-h-[220px] lg:min-h-[280px] sm:col-span-2 lg:col-span-1">
+                <div className="w-full flex flex-col justify-end items-center gap-2">
+                  <div className="text-center text-black text-lg lg:text-2xl font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Active pools</div>
                 </div>
-                <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', display: 'flex'}}>
-                  <div style={{
-                    alignSelf: 'center',
-                    color: 'black',
-                    fontSize: 48,
-                    fontFamily: 'var(--ep-font-avenir)',
-                    fontWeight: '500',
-                    wordWrap: 'break-word',
-                    textAlign: 'center'
-                  }}>
+                <div className="w-full flex flex-col justify-end items-center">
+                  <div className="text-center text-black text-3xl lg:text-5xl font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>
                     {summaryStats.activePools}
                   </div>
                 </div>
-                <div style={{width: 286, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 8, display: 'flex'}}>
-                  <div style={{alignSelf: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', textAlign: 'center'}}>(i) Number of currently running loans.</div>
+                <div className="w-full flex flex-col justify-end items-center gap-2">
+                  <div className="text-center text-black text-xs lg:text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>(i) Number of currently running loans.</div>
                 </div>
               </div>
             </div>
+            
+            {/* Create Pool Button - Responsive */}
             <div 
-              style={{width: 1080, height: 138, paddingLeft: 40, paddingRight: 40, paddingTop: 24, paddingBottom: 24, background: '#E4EFFF', overflow: 'hidden', borderRadius: 24, justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex', cursor: 'pointer'}}
+              className="w-full p-6 lg:px-10 lg:py-6 bg-blue-50 overflow-hidden rounded-3xl flex flex-col lg:flex-row justify-start items-center gap-4 lg:gap-2 cursor-pointer min-h-[120px] lg:min-h-[138px]"
               onClick={() => setShowPoolTypeModal(true)}
             >
-              <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                <div style={{flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                  <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Create a pool</div>
+              <div className="flex-1 flex flex-col justify-start items-start lg:items-start gap-2">
+                <div className="flex flex-col justify-end items-start gap-2">
+                  <div className="text-black text-2xl lg:text-3xl font-medium text-center lg:text-left w-full" style={{fontFamily: 'var(--ep-font-avenir)'}}>Create a pool</div>
                 </div>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                  <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start a new funding request backed by your property.<br/>Define your loan amount, term, and target return — we&apos;ll guide you from there.</div>
+                <div className="w-full flex flex-col justify-end items-start gap-2">
+                  <div className="text-black text-sm font-medium text-center lg:text-left" style={{fontFamily: 'var(--ep-font-avenir)'}}>Start a new funding request backed by your property.<br/>Define your loan amount, term, and target return — we&apos;ll guide you from there.</div>
                 </div>
               </div>
-              <div style={{width: 40, height: 40, position: 'relative', background: 'white', overflow: 'hidden', borderRadius: 40, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <div className="w-10 h-10 lg:w-10 lg:h-10 bg-white overflow-hidden rounded-full flex justify-center items-center flex-shrink-0">
                 <Image src="/add_pool.svg" alt="Add Pool" width={26} height={26} />
               </div>
             </div>
@@ -906,102 +972,73 @@ export default function PoolsPage() {
       </main>
 
       {/* All Pools Section */}
-      <div style={{width: '100%', maxWidth: 1440, height: '100%', padding: '80px 20px', margin: '80px auto 0 auto', position: 'relative', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
-    <div style={{width: '100%', maxWidth: 1093, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
-      <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
-        <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>All Pools</div>
-      </div>
-    </div>
-  <div style={{width: '100%', maxWidth: 1122, height: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, 350px)', gap: 24, justifyContent: 'flex-start', alignItems: 'start', margin: '24px 0 0 0'}}>
-    {/* Loading state */}
-    {loadingPools && (
-      <div style={{
-        gridColumn: '1 / -1',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 40,
-        color: '#767676',
-        fontSize: 16,
-        fontFamily: 'var(--ep-font-avenir)',
-        fontWeight: '500'
-      }}>
-        Loading pools...
-      </div>
-    )}
-
-    {/* No pools state */}
-    {!loadingPools && realPools.length === 0 && (
-      <div style={{
-        gridColumn: '1 / -1',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 40,
-        gap: 16
-      }}>
-        <div style={{
-          color: '#767676',
-          fontSize: 18,
-          fontFamily: 'var(--ep-font-avenir)',
-          fontWeight: '500',
-          textAlign: 'center'
-        }}>
-          No pools yet
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 mt-12 lg:mt-20">
+        <div className="w-full flex justify-start items-center gap-3 mb-6">
+          <div className="flex-1 flex justify-start items-center">
+            <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>All Pools</div>
+          </div>
         </div>
-        <div style={{
-          color: '#B2B2B2',
-          fontSize: 14,
-          fontFamily: 'var(--ep-font-avenir)',
-          fontWeight: '400',
-          textAlign: 'center'
-        }}>
-          Create your first pool to get started with raising capital
-        </div>
-      </div>
-    )}
+        
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+          {/* Loading state */}
+          {loadingPools && (
+            <div className="col-span-full flex justify-center items-center py-10 text-gray-500 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>
+              Loading pools...
+            </div>
+          )}
 
-    {/* Dynamic pool cards */}
-  {!loadingPools && realPools.map((pool) => {
-      // human-friendly display id (EP000123), keep for UI only
-      const displayId = `EP${String(pool.id).padStart(6, '0')}`;
-      const statusConfig: { [key: string]: { color: string; bgColor: string; label: string } } = {
-        'active': { color: '#65CC8E', bgColor: '#DDF4E6', label: 'Active' },
-        'draft': { color: '#F59E0B', bgColor: '#FEF3C7', label: 'Draft' },
-        'funded': { color: '#3B82F6', bgColor: '#DBEAFE', label: 'Funded' },
-        'completed': { color: '#10B981', bgColor: '#D1FAE5', label: 'Completed' },
-        'cancelled': { color: '#EF4444', bgColor: '#FEE2E2', label: 'Cancelled' }
-      };
-      const status = statusConfig[pool.status] || statusConfig['draft'];
-      
-  return (
-        <div key={pool.id} style={{
-          width: 350,
-          height: 355,
-          padding: 32,
-          paddingBottom: 56, // leave space for the bottom action
-          position: 'relative',
-          background: 'white',
-          borderRadius: 24,
-          border: '1px solid #E5E7EB',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease'
-        }}
-  // navigate to numeric pool id so backend/detail routing can use the integer id
-  onClick={() => router.push(`/pools/${pool.id}`)}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'none';
-        }}
-        >
+          {/* No pools state */}
+          {!loadingPools && realPools.length === 0 && (
+            <div className="col-span-full flex flex-col justify-center items-center py-10 gap-4">
+              <div style={{
+                color: '#767676',
+                fontSize: 18,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '500',
+                textAlign: 'center'
+              }}>
+                No pools yet
+              </div>
+              <div style={{
+                color: '#B2B2B2',
+                fontSize: 14,
+                fontFamily: 'var(--ep-font-avenir)',
+                fontWeight: '400',
+                textAlign: 'center'
+              }}>
+                Create your first pool to get started with raising capital
+              </div>
+            </div>
+          )}
+
+          {/* Dynamic pool cards */}
+          {!loadingPools && realPools.map((pool) => {
+            // human-friendly display id (EP000123), keep for UI only
+            const displayId = `EP${String(pool.id).padStart(6, '0')}`;
+            const statusConfig: { [key: string]: { color: string; bgColor: string; label: string } } = {
+              'active': { color: '#65CC8E', bgColor: '#DDF4E6', label: 'Active' },
+              'draft': { color: '#F59E0B', bgColor: '#FEF3C7', label: 'Draft' },
+              'funded': { color: '#3B82F6', bgColor: '#DBEAFE', label: 'Funded' },
+              'completed': { color: '#10B981', bgColor: '#D1FAE5', label: 'Completed' },
+              'cancelled': { color: '#EF4444', bgColor: '#FEE2E2', label: 'Cancelled' }
+            };
+            const status = statusConfig[pool.status] || statusConfig['draft'];
+            
+            return (
+              <div 
+                key={pool.id} 
+                className="w-full max-w-[350px] mx-auto p-6 lg:p-8 pb-14 relative bg-white rounded-3xl border border-gray-200 flex flex-col justify-between cursor-pointer transition-all duration-200 hover:shadow-lg"
+                style={{minHeight: '355px'}}
+                onClick={() => router.push(`/pools/${pool.id}`)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0px 8px 20px rgba(17, 61, 123, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
           {/* Header */}
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
             <div style={{color: '#B2B2B2', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67}}>#{displayId}</div>
