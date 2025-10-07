@@ -1280,8 +1280,10 @@ export default function PoolsPage() {
         >
           <div 
             style={{
-              width: 800,
-              height: 500,
+              width: 'calc(100vw - 720px)',
+              height: 'calc(100vh - 384px)',
+              minWidth: 800,
+              minHeight: 600,
               backgroundColor: 'white',
               borderRadius: 24,
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
@@ -1298,7 +1300,7 @@ export default function PoolsPage() {
               flexDirection: 'column', 
               justifyContent: 'flex-start', 
               alignItems: 'flex-start', 
-              gap: 32, 
+              gap: 130, 
               display: 'flex'
             }}>
               {/* Header */}
@@ -1315,7 +1317,7 @@ export default function PoolsPage() {
               </div>
               
               {/* Pool Type Cards */}
-              <div style={{alignSelf: 'stretch', flex: '1 1 0', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex'}}>
+              <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex', marginBottom: 130}}>
                 <div 
                   style={{
                     width: 277, 
