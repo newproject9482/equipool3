@@ -1043,9 +1043,9 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
           {/* Left Side - Content */}
           <section className="order-1 lg:order-1">
-            <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 32, display: 'flex'}}>
-              <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
-                <div style={{width: '100%', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+            <div className="w-full h-full flex flex-col justify-center items-center lg:items-start gap-8">
+              <div className="w-full flex flex-col justify-start items-center lg:items-start gap-6">
+                <div className="w-full flex justify-center lg:justify-start items-center">
                   <div className="text-center lg:text-left" style={{color: '#113D7B', fontSize: 'clamp(16px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Welcome to EquiPool</div>
                 </div>
                 <div className="text-center lg:text-left" style={{width: '100%'}}>
@@ -1467,9 +1467,9 @@ export default function Home() {
                 <div className="text-black font-bold" style={{fontSize: 'clamp(16px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)'}}>Stay Ahead of the Curve</div>
                 <div className="w-full text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Be the first to discover newly launched pools, platform updates, and investor insights — right in your inbox.</div>
             </div>
-            <div className="w-full p-1 pl-4 pr-1 bg-gray-100 rounded-full flex flex-col sm:flex-row justify-start items-center gap-4 sm:gap-4">
-                <div className="flex-1 w-full flex flex-col justify-start items-start">
-                    <div className="w-full rounded-md flex justify-start items-center gap-2">
+            <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 sm:p-1 sm:pl-4 sm:pr-1 sm:bg-gray-100 sm:rounded-full">
+                <div className="flex-1 w-full">
+                    <div className="w-full p-3 sm:p-0 bg-gray-100 sm:bg-transparent rounded-lg sm:rounded-none">
                         <input
                           type="email"
                           value={newsletterEmail}
@@ -1489,7 +1489,7 @@ export default function Home() {
                     </div>
                 </div>
                 <div 
-                  className="w-full sm:w-auto px-3 py-2 bg-blue-900 rounded-xl border border-gray-200 flex justify-center items-center gap-2 cursor-pointer shadow-sm"
+                  className="w-full sm:w-auto px-4 py-3 sm:px-3 sm:py-2 bg-blue-900 rounded-xl border border-gray-200 flex justify-center items-center gap-2 cursor-pointer shadow-sm"
                   style={{
                     boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)'
                   }}
