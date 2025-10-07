@@ -11,6 +11,7 @@ export default function PoolDetailPage() {
   const poolId = params?.poolId as string;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'documents'>('overview');
   const [showEditModal, setShowEditModal] = useState(false);
@@ -271,63 +272,147 @@ export default function PoolDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
-          <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-          <span className="ep-nav-brand">EquiPool</span>
+      <header className="w-full px-4 sm:px-6 py-4 sm:py-6 relative">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
+            <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
+            <span className="ep-nav-brand">EquiPool</span>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-6">
+            <a className="ep-nav-link">About Us</a>
+            <a className="ep-nav-link">Security</a>
+            <div className="flex items-center gap-2">
+              <a className="ep-nav-link">Learn</a>
+              <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+            </div>
+          </nav>
+
+          {/* Mobile menu button */}
+          <button 
+            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label="Toggle menu"
+          >
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'opacity-0' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+          </button>
+
+          {/* Desktop Auth Section */}
+          <div className="hidden lg:flex items-center gap-4" style={{position:'relative'}}>
+            {isAuthenticated ? (
+              <>
+                {/* Notifications Icon */}
+                <div
+                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
+                >
+                  <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+                </div>
+                {/* Profile Icon (right / opens menu) */}
+                <div
+                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
+                  onClick={() => setShowProfileMenu(v => !v)}
+                  aria-haspopup="menu"
+                  aria-expanded={showProfileMenu}
+                >
+                  <Image src="/profile.svg" alt="Profile" width={16} height={16} />
+                  {showProfileMenu && (
+                    <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => window.location.href = '/pools'}>Pools & Dashboard</button>
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <button className="ep-nav-login" style={{cursor: 'pointer'}}>Login</button>
+                <button className="ep-cta-join" onClick={() => window.location.href = '/'}>Join Equipool</button>
+              </>
+            )}
+          </div>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <a className="ep-nav-link">About Us</a>
-          <a className="ep-nav-link">Security</a>
-          <div className="flex items-center gap-2">
-            <a className="ep-nav-link">Learn</a>
-            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
-          </div>
-        </nav>
-
-        {/* Auth Section */}
-        <div className="flex items-center gap-4" style={{position:'relative'}}>
-          {isAuthenticated ? (
-            <>
-              {/* Notifications Icon */}
-              <div
-                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
-              >
-                <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 mt-0">
+            <div className="px-4 py-4 space-y-4">
+              {/* Navigation Links */}
+              <div className="space-y-3">
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
+                <div className="flex items-center gap-2 py-2">
+                  <a className="text-gray-700 hover:text-blue-900 cursor-pointer text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
+                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
+                </div>
               </div>
-              {/* Profile Icon (right / opens menu) */}
-              <div
-                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
-                onClick={() => setShowProfileMenu(v => !v)}
-                aria-haspopup="menu"
-                aria-expanded={showProfileMenu}
-              >
-                <Image src="/profile.svg" alt="Profile" width={16} height={16} />
-                {showProfileMenu && (
-                  <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => window.location.href = '/pools'}>Pools & Dashboard</button>
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+              
+              {/* Auth Section */}
+              <div className="pt-4 border-t border-gray-200">
+                {isAuthenticated ? (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full text-left py-2 text-black text-base font-medium"
+                      onClick={() => {
+                        window.location.href = '/pools';
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Pools & Dashboard
+                    </button>
+                    <button className="w-full text-left py-2 text-gray-500 text-base font-medium">Profile</button>
+                    <button 
+                      className="w-full text-left py-2 text-red-600 text-base font-medium"
+                      onClick={() => {
+                        handleLogout();
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Log out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full text-center py-3 border border-gray-200 rounded-lg text-gray-700 font-medium bg-white hover:bg-gray-50"
+                      style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}}
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button 
+                      className="w-full text-center py-3 rounded-lg text-white font-medium"
+                      style={{
+                        fontFamily: 'var(--ep-font-avenir)', 
+                        fontSize: '14px',
+                        background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)'
+                      }}
+                      onClick={() => {
+                        window.location.href = '/';
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Join Equipool
+                    </button>
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            <>
-              <button className="ep-nav-login" style={{cursor: 'pointer'}}>Login</button>
-              <button className="ep-cta-join" onClick={() => window.location.href = '/'}>Join Equipool</button>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main style={{width: '100%', maxWidth: 1440, margin: '0 auto', padding: '40px 20px'}}>
-        <div style={{width: '100%', height: '100%', paddingTop: 120, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
-          <div style={{alignSelf: 'stretch', paddingLeft: 140, paddingRight: 140, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+      <main className="w-full px-4 sm:px-6 py-8 sm:py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col gap-4">
             {/* Breadcrumb */}
-            <div style={{alignSelf: 'stretch', paddingBottom: 16}}>
+            <div className="pb-4">
               <div>
                 <span style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pools & Dashboard </span>
                 <span style={{color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> &gt; Pool #{poolId}</span>
@@ -335,15 +420,7 @@ export default function PoolDetailPage() {
             </div>
 
             {/* Navigation Tabs */}
-            <div style={{
-              alignSelf: 'stretch',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 32,
-              display: 'flex',
-              paddingBottom: 24,
-              borderBottom: '1px solid #E5E7EB'
-            }}>
+            <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4 sm:gap-8 pb-6 border-b border-gray-200">
               <div style={{
                 color: activeTab === 'overview' ? '#113D7B' : '#767676',
                 fontSize: 18,
@@ -1641,103 +1718,84 @@ export default function PoolDetailPage() {
         </div>
       </main>
 
-      {/* Footer section */}
-      <div style={{width: '100%', height: '100%', paddingTop: 32, paddingBottom: 32, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'inline-flex', marginTop: 160}}>
-        <div style={{width: 1080, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 130, display: 'inline-flex'}}>
-            <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 40, display: 'inline-flex'}}>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-                    <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                        <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Quick Links</div>
+      {/* Footer */}
+      <div className="w-full mt-16 lg:mt-40 py-8 lg:py-8 px-4 sm:px-8 lg:px-32 xl:px-44 flex flex-col justify-center items-center gap-12">
+        <div className="w-full max-w-5xl flex flex-col lg:flex-row justify-start items-start gap-8 lg:gap-32">
+            <div className="flex flex-col justify-start items-start gap-10 w-full lg:w-auto">
+                <div className="w-full flex flex-col justify-start items-start gap-4">
+                    <div className="rounded-md flex justify-start items-center gap-2">
+                        <div className="text-black text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Quick Links</div>
                     </div>
-                    <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                        <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Active Pools</div>
+                    <div className="rounded-md flex justify-start items-center gap-2">
+                        <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Active Pools</div>
                     </div>
-                    <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                        <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>About Us</div>
+                    <div className="rounded-md flex justify-start items-center gap-2">
+                        <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</div>
                     </div>
-                    <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                        <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Security</div>
+                    <div className="rounded-md flex justify-start items-center gap-2">
+                        <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</div>
                     </div>
-                    <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                        <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Learn</div>
-                        <div style={{paddingLeft: 6, paddingRight: 6, paddingTop: 3, paddingBottom: 3, background: '#F5F5F5', borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-                            <div style={{color: '#4A5565', fontSize: 10, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Soon</div>
+                    <div className="rounded-md flex justify-start items-center gap-1">
+                        <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</div>
+                        <div className="px-2 py-1 bg-gray-100 rounded-full flex justify-center items-center">
+                            <div className="text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</div>
                         </div>
                     </div>
                 </div>
-                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-                    <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                        <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Terms of Service</div>
+                <div className="flex flex-col justify-start items-start gap-4">
+                    <div className="rounded-md flex justify-start items-center gap-2">
+                        <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Terms of Service</div>
                     </div>
-                    <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                        <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Privacy Policy</div>
+                    <div className="rounded-md flex justify-start items-center gap-2">
+                        <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Privacy Policy</div>
                     </div>
                 </div>
             </div>
-            <div style={{width: 71, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Support</div>
+            <div className="flex flex-col justify-start items-start gap-4 w-full lg:w-auto">
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-black text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Support</div>
                 </div>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Contact Us</div>
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Contact Us</div>
                 </div>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>FAQs</div>
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>FAQs</div>
                 </div>
             </div>
-            <div style={{width: 104, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Socials</div>
+            <div className="flex flex-col justify-start items-start gap-4 w-full lg:w-auto">
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-black text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Socials</div>
                 </div>
-                <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+                <div className="flex justify-start items-start gap-4">
                     <Image src="/mdi-instagram.svg" alt="Instagram" width={24} height={24} />
                     <Image src="/ic-baseline-facebook.svg" alt="Facebook" width={24} height={24} />
                     <Image src="/mdi-linkedin.svg" alt="LinkedIn" width={24} height={24} />
                 </div>
             </div>
-            <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-                <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                    <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Stay Ahead of the Curve</div>
-                    <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Be the first to discover newly launched pools, platform updates, and investor insights — right in your inbox.</div>
+            <div className="flex-1 flex flex-col justify-start items-start gap-4 w-full lg:w-auto">
+                <div className="w-full flex flex-col justify-start items-start gap-1">
+                    <div className="text-black font-bold" style={{fontSize: 'clamp(16px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)'}}>Stay Ahead of the Curve</div>
+                    <div className="w-full text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Be the first to discover newly launched pools, platform updates, and investor insights — right in your inbox.</div>
                 </div>
-                <div style={{alignSelf: 'stretch', paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 4, background: '#F4F4F4', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                    <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
-                        <div style={{alignSelf: 'stretch', borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                            <input
-                              type="email"
-                              value={newsletterEmail}
-                              onChange={(e) => setNewsletterEmail(e.target.value)}
-                              placeholder="Enter your email"
-                              style={{
-                                width: '100%',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                outline: 'none',
-                                color: '#767676',
-                                fontSize: 14,
-                                fontFamily: 'var(--ep-font-avenir)',
-                                fontWeight: '500'
-                              }}
-                            />
-                        </div>
+                <div className="w-full flex flex-col sm:flex-row gap-3 sm:gap-0 sm:p-1 sm:pl-4 sm:pr-1 sm:bg-gray-100 sm:rounded-full">
+                    <div className="flex-1 w-full">
+                        <input
+                          type="email"
+                          placeholder="Enter your email address"
+                          value={newsletterEmail}
+                          onChange={(e) => setNewsletterEmail(e.target.value)}
+                          className="w-full h-12 sm:h-10 px-4 sm:px-0 bg-gray-100 sm:bg-transparent border border-gray-200 sm:border-none rounded-xl sm:rounded-none text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0"
+                          style={{
+                            fontFamily: 'var(--ep-font-avenir)',
+                            fontSize: '14px',
+                            fontWeight: '400'
+                          }}
+                        />
                     </div>
                     <div 
+                      className="w-full sm:w-auto px-4 py-3 sm:px-3 sm:py-2 bg-blue-900 rounded-xl border border-gray-200 flex justify-center items-center gap-2 cursor-pointer shadow-sm"
                       style={{
-                        alignSelf: 'stretch', 
-                        paddingLeft: 12, 
-                        paddingRight: 12, 
-                        paddingTop: 6, 
-                        paddingBottom: 6, 
-                        background: '#113D7B', 
-                        boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
-                        borderRadius: 12, 
-                        outline: '1px #E5E7EB solid', 
-                        outlineOffset: '-1px', 
-                        justifyContent: 'center', 
-                        alignItems: 'center', 
-                        gap: 6, 
-                        display: 'flex',
-                        cursor: 'pointer'
+                        boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)'
                       }}
                       onClick={() => {
                         if (newsletterEmail.trim()) {
@@ -1748,13 +1806,13 @@ export default function PoolDetailPage() {
                         }
                       }}
                     >
-                        <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit</div>
+                        <div className="text-white text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Submit</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div style={{width: 1080, color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
-    </div>
+        <div className="w-full max-w-5xl text-gray-600 text-xs font-normal leading-relaxed" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
+      </div>
 
     {/* Edit Pool Modal */}
     {showEditModal && poolData && (
