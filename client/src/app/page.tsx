@@ -865,9 +865,9 @@ export default function Home() {
             onClick={() => setShowMobileMenu(!showMobileMenu)}
             aria-label="Toggle menu"
           >
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-300 ${showMobileMenu ? 'rotate-45 translate-y-2' : ''}`}></span>
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-300 ${showMobileMenu ? 'opacity-0' : ''}`}></span>
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-300 ${showMobileMenu ? '-rotate-45 -translate-y-2' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'opacity-0' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
           </button>
 
           {/* Desktop Auth Section */}
@@ -1042,7 +1042,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
           {/* Left Side - Content */}
-          <section className="order-2 lg:order-1">
+          <section className="order-1 lg:order-1">
             <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 32, display: 'flex'}}>
               <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
                 <div style={{width: '100%', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
@@ -1118,7 +1118,7 @@ export default function Home() {
           </section>
 
           {/* Right Side - How it works */}
-          <section className="order-1 lg:order-2">
+          <section className="order-2 lg:order-2">
             <div className="w-full aspect-video lg:min-h-[400px] relative bg-gray-200 overflow-hidden rounded-lg flex items-center justify-center">
               <div style={{paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 18, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 56, justifyContent: 'flex-start', alignItems: 'center', gap: 9, display: 'inline-flex'}}>
                 <Image src="/play.svg" alt="Play icon" width={24} height={24} />
