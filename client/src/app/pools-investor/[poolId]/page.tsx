@@ -12,6 +12,7 @@ export default function InvestorPoolDetailPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userRole, setUserRole] = useState<'borrower' | 'investor' | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'documents' | 'investments'>('overview');
 
@@ -278,63 +279,147 @@ export default function InvestorPoolDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/pools-investor'}>
-          <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-          <span className="ep-nav-brand">EquiPool</span>
+      <header className="w-full px-4 sm:px-6 py-4 sm:py-6 relative">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/pools-investor'}>
+            <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
+            <span className="ep-nav-brand">EquiPool</span>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-6">
+            <a className="ep-nav-link hover:text-blue-900 transition-colors duration-200 cursor-pointer">About Us</a>
+            <a className="ep-nav-link hover:text-blue-900 transition-colors duration-200 cursor-pointer">Security</a>
+            <div className="flex items-center gap-2">
+              <a className="ep-nav-link hover:text-blue-900 transition-colors duration-200 cursor-pointer">Learn</a>
+              <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+            </div>
+          </nav>
+
+          {/* Mobile menu button */}
+          <button 
+            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label="Toggle menu"
+          >
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'opacity-0' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+          </button>
+
+          {/* Desktop Auth Section */}
+          <div className="hidden lg:flex items-center gap-4" style={{position:'relative'}}>
+            {isAuthenticated ? (
+              <>
+                {/* Notifications Icon */}
+                <div
+                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
+                >
+                  <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+                </div>
+                {/* Profile Icon (right / opens menu) */}
+                <div
+                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
+                  onClick={() => setShowProfileMenu(v => !v)}
+                  aria-haspopup="menu"
+                  aria-expanded={showProfileMenu}
+                >
+                  <Image src="/profile.svg" alt="Profile" width={16} height={16} />
+                  {showProfileMenu && (
+                    <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => window.location.href = '/pools-investor'}>Pools & Dashboard</button>
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
+                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <button className="ep-nav-login" style={{cursor: 'pointer'}}>Login</button>
+                <button className="ep-cta-join" onClick={() => window.location.href = '/'}>Join Equipool</button>
+              </>
+            )}
+          </div>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <a className="ep-nav-link">About Us</a>
-          <a className="ep-nav-link">Security</a>
-          <div className="flex items-center gap-2">
-            <a className="ep-nav-link">Learn</a>
-            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
-          </div>
-        </nav>
-
-        {/* Auth Section */}
-        <div className="flex items-center gap-4" style={{position:'relative'}}>
-          {isAuthenticated ? (
-            <>
-              {/* Notifications Icon */}
-              <div
-                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
-              >
-                <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 mt-0">
+            <div className="px-4 py-4 space-y-4">
+              {/* Navigation Links */}
+              <div className="space-y-3">
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium transition-colors duration-200" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
+                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium transition-colors duration-200" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
+                <div className="flex items-center gap-2 py-2">
+                  <a className="text-gray-700 hover:text-blue-900 cursor-pointer text-base font-medium transition-colors duration-200" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
+                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
+                </div>
               </div>
-              {/* Profile Icon (right / opens menu) */}
-              <div
-                style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
-                onClick={() => setShowProfileMenu(v => !v)}
-                aria-haspopup="menu"
-                aria-expanded={showProfileMenu}
-              >
-                <Image src="/profile.svg" alt="Profile" width={16} height={16} />
-                {showProfileMenu && (
-                  <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => window.location.href = '/pools-investor'}>Pools & Dashboard</button>
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
-                    <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+              
+              {/* Auth Section */}
+              <div className="pt-4 border-t border-gray-200">
+                {isAuthenticated ? (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full text-left py-2 text-black text-base font-medium"
+                      onClick={() => {
+                        window.location.href = '/pools-investor';
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Pools & Dashboard
+                    </button>
+                    <button className="w-full text-left py-2 text-gray-500 text-base font-medium">Profile</button>
+                    <button 
+                      className="w-full text-left py-2 text-red-600 text-base font-medium"
+                      onClick={() => {
+                        handleLogout();
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Log out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full text-center py-3 border border-gray-200 rounded-lg text-gray-700 font-medium bg-white hover:bg-gray-50"
+                      style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}}
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button 
+                      className="w-full text-center py-3 rounded-lg text-white font-medium"
+                      style={{
+                        fontFamily: 'var(--ep-font-avenir)', 
+                        fontSize: '14px',
+                        background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)'
+                      }}
+                      onClick={() => {
+                        window.location.href = '/';
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Join Equipool
+                    </button>
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            <>
-              <button className="ep-nav-login" style={{cursor: 'pointer'}}>Login</button>
-              <button className="ep-cta-join" onClick={() => window.location.href = '/'}>Join Equipool</button>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
-      <main style={{width: '100%', maxWidth: 1440, margin: '0 auto', padding: '40px 20px'}}>
-        <div style={{width: '100%', height: '100%', paddingTop: 120, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'flex'}}>
-          <div style={{alignSelf: 'stretch', paddingLeft: 140, paddingRight: 140, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
+      <main className="w-full px-4 sm:px-6 py-8 sm:py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col gap-4">
             {/* Breadcrumb */}
-            <div style={{alignSelf: 'stretch', paddingBottom: 16}}>
+            <div className="pb-4">
               <div>
                 <span style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Pools & Dashboard </span>
                 <span style={{color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> &gt; Pool #{poolId}</span>
@@ -342,15 +427,7 @@ export default function InvestorPoolDetailPage() {
             </div>
 
             {/* Navigation Tabs */}
-            <div style={{
-              alignSelf: 'stretch',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: 32,
-              display: 'flex',
-              paddingBottom: 24,
-              borderBottom: '1px solid #E5E7EB'
-            }}>
+            <div className="flex flex-col sm:flex-row justify-start items-start sm:items-center gap-4 sm:gap-8 pb-6 border-b border-gray-200">
               <div style={{
                 color: activeTab === 'overview' ? '#113D7B' : '#767676',
                 fontSize: 18,
@@ -418,572 +495,209 @@ export default function InvestorPoolDetailPage() {
 
             {/* Tab Content */}
             {activeTab === 'overview' && (
-              <>
-                {/* Pool Content - Overview Section */}
-                <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                  <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Investment Pool Details</div>
-                </div>
+              <div className="w-full flex flex-col lg:flex-row gap-6">
+                {/* Left Side - Pool Details */}
+                <div className="flex-1">
+                  {/* Pool Content - Overview Section */}
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="text-blue-900 text-xl font-bold">Investment Pool Details</div>
+                  </div>
 
-                {/* Pool Overview Card */}
-                {loadingPool ? (
-                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Loading pool details...</p>
-                  </div>
-                ) : poolError ? (
-                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
-                    <p style={{color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>{poolError}</p>
-                  </div>
-                ) : poolData ? (
-                  <div style={{
-                    width: '100%',
-                    padding: 32,
-                    background: 'white',
-                    borderRadius: 24,
-                    border: '1px solid #E5E7EB',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
-                    gap: 32,
-                    display: 'flex'
-                  }}>
-                    {/* Header Section */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        color: 'black',
-                        fontSize: 20,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '500',
-                        wordWrap: 'break-word'
-                      }}>
-                        Pool #EP{poolId} - Overview
-                      </div>
-                      <div style={{
-                        paddingLeft: 10,
-                        paddingRight: 10,
-                        paddingTop: 4,
-                        paddingBottom: 4,
-                        background: '#CBD764',
-                        borderRadius: 50,
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 6,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          width: 8,
-                          height: 8,
-                          background: '#7E8C03',
-                          borderRadius: 9999
-                        }} />
-                        <div style={{
-                          color: 'black',
-                          fontSize: 14,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>
-                          Available to invest
+                  {/* Pool Overview Card */}
+                  {loadingPool ? (
+                    <div className="text-center py-10">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      <p className="text-gray-500 text-base font-medium">Loading pool details...</p>
+                    </div>
+                  ) : poolError ? (
+                    <div className="text-center py-10">
+                      <p className="text-red-600 text-base font-medium">{poolError}</p>
+                    </div>
+                  ) : poolData ? (
+                    <div className="w-full bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 flex flex-col gap-6 sm:gap-8">
+                      {/* Header Section */}
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="text-black text-lg sm:text-xl font-medium">
+                          Pool #EP{poolId} - Overview
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-2 bg-lime-200 rounded-full">
+                          <div className="w-2 h-2 bg-lime-700 rounded-full" />
+                          <div className="text-black text-sm font-medium">
+                            Available to invest
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Pool Repayment Section */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-end',
-                      alignItems: 'flex-start',
-                      gap: 12,
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        alignItems: 'flex-start',
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          color: '#113D7B',
-                          fontSize: 16,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>
+                      {/* Pool Repayment Section */}
+                      <div className="flex flex-col gap-3">
+                        <div className="text-blue-900 text-base font-medium">
                           Pool Repayment
                         </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          color: 'black',
-                          fontSize: 32,
-                          fontFamily: 'var(--ep-font-avenir)',
-                          fontWeight: '500',
-                          wordWrap: 'break-word'
-                        }}>
+                        <div className="text-black text-2xl sm:text-3xl font-medium">
                           ${poolData.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
                         </div>
                       </div>
-                    </div>
 
-                    {/* Pool Information Section */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-start',
-                      alignItems: 'flex-start',
-                      gap: 16,
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        justifyContent: 'center',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        color: '#113D7B',
-                        fontSize: 16,
-                        fontFamily: 'var(--ep-font-avenir)',
-                        fontWeight: '500',
-                        wordWrap: 'break-word'
-                      }}>
-                        Pool Information
+                      {/* Pool Information Section */}
+                      <div className="flex flex-col gap-4">
+                        <div className="text-blue-900 text-base font-medium">
+                          Pool Information
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Date Created</div>
+                            <div className="text-black text-base font-medium">
+                              {poolData.createdAt ? new Date(poolData.createdAt).toLocaleDateString('en-GB') : 'N/A'}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Start Date</div>
+                            <div className="text-black text-base font-medium">--/--/----</div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">End Date</div>
+                            <div className="text-black text-base font-medium">--/--/----</div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Type</div>
+                            <div className="text-black text-base font-medium">
+                              {poolData.poolType || 'Equity pool'}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Requested amount</div>
+                            <div className="text-black text-base font-medium">
+                              ${poolData.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Terms</div>
+                            <div className="text-black text-base font-medium">
+                              {poolData.roiRate ? `${poolData.roiRate}%` : ''} {poolData.term ? `/ ${poolData.term}` : ''}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        alignItems: 'flex-start',
-                        gap: 12,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Date Created
+
+                      {/* Property Info Section */}
+                      <div className="flex flex-col gap-4">
+                        <div className="text-blue-900 text-base font-medium">
+                          Property Info
+                        </div>
+                        <div className="flex flex-col gap-3">
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Address</div>
+                            <div className="text-black text-base font-medium text-right">
+                              {poolData.addressLine ? `${poolData.addressLine}, ${poolData.city}, ${poolData.state} ${poolData.zipCode}` : 'N/A'}
+                            </div>
                           </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            {poolData.createdAt ? new Date(poolData.createdAt).toLocaleDateString('en-GB') : 'N/A'}
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Co-owner(s)</div>
+                            <div className="text-black text-base font-medium">
+                              {poolData.coOwner || 'N/A'}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Property Link</div>
+                            <div className="text-black text-base font-medium underline cursor-pointer">
+                              {poolData.propertyLink || 'N/A'}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Property value</div>
+                            <div className="text-black text-base font-medium">
+                              ${poolData.propertyValue || 'N/A'}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Total mortgage balance</div>
+                            <div className="text-black text-base font-medium">
+                              ${poolData.mortgageBalance || 'N/A'}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="text-gray-400 text-sm font-medium">Ownership</div>
+                            <div className="text-black text-base font-medium">
+                              {poolData.percentOwned ? `${poolData.percentOwned}% Owned` : 'N/A'}
+                            </div>
                           </div>
                         </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Start Date
+                      </div>
+
+                      {/* Invest Button */}
+                      <div className="flex justify-center items-center">
+                        {hasInvested ? (
+                          <div className="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-400 rounded-xl">
+                            <div className="w-2 h-2 bg-green-400 rounded-full" />
+                            <div className="text-green-800 text-sm font-medium">
+                              Invested ${userInvestment?.amount ? parseFloat(userInvestment.amount).toLocaleString() : ''}
+                            </div>
                           </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            --/--/----
+                        ) : (
+                          <div 
+                            className={`flex items-center gap-2 px-4 py-3 rounded-xl cursor-pointer ${investing ? 'bg-gray-400 cursor-not-allowed opacity-60' : 'bg-gradient-to-r from-blue-900 to-blue-600'}`}
+                            onClick={investing ? undefined : handleInvest}
+                          >
+                            <div className="text-white text-sm font-medium">
+                              {investing ? 'Investing...' : 'Invest'}
+                            </div>
                           </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            End Date
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            --/--/----
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Type
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            {poolData.poolType || 'Equity pool'}
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Requested amount
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            ${poolData.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Terms
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            {poolData.roiRate ? `${poolData.roiRate}%` : ''} {poolData.term ? `/ ${poolData.term}` : ''}
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </div>
-
-                    {/* Property Info Section */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      gap: 16,
-                      display: 'flex'
-                    }}>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: 8,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          justifyContent: 'flex-start',
-                          alignItems: 'center',
-                          gap: 8,
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#113D7B',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Property Info
-                          </div>
-                        </div>
-                      </div>
-                      <div style={{
-                        alignSelf: 'stretch',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        alignItems: 'flex-start',
-                        gap: 12,
-                        display: 'flex'
-                      }}>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Address
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word',
-                            textAlign: 'right'
-                          }}>
-                            {poolData.addressLine ? `${poolData.addressLine}, ${poolData.city}, ${poolData.state} ${poolData.zipCode}` : 'N/A'}
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Co-owner(s)
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            {poolData.coOwner || 'N/A'}
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Property Link
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            textDecoration: 'underline',
-                            wordWrap: 'break-word',
-                            cursor: 'pointer'
-                          }}>
-                            {poolData.propertyLink || 'N/A'}
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Property value
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            ${poolData.propertyValue || 'N/A'}
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Total mortgage balance
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            ${poolData.mortgageBalance || 'N/A'}
-                          </div>
-                        </div>
-                        <div style={{
-                          alignSelf: 'stretch',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          display: 'flex'
-                        }}>
-                          <div style={{
-                            color: '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Ownership
-                          </div>
-                          <div style={{
-                            color: 'black',
-                            fontSize: 16,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            {poolData.percentOwned ? `${poolData.percentOwned}% Owned` : 'N/A'}
-                          </div>
-                        </div>
-                      </div>
+                  ) : (
+                    <div className="text-center py-10">
+                      <p className="text-gray-500 text-base font-medium">Pool not found</p>
                     </div>
+                  )}
+                </div>
 
-                    {/* Invest Button */}
-                    <div style={{
-                      alignSelf: 'stretch',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: 8,
-                      display: 'flex'
-                    }}>
-                      {hasInvested ? (
-                        <div style={{
-                          paddingLeft: 16,
-                          paddingRight: 16,
-                          paddingTop: 10,
-                          paddingBottom: 10,
-                          background: '#DDF4E6',
-                          borderRadius: 12,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: 8,
-                          display: 'flex',
-                          border: '1px solid #65CC8E'
-                        }}>
-                          <div style={{
-                            width: 8,
-                            height: 8,
-                            background: '#65CC8E',
-                            borderRadius: 9999
-                          }} />
-                          <div style={{
-                            color: '#065F46',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            Invested ${userInvestment?.amount ? parseFloat(userInvestment.amount).toLocaleString() : ''}
-                          </div>
+                {/* Right Side - Quick Actions (Mobile: Below, Desktop: Right sidebar) */}
+                <div className="w-full lg:w-80 xl:w-96">
+                  <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-6">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
+                    
+                    {/* Investment Summary */}
+                    {hasInvested && userInvestment && (
+                      <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                        <div className="text-sm text-blue-600 mb-1">Your Investment</div>
+                        <div className="text-2xl font-bold text-blue-900">
+                          ${parseFloat(userInvestment.amount).toLocaleString()}
                         </div>
-                      ) : (
-                        <div style={{
-                          paddingLeft: 16,
-                          paddingRight: 16,
-                          paddingTop: 10,
-                          paddingBottom: 10,
-                          background: investing ? '#ccc' : 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)',
-                          borderRadius: 12,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          gap: 8,
-                          display: 'flex',
-                          cursor: investing ? 'not-allowed' : 'pointer',
-                          opacity: investing ? 0.6 : 1
-                        }}
-                        onClick={investing ? undefined : handleInvest}>
-                          <div style={{
-                            color: 'white',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            wordWrap: 'break-word'
-                          }}>
-                            {investing ? 'Investing...' : 'Invest'}
-                          </div>
+                        <div className="text-sm text-blue-700 mt-1">
+                          {poolData ? ((parseFloat(userInvestment.amount) / parseFloat(poolData.amount.replace(/\s/g, ''))) * 100).toFixed(2) : '0'}% of pool
                         </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="space-y-3">
+                      <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                        {hasInvested ? 'Increase Investment' : 'Invest Now'}
+                      </button>
+                      <button className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                        View Documents
+                      </button>
+                      {hasInvested && (
+                        <button className="w-full bg-red-50 text-red-600 py-3 px-4 rounded-lg font-medium hover:bg-red-100 transition-colors">
+                          Manage Investment
+                        </button>
                       )}
                     </div>
+
+                    {/* Pool Progress */}
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-gray-600">Pool Status</span>
+                        <span className="font-medium text-green-600">Active</span>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Pool created: {poolData?.createdAt ? new Date(poolData.createdAt).toLocaleDateString() : 'N/A'}
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <div style={{alignSelf: 'stretch', textAlign: 'center', padding: 40}}>
-                    <p style={{color: '#767676', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500'}}>Pool not found</p>
-                  </div>
-                )}
-              </>
+                </div>
+              </div>
             )}
 
             {/* Assigned Documents Tab Content */}
@@ -1419,118 +1133,90 @@ export default function InvestorPoolDetailPage() {
       </main>
 
       {/* Footer */}
-      <div style={{width: '100%', height: '100%', paddingTop: 32, paddingBottom: 32, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'inline-flex', marginTop: 160}}>
-        <div style={{width: 1080, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 130, display: 'inline-flex'}}>
-          <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 40, display: 'inline-flex'}}>
-            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-              <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Quick Links</div>
-              </div>
-              <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Active Pools</div>
-              </div>
-              <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>About Us</div>
-              </div>
-              <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Security</div>
-              </div>
-              <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Learn</div>
-                <div style={{paddingLeft: 6, paddingRight: 6, paddingTop: 3, paddingBottom: 3, background: '#F5F5F5', borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-                  <div style={{color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Soon</div>
+      <footer className="w-full px-4 sm:px-6 py-8 sm:py-12 mt-20 sm:mt-32">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
+            {/* Quick Links */}
+            <div className="space-y-4">
+              <h3 className="text-black text-sm font-medium">Quick Links</h3>
+              <div className="space-y-3">
+                <a className="block text-gray-600 text-sm hover:text-gray-900 cursor-pointer">Active Pools</a>
+                <a className="block text-gray-600 text-sm hover:text-gray-900 cursor-pointer">About Us</a>
+                <a className="block text-gray-600 text-sm hover:text-gray-900 cursor-pointer">Security</a>
+                <div className="flex items-center gap-2">
+                  <a className="text-gray-600 text-sm hover:text-gray-900 cursor-pointer">Learn</a>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">Soon</span>
                 </div>
               </div>
             </div>
-            <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-              <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Terms of Service</div>
+
+            {/* Legal */}
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <a className="block text-gray-600 text-sm hover:text-gray-900 cursor-pointer">Terms of Service</a>
+                <a className="block text-gray-600 text-sm hover:text-gray-900 cursor-pointer">Privacy Policy</a>
               </div>
-              <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Privacy Policy</div>
+            </div>
+
+            {/* Support */}
+            <div className="space-y-4">
+              <h3 className="text-black text-sm font-medium">Support</h3>
+              <div className="space-y-3">
+                <a className="block text-gray-600 text-sm hover:text-gray-900 cursor-pointer">Contact Us</a>
+                <a className="block text-gray-600 text-sm hover:text-gray-900 cursor-pointer">FAQs</a>
+              </div>
+            </div>
+
+            {/* Newsletter */}
+            <div className="space-y-4 lg:col-span-1">
+              <div className="space-y-2">
+                <h3 className="text-black text-xl font-bold">Stay Ahead of the Curve</h3>
+                <p className="text-gray-600 text-sm">Be the first to discover newly launched pools, platform updates, and investor insights — right in your inbox.</p>
+              </div>
+              <div className="flex items-center bg-gray-100 rounded-full p-1 max-w-md">
+                <input
+                  type="email"
+                  name="newsletter-email"
+                  autoComplete="off"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="flex-1 bg-transparent border-none outline-none text-gray-600 text-sm px-4 py-2"
+                />
+                <button
+                  onClick={() => {
+                    if (newsletterEmail.trim()) {
+                      // Handle newsletter signup
+                      console.log('Newsletter signup:', newsletterEmail);
+                      setNewsletterEmail('');
+                    }
+                  }}
+                  className="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
+                >
+                  Submit
+                </button>
               </div>
             </div>
           </div>
-          <div style={{width: 71, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-              <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Support</div>
-            </div>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-              <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Contact Us</div>
-            </div>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-              <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>FAQs</div>
-            </div>
-          </div>
-          <div style={{width: 104, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-              <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Socials</div>
-            </div>
-            <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-              <Image src="/mdi-instagram.svg" alt="Instagram" width={24} height={24} />
-              <Image src="/ic-baseline-facebook.svg" alt="Facebook" width={24} height={24} />
-              <Image src="/mdi-linkedin.svg" alt="LinkedIn" width={24} height={24} />
+
+          {/* Socials */}
+          <div className="flex items-center gap-4 mt-8 pt-8 border-t border-gray-200">
+            <span className="text-black text-sm font-medium">Socials</span>
+            <div className="flex items-center gap-4">
+              <Image src="/mdi-instagram.svg" alt="Instagram" width={24} height={24} className="cursor-pointer hover:opacity-70" />
+              <Image src="/ic-baseline-facebook.svg" alt="Facebook" width={24} height={24} className="cursor-pointer hover:opacity-70" />
+              <Image src="/mdi-linkedin.svg" alt="LinkedIn" width={24} height={24} className="cursor-pointer hover:opacity-70" />
             </div>
           </div>
-          <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-              <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Stay Ahead of the Curve</div>
-              <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Be the first to discover newly launched pools, platform updates, and investor insights — right in your inbox.</div>
-            </div>
-            <div style={{alignSelf: 'stretch', paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 4, background: '#F4F4F4', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-              <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
-                <div style={{alignSelf: 'stretch', borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                  <input
-                    type="email"
-                    value={newsletterEmail}
-                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    style={{
-                      width: '100%',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      color: '#767676',
-                      fontSize: 14,
-                      fontFamily: 'var(--ep-font-avenir)',
-                      fontWeight: '500'
-                    }}
-                  />
-                </div>
-              </div>
-              <div
-                style={{
-                  alignSelf: 'stretch',
-                  paddingLeft: 12,
-                  paddingRight: 12,
-                  paddingTop: 6,
-                  paddingBottom: 6,
-                  background: '#113D7B',
-                  boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)',
-                  borderRadius: 12,
-                  outline: '1px #E5E7EB solid',
-                  outlineOffset: '-1px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 6,
-                  display: 'flex',
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  if (newsletterEmail.trim()) {
-                    // Handle newsletter signup
-                    console.log('Newsletter signup:', newsletterEmail);
-                    setNewsletterEmail('');
-                  }
-                }}
-              >
-                <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit</div>
-              </div>
-            </div>
+
+          {/* Legal Text */}
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <p className="text-gray-600 text-xs leading-relaxed">
+              Security & Legal: Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital. © 2025 Equipool. All rights reserved.
+            </p>
           </div>
         </div>
-        <div style={{width: 1080, color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
-      </div>
+      </footer>
     </div>
   );
 }

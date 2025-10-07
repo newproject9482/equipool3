@@ -909,6 +909,8 @@ export default function InvestorPoolsPage() {
                         <div className="w-full p-3 sm:p-0 bg-gray-100 sm:bg-transparent rounded-lg sm:rounded-none">
                             <input
                               type="email"
+                              name="newsletter-email"
+                              autoComplete="off"
                               value={newsletterEmail}
                               onChange={(e) => setNewsletterEmail(e.target.value)}
                               placeholder="Enter your email"

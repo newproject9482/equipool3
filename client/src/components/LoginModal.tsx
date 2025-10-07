@@ -108,6 +108,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ onClose, onSwitchToSignUp, onSu
                   <input
                     ref={emailInputRef}
                     type="email"
+                    name="email"
+                    autoComplete="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e)=> setEmail(e.target.value)}

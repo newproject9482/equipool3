@@ -1781,6 +1781,8 @@ export default function PoolDetailPage() {
                     <div className="flex-1 w-full">
                         <input
                           type="email"
+                          name="newsletter-email"
+                          autoComplete="off"
                           placeholder="Enter your email address"
                           value={newsletterEmail}
                           onChange={(e) => setNewsletterEmail(e.target.value)}
