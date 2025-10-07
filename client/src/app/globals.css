@@ -232,3 +232,38 @@ input, textarea, select {
 .ep-nav-join-btn:hover {
   background-color: #0f2d5f;
 }
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  /* Mobile menu animations */
+  .mobile-menu-enter {
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Ensure buttons don't become too small on mobile */
+  .ep-cta-join, .ep-nav-login {
+    min-height: 44px;
+    min-width: 120px;
+  }
+}
+
+/* Prevent horizontal scrolling on smaller screens */
+body {
+  overflow-x: hidden;
+}
+
+/* Smooth transitions for responsive elements */
+* {
+  transition: font-size 0.2s ease, padding 0.2s ease;
+}

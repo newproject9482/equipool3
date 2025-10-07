@@ -64,6 +64,7 @@ export default function Home() {
   const [monthInput, setMonthInput] = useState('June');
   const [yearInput, setYearInput] = useState('1993');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   // Borrower validation errors
   const [borrowerErrors, setBorrowerErrors] = useState<string[]>([]);
   const [showBorrowerErrors, setShowBorrowerErrors] = useState(false);
@@ -841,123 +842,218 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <header className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-          <span className="ep-nav-brand">EquiPool</span>
-        </div>
-
-        <nav className="hidden md:flex items-center gap-6">
-          <a className="ep-nav-link">About Us</a>
-          <a className="ep-nav-link">Security</a>
+      <header className="w-full px-4 sm:px-6 py-4 sm:py-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <a className="ep-nav-link">Learn</a>
-            <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+            <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
+            <span className="ep-nav-brand">EquiPool</span>
           </div>
-        </nav>
 
-        {/* Auth Section */}
-        <div className="flex items-center gap-4" style={{position:'relative'}}>
-          {isAuthenticated ? (
-            <>
-              {/* Notification Icon (left) */}
-              <div
-                style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer'}}
-                onClick={()=> alert('Notifications placeholder')}
-                aria-label="Notifications"
-              >
-                <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
-              </div>
-              {/* Profile Icon (right / opens menu) */}
-              <div
-                style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer', position:'relative'}}
-                onClick={()=> setShowProfileMenu(v=>!v)}
-                aria-haspopup="menu"
-                aria-expanded={showProfileMenu}
-              >
-                <Image src="/profile.svg" alt="Profile" width={16} height={16} />
-                {showProfileMenu && (
-                  <div style={{width:220,padding:24,position:'absolute',top:48,right:0,background:'#F4F4F4',overflow:'hidden',borderRadius:24,outline:'1px #E5E7EB solid',display:'inline-flex',flexDirection:'column',justifyContent:'flex-end',alignItems:'flex-start',gap:14,zIndex:50}} role="menu">
-                    <button style={{all:'unset',alignSelf:'stretch',color:'black',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={async () => {
-                      try {
-                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
-                        if (res.ok) {
-                          const data = await res.json();
-                          if (data.authenticated) {
-                            const role = data.role;
-                            setSelectedRole(role);
-                            window.location.href = getPoolsUrlForRole(role);
-                            return;
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-6">
+            <a className="ep-nav-link cursor-pointer">About Us</a>
+            <a className="ep-nav-link cursor-pointer">Security</a>
+            <div className="flex items-center gap-2">
+              <a className="ep-nav-link cursor-pointer">Learn</a>
+              <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+            </div>
+          </nav>
+
+          {/* Mobile menu button */}
+          <button 
+            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            aria-label="Toggle menu"
+          >
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-300 ${showMobileMenu ? 'rotate-45 translate-y-2' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-300 ${showMobileMenu ? 'opacity-0' : ''}`}></span>
+            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-300 ${showMobileMenu ? '-rotate-45 -translate-y-2' : ''}`}></span>
+          </button>
+
+          {/* Desktop Auth Section */}
+          <div className="hidden lg:flex items-center gap-4" style={{position:'relative'}}>
+            {isAuthenticated ? (
+              <>
+                {/* Notification Icon (left) */}
+                <div
+                  style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer'}}
+                  onClick={()=> alert('Notifications placeholder')}
+                  aria-label="Notifications"
+                >
+                  <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
+                </div>
+                {/* Profile Icon (right / opens menu) */}
+                <div
+                  style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer', position:'relative'}}
+                  onClick={()=> setShowProfileMenu(v=>!v)}
+                  aria-haspopup="menu"
+                  aria-expanded={showProfileMenu}
+                >
+                  <Image src="/profile.svg" alt="Profile" width={16} height={16} />
+                  {showProfileMenu && (
+                    <div style={{width:220,padding:24,position:'absolute',top:48,right:0,background:'#F4F4F4',overflow:'hidden',borderRadius:24,outline:'1px #E5E7EB solid',display:'inline-flex',flexDirection:'column',justifyContent:'flex-end',alignItems:'flex-start',gap:14,zIndex:50}} role="menu">
+                      <button style={{all:'unset',alignSelf:'stretch',color:'black',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={async () => {
+                        try {
+                          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
+                          if (res.ok) {
+                            const data = await res.json();
+                            if (data.authenticated) {
+                              const role = data.role;
+                              setSelectedRole(role);
+                              window.location.href = getPoolsUrlForRole(role);
+                              return;
+                            }
                           }
+                        } catch (e) {
+                          console.error('Failed to fetch user role:', e);
                         }
-                      } catch (e) {
-                        console.error('Failed to fetch user role:', e);
-                      }
-                      setShowLoginModal(true);
-                    }}>Pools & Dashboard</button>
-                    <button style={{all:'unset',alignSelf:'stretch',color:'#B2B2B2',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem">Profile</button>
-                    <button style={{all:'unset',alignSelf:'stretch',color:'#CC4747',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+                        setShowLoginModal(true);
+                      }}>Pools & Dashboard</button>
+                      <button style={{all:'unset',alignSelf:'stretch',color:'#B2B2B2',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem">Profile</button>
+                      <button style={{all:'unset',alignSelf:'stretch',color:'#CC4747',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <button 
+                  className="ep-nav-login" 
+                  onClick={()=> setShowLoginModal(true)} 
+                  style={{
+                    cursor:'pointer',
+                    transition: 'all 0.2s ease',
+                    opacity: loginHover ? 0.8 : 1,
+                    transform: loginHover ? 'translateY(-1px)' : 'translateY(0)'
+                  }}
+                  onMouseEnter={() => setLoginHover(true)}
+                  onMouseLeave={() => setLoginHover(false)}
+                >
+                  Login
+                </button>
+                <button 
+                  className="ep-cta-join" 
+                  onClick={openSignUpModal}
+                  style={{
+                    cursor:'pointer',
+                    transition: 'all 0.2s ease',
+                    transform: joinHover ? 'translateY(-1px)' : 'translateY(0)',
+                    boxShadow: joinHover ? '0px 4px 12px rgba(17, 61, 123, 0.3)' : '0px 1px 3px rgba(0, 0, 0, 0.1)',
+                    background: joinHover ? 'linear-gradient(128deg, #0E3A6F 0%, #0C3E91 100%)' : undefined
+                  }}
+                  onMouseEnter={() => setJoinHover(true)}
+                  onMouseLeave={() => setJoinHover(false)}
+                >
+                  Join Equipool
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+        
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+            <div className="px-4 py-4 space-y-4">
+              {/* Navigation Links */}
+              <div className="space-y-3">
+                <a className="block ep-nav-link cursor-pointer py-2">About Us</a>
+                <a className="block ep-nav-link cursor-pointer py-2">Security</a>
+                <div className="flex items-center gap-2 py-2">
+                  <a className="ep-nav-link cursor-pointer">Learn</a>
+                  <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
+                </div>
+              </div>
+              
+              {/* Auth Section */}
+              <div className="pt-4 border-t border-gray-200">
+                {isAuthenticated ? (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full text-left py-2 text-black text-base font-medium"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
+                          if (res.ok) {
+                            const data = await res.json();
+                            if (data.authenticated) {
+                              const role = data.role;
+                              setSelectedRole(role);
+                              window.location.href = getPoolsUrlForRole(role);
+                              return;
+                            }
+                          }
+                        } catch (e) {
+                          console.error('Failed to fetch user role:', e);
+                        }
+                        setShowLoginModal(true);
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Pools & Dashboard
+                    </button>
+                    <button className="w-full text-left py-2 text-gray-500 text-base font-medium">Profile</button>
+                    <button 
+                      className="w-full text-left py-2 text-red-600 text-base font-medium"
+                      onClick={() => {
+                        handleLogout();
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Log out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <button 
+                      className="w-full ep-nav-login text-center py-3 border border-gray-200 rounded-lg"
+                      onClick={() => {
+                        setShowLoginModal(true);
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Login
+                    </button>
+                    <button 
+                      className="w-full ep-cta-join text-center py-3 rounded-lg"
+                      onClick={() => {
+                        openSignUpModal();
+                        setShowMobileMenu(false);
+                      }}
+                    >
+                      Join Equipool
+                    </button>
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            <>
-              <button 
-                className="ep-nav-login" 
-                onClick={()=> setShowLoginModal(true)} 
-                style={{
-                  cursor:'pointer',
-                  transition: 'all 0.2s ease',
-                  opacity: loginHover ? 0.8 : 1,
-                  transform: loginHover ? 'translateY(-1px)' : 'translateY(0)'
-                }}
-                onMouseEnter={() => setLoginHover(true)}
-                onMouseLeave={() => setLoginHover(false)}
-              >
-                Login
-              </button>
-              <button 
-                className="ep-cta-join" 
-                onClick={openSignUpModal}
-                style={{
-                  cursor:'pointer',
-                  transition: 'all 0.2s ease',
-                  transform: joinHover ? 'translateY(-1px)' : 'translateY(0)',
-                  boxShadow: joinHover ? '0px 4px 12px rgba(17, 61, 123, 0.3)' : '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                  background: joinHover ? 'linear-gradient(128deg, #0E3A6F 0%, #0C3E91 100%)' : undefined
-                }}
-                onMouseEnter={() => setJoinHover(true)}
-                onMouseLeave={() => setJoinHover(false)}
-              >
-                Join Equipool
-              </button>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero */}
-      <main className="max-w-6xl mx-auto px-6 py-12" style={{marginTop: 100}}>
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center'}}>
+      <main className="w-full px-4 sm:px-6 py-8 sm:py-12" style={{marginTop: '60px'}}>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
           {/* Left Side - Content */}
-          <section>
+          <section className="order-2 lg:order-1">
             <div style={{width: '100%', height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 32, display: 'flex'}}>
               <div style={{width: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
                 <div style={{width: '100%', justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                  <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Welcome to EquiPool</div>
+                  <div className="text-center lg:text-left" style={{color: '#113D7B', fontSize: 'clamp(16px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Welcome to EquiPool</div>
                 </div>
-                <div style={{width: '100%'}}>
-                  <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 400, wordWrap: 'break-word'}}>Your Property. Your Terms. </span>
-                  <span style={{color: 'black', fontSize: 48, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, fontStyle: 'italic', wordWrap: 'break-word'}}>Your Capital.</span>
+                <div className="text-center lg:text-left" style={{width: '100%'}}>
+                  <span style={{color: 'black', fontSize: 'clamp(28px, 8vw, 48px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 400, wordWrap: 'break-word'}}>Your Property. Your Terms. </span>
+                  <span style={{color: 'black', fontSize: 'clamp(28px, 8vw, 48px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, fontStyle: 'italic', wordWrap: 'break-word'}}>Your Capital.</span>
                 </div>
-                <div style={{width: '100%', color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>
+                <div className="text-center lg:text-left" style={{width: '100%', color: 'black', fontSize: 'clamp(16px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>
           Access fair, fast, and community-powered loans backed by real assets. Whether you’re borrowing or investing — our AI-powered platform gives you control, clarity, and confidence.
         </div>
-                <div style={{width: '100%', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
+                <div className="w-full flex flex-col sm:flex-row justify-center lg:justify-start items-center gap-4 sm:gap-2">
           <div 
             data-left-icon={true} 
             data-state="default" 
+            className="w-full sm:w-auto"
             style={{
               paddingLeft: 16, 
               paddingRight: 16, 
@@ -985,6 +1081,7 @@ export default function Home() {
           <div 
             data-left-icon={true} 
             data-state="default" 
+            className="w-full sm:w-auto"
             style={{
               paddingLeft: 16, 
               paddingRight: 16, 
@@ -1008,15 +1105,15 @@ export default function Home() {
           >
             <Image src="/invest.svg" alt="Investment icon" width={24} height={24} />
             <div style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, wordWrap: 'break-word'}}>I want to invest</div>
-                  </div>
+          </div>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Right Side - New Content */}
-          <section>
-            <div style={{width: '100%', minHeight: 400, position: 'relative', background: '#EAEAEA', overflow: 'hidden', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          {/* Right Side - How it works */}
+          <section className="order-1 lg:order-2">
+            <div className="w-full aspect-video lg:min-h-[400px] relative bg-gray-200 overflow-hidden rounded-lg flex items-center justify-center">
               <div style={{paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 18, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 56, justifyContent: 'flex-start', alignItems: 'center', gap: 9, display: 'inline-flex'}}>
                 <Image src="/play.svg" alt="Play icon" width={24} height={24} />
                 <div style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>How this works?</div>
@@ -1024,34 +1121,35 @@ export default function Home() {
             </div>
           </section>
         </div>
+        </div>
       </main>
 
-      {/* Trusted by section - 160px below hero */}
-      <div style={{marginTop: 160}}>
-        <div style={{width: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex', boxSizing: 'border-box'}}>
-          <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-            <div style={{textAlign: 'center', color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Trusted by</div>
+      {/* Trusted by section - responsive spacing */}
+      <div className="mt-16 lg:mt-40">
+        <div className="w-full px-4 sm:px-8 lg:px-44 xl:px-48 max-w-6xl mx-auto flex flex-col justify-center items-center gap-6">
+          <div className="w-full flex justify-center items-center">
+            <div style={{textAlign: 'center', color: '#113D7B', fontSize: 'clamp(18px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, wordWrap: 'break-word'}}>Trusted by</div>
           </div>
 
-          <div style={{display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'flex-start'}}>
-            <div style={{padding: 40, background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <div style={{color: '#4A5565', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Escrow</div>
+          <div className="flex flex-wrap gap-4 items-center justify-center">
+            <div className="flex-shrink-0" style={{padding: 'clamp(24px, 6vw, 40px)', background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <div style={{color: '#4A5565', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Escrow</div>
             </div>
 
-            <div style={{padding: 40, background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <div style={{color: '#4A5565', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Title</div>
+            <div className="flex-shrink-0" style={{padding: 'clamp(24px, 6vw, 40px)', background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <div style={{color: '#4A5565', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Title</div>
             </div>
 
-            <div style={{padding: 40, background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <div style={{color: '#4A5565', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Logo 1</div>
+            <div className="flex-shrink-0" style={{padding: 'clamp(24px, 6vw, 40px)', background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <div style={{color: '#4A5565', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Logo 1</div>
             </div>
 
-            <div style={{padding: 40, background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <div style={{color: '#4A5565', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Loan Service</div>
+            <div className="flex-shrink-0" style={{padding: 'clamp(24px, 6vw, 40px)', background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <div style={{color: '#4A5565', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Loan Service</div>
             </div>
 
-            <div style={{padding: 40, background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <div style={{color: '#4A5565', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Logo 1</div>
+            <div className="flex-shrink-0" style={{padding: 'clamp(24px, 6vw, 40px)', background: '#FAFAFA', boxShadow: '0px 1px 0.5px rgba(29,41,61,0.02)', borderRadius: 26, outline: '1px #E5E7EB solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <div style={{color: '#4A5565', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: 500}}>Logo 1</div>
             </div>
           </div>
         </div>
@@ -1087,15 +1185,15 @@ export default function Home() {
     </div>
     </div>
 
-    <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 80, display: 'inline-flex', marginTop: 160}}>
-  <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 20, display: 'flex'}}>
-    <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-      <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>How it works?</div>
+    <div className="w-full mt-16 lg:mt-40 px-4 sm:px-8 lg:px-32 xl:px-44 flex flex-col justify-start items-center gap-16 lg:gap-20">
+  <div className="w-full flex flex-col justify-start items-center gap-5 text-center">
+    <div className="w-full flex justify-center items-center">
+      <div style={{color: '#113D7B', fontSize: 'clamp(18px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>How it works?</div>
     </div>
-    <div style={{color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Simple steps. Smart infrastructure.</div>
+    <div style={{color: 'black', fontSize: 'clamp(24px, 6vw, 32px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Simple steps. Smart infrastructure.</div>
   </div>
-  <div style={{width: 1090, paddingTop: 32, paddingBottom: 64, paddingLeft: 56, paddingRight: 56, background: '#F4F4F4', borderRadius: 40, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 80, display: 'flex'}}>
-    <div style={{paddingLeft: 10, paddingRight: 10, paddingTop: 8, paddingBottom: 8, background: 'white', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
+  <div className="w-full max-w-6xl py-8 lg:py-16 px-6 lg:px-14 bg-gray-100 rounded-3xl lg:rounded-[40px] border border-gray-200 flex flex-col justify-start items-center gap-16 lg:gap-20">
+    <div className="px-2 sm:px-2.5 py-2 bg-white rounded-3xl flex justify-start items-start gap-2">
       <div 
         onClick={() => setHowItWorksView('borrower')}
         style={{
@@ -1132,49 +1230,49 @@ export default function Home() {
       </div>
     </div>
     
-    {/* 2x2 Grid Layout */}
-    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 40, width: '100%', maxWidth: 900}}>
-      {/* Top Left: Submit property & loan request */}
-      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+    {/* Responsive Grid Layout */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 w-full max-w-4xl">
+      {/* Submit property & loan request */}
+      <div className="flex items-start gap-4 lg:gap-6">
+        <div className="w-12 h-12 lg:w-14 lg:h-14 p-2 bg-gray-200 rounded-3xl flex justify-center items-center flex-shrink-0">
           <Image src="/group.svg" alt="Submit property icon" width={24} height={24} />
         </div>
-        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
-          <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit property & loan request</div>
-          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add property details, upload optional documents, and set your loan amount, term, and preferred ROI.</div>
+        <div className="flex-1 flex flex-col gap-2">
+          <div style={{color: 'black', fontSize: 'clamp(18px, 5vw, 24px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Submit property & loan request</div>
+          <div style={{color: 'black', fontSize: 'clamp(13px, 3vw, 14px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Add property details, upload optional documents, and set your loan amount, term, and preferred ROI.</div>
         </div>
       </div>
 
-      {/* Top Right: Get AI support & approval */}
-      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      {/* Get AI support & approval */}
+      <div className="flex items-start gap-4 lg:gap-6">
+        <div className="w-12 h-12 lg:w-14 lg:h-14 p-2 bg-gray-200 rounded-3xl flex justify-center items-center flex-shrink-0">
           <Image src="/group.svg" alt="AI support icon" width={24} height={24} />
         </div>
-        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
-          <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Get AI support & approval</div>
-          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>AI verifies documents, suggests ROI ranges, and flags inconsistencies — so you can move faster with confidence.</div>
+        <div className="flex-1 flex flex-col gap-2">
+          <div style={{color: 'black', fontSize: 'clamp(18px, 5vw, 24px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Get AI support & approval</div>
+          <div style={{color: 'black', fontSize: 'clamp(13px, 3vw, 14px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>AI verifies documents, suggests ROI ranges, and flags inconsistencies — so you can move faster with confidence.</div>
         </div>
       </div>
 
-      {/* Bottom Left: Launch your pool */}
-      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      {/* Launch your pool */}
+      <div className="flex items-start gap-4 lg:gap-6">
+        <div className="w-12 h-12 lg:w-14 lg:h-14 p-2 bg-gray-200 rounded-3xl flex justify-center items-center flex-shrink-0">
           <Image src="/group.svg" alt="Launch pool icon" width={24} height={24} />
         </div>
-        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
-          <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Launch your pool</div>
-          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Once approved, your loan pool is live and visible to investors.</div>
+        <div className="flex-1 flex flex-col gap-2">
+          <div style={{color: 'black', fontSize: 'clamp(18px, 5vw, 24px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Launch your pool</div>
+          <div style={{color: 'black', fontSize: 'clamp(13px, 3vw, 14px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Once approved, your loan pool is live and visible to investors.</div>
         </div>
       </div>
 
-      {/* Bottom Right: Receive funding */}
-      <div style={{display: 'flex', alignItems: 'flex-start', gap: 24}}>
-        <div style={{width: 56, height: 56, padding: 8, background: '#ECECEC', borderRadius: 30, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      {/* Receive funding */}
+      <div className="flex items-start gap-4 lg:gap-6">
+        <div className="w-12 h-12 lg:w-14 lg:h-14 p-2 bg-gray-200 rounded-3xl flex justify-center items-center flex-shrink-0">
           <Image src="/group.svg" alt="Receive funding icon" width={24} height={24} />
         </div>
-        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 8}}>
-          <div style={{color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Receive funding</div>
-          <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>When funded, money is disbursed through escrow and your repayment schedule begins.</div>
+        <div className="flex-1 flex flex-col gap-2">
+          <div style={{color: 'black', fontSize: 'clamp(18px, 5vw, 24px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Receive funding</div>
+          <div style={{color: 'black', fontSize: 'clamp(13px, 3vw, 14px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>When funded, money is disbursed through escrow and your repayment schedule begins.</div>
         </div>
       </div>
     </div>
@@ -1182,21 +1280,21 @@ export default function Home() {
 </div>
 
   {/* F.A.Q section */}
-  <div style={{width: '100%', height: '100%', paddingTop: 10, paddingBottom: 10, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'inline-flex', marginTop: 160}}>
-  <div style={{width: 1080, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, display: 'flex'}}>
-    <div style={{alignSelf: 'stretch', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>F.A.Q</div>
-    <div style={{alignSelf: 'stretch', boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', overflow: 'hidden', borderRadius: 12, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
-      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: '#F4F4F4', borderTopLeftRadius: 12, borderTopRightRadius: 12, borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-        <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
-          <div style={{flex: '1 1 0', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Can I use Flowbite in open-source projects?</div>
+  <div className="w-full mt-16 lg:mt-40 py-2.5 flex flex-col justify-center items-center gap-6">
+  <div className="w-full max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col justify-start items-start gap-6">
+    <div className="w-full text-center lg:text-left" style={{color: 'black', fontSize: 'clamp(24px, 6vw, 32px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>F.A.Q</div>
+    <div className="w-full shadow-sm overflow-hidden rounded-xl border border-gray-200 flex flex-col justify-start items-start">
+      <div className="w-full px-4 sm:px-6 py-4 sm:py-5 bg-gray-100 rounded-t-xl border-b border-gray-200 flex justify-between items-center">
+        <div className="flex-1 flex justify-start items-center gap-2">
+          <div className="flex-1" style={{color: 'black', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Can I use Flowbite in open-source projects?</div>
         </div>
-        <div style={{width: 20, height: 20, position: 'relative'}}>
+        <div className="w-5 h-5 relative flex-shrink-0">
           <Image src="/angle-down.svg" alt="Expand FAQ" width={20} height={20} />
         </div>
       </div>
-      <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
-        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Generally, it is accepted to use Flowbite in open-source projects, as long as it is not a UI library, a theme, a template, a page-builder that would be considered as an alternative to Flowbite itself.</div>
-        <div style={{alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>With that being said, feel free to use this design kit for your open-source projects.</div>
+      <div className="w-full px-4 sm:px-6 py-4 sm:py-5 bg-white border-b border-gray-200 flex flex-col justify-start items-start gap-3">
+        <div className="w-full" style={{color: 'black', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Generally, it is accepted to use Flowbite in open-source projects, as long as it is not a UI library, a theme, a template, a page-builder that would be considered as an alternative to Flowbite itself.</div>
+        <div className="w-full" style={{color: 'black', fontSize: 'clamp(14px, 3vw, 16px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>With that being said, feel free to use this design kit for your open-source projects.</div>
       </div>
       <div style={{alignSelf: 'stretch', paddingLeft: 24, paddingRight: 24, paddingTop: 20, paddingBottom: 20, background: 'white', borderBottom: '1px #E5E7EB solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
         <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
@@ -1235,10 +1333,10 @@ export default function Home() {
 </div>
 
   {/* Call-to-action section under F.A.Q */}
-  <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex', marginTop: 160}}>
-  <div style={{width: 1090, height: 422, padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 32, outline: '1px #E5E7EB solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 24, display: 'flex'}}>
-    <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start building your wealth today</div>
-    <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
+  <div className="w-full mt-16 lg:mt-40 px-4 sm:px-8 lg:px-32 xl:px-44 flex flex-col justify-start items-center gap-6">
+  <div className="w-full max-w-5xl min-h-[300px] sm:min-h-[350px] lg:min-h-[422px] p-6 sm:p-8 bg-gray-100 overflow-hidden rounded-2xl lg:rounded-3xl border border-gray-200 flex flex-col justify-center items-center gap-6">
+    <div className="w-full text-center" style={{color: 'black', fontSize: 'clamp(24px, 6vw, 32px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Start building your wealth today</div>
+    <div className="w-full flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-2">
       <div 
         data-left-icon="true" 
         data-state="default" 
@@ -1298,67 +1396,67 @@ export default function Home() {
   </div>
 
   {/* Footer section */}
-  <div style={{width: '100%', height: '100%', paddingTop: 32, paddingBottom: 32, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 48, display: 'inline-flex', marginTop: 160}}>
-    <div style={{width: 1080, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 130, display: 'inline-flex'}}>
-        <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 40, display: 'inline-flex'}}>
-            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Quick Links</div>
+  <div className="w-full mt-16 lg:mt-40 py-8 lg:py-8 px-4 sm:px-8 lg:px-32 xl:px-44 flex flex-col justify-center items-center gap-12">
+    <div className="w-full max-w-5xl flex flex-col lg:flex-row justify-start items-start gap-8 lg:gap-32">
+        <div className="flex flex-col justify-start items-start gap-10 w-full lg:w-auto">
+            <div className="w-full flex flex-col justify-start items-start gap-4">
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-black text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Quick Links</div>
                 </div>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Active Pools</div>
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Active Pools</div>
                 </div>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>About Us</div>
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</div>
                 </div>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Security</div>
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</div>
                 </div>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Learn</div>
-                    <div style={{paddingLeft: 6, paddingRight: 6, paddingTop: 3, paddingBottom: 3, background: '#F5F5F5', borderRadius: 20, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-                        <div style={{color: '#4A5565', fontSize: 10, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Soon</div>
+                <div className="rounded-md flex justify-start items-center gap-1">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</div>
+                    <div className="px-2 py-1 bg-gray-100 rounded-full flex justify-center items-center">
+                        <div className="text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</div>
                     </div>
                 </div>
             </div>
-            <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Terms of Service</div>
+            <div className="flex flex-col justify-start items-start gap-4">
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Terms of Service</div>
                 </div>
-                <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                    <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Privacy Policy</div>
+                <div className="rounded-md flex justify-start items-center gap-2">
+                    <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Privacy Policy</div>
                 </div>
             </div>
         </div>
-        <div style={{width: 71, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Support</div>
+        <div className="flex flex-col justify-start items-start gap-4 w-full lg:w-auto">
+            <div className="rounded-md flex justify-start items-center gap-2">
+                <div className="text-black text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Support</div>
             </div>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Contact Us</div>
+            <div className="rounded-md flex justify-start items-center gap-2">
+                <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Contact Us</div>
             </div>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>FAQs</div>
+            <div className="rounded-md flex justify-start items-center gap-2">
+                <div className="text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>FAQs</div>
             </div>
         </div>
-        <div style={{width: 104, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-            <div style={{borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
-                <div style={{color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Socials</div>
+        <div className="flex flex-col justify-start items-start gap-4 w-full lg:w-auto">
+            <div className="rounded-md flex justify-start items-center gap-2">
+                <div className="text-black text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Socials</div>
             </div>
-            <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
+            <div className="flex justify-start items-start gap-4">
                 <Image src="/mdi-instagram.svg" alt="Instagram" width={24} height={24} />
                 <Image src="/ic-baseline-facebook.svg" alt="Facebook" width={24} height={24} />
                 <Image src="/mdi-linkedin.svg" alt="LinkedIn" width={24} height={24} />
             </div>
         </div>
-        <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 16, display: 'inline-flex'}}>
-            <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                <div style={{color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Stay Ahead of the Curve</div>
-                <div style={{alignSelf: 'stretch', color: '#4A5565', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Be the first to discover newly launched pools, platform updates, and investor insights — right in your inbox.</div>
+        <div className="flex-1 flex flex-col justify-start items-start gap-4 w-full lg:w-auto">
+            <div className="w-full flex flex-col justify-start items-start gap-1">
+                <div className="text-black font-bold" style={{fontSize: 'clamp(16px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)'}}>Stay Ahead of the Curve</div>
+                <div className="w-full text-gray-600 text-sm font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Be the first to discover newly launched pools, platform updates, and investor insights — right in your inbox.</div>
             </div>
-            <div style={{alignSelf: 'stretch', paddingTop: 4, paddingBottom: 4, paddingLeft: 16, paddingRight: 4, background: '#F4F4F4', borderRadius: 30, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
-                    <div style={{alignSelf: 'stretch', borderRadius: 6, justifyContent: 'flex-start', alignItems: 'center', gap: 6, display: 'inline-flex'}}>
+            <div className="w-full p-1 pl-4 pr-1 bg-gray-100 rounded-full flex flex-col sm:flex-row justify-start items-center gap-4 sm:gap-4">
+                <div className="flex-1 w-full flex flex-col justify-start items-start">
+                    <div className="w-full rounded-md flex justify-start items-center gap-2">
                         <input
                           type="email"
                           value={newsletterEmail}
@@ -1378,22 +1476,9 @@ export default function Home() {
                     </div>
                 </div>
                 <div 
+                  className="w-full sm:w-auto px-3 py-2 bg-blue-900 rounded-xl border border-gray-200 flex justify-center items-center gap-2 cursor-pointer shadow-sm"
                   style={{
-                    alignSelf: 'stretch', 
-                    paddingLeft: 12, 
-                    paddingRight: 12, 
-                    paddingTop: 6, 
-                    paddingBottom: 6, 
-                    background: '#113D7B', 
-                    boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)', 
-                    borderRadius: 12, 
-                    outline: '1px #E5E7EB solid', 
-                    outlineOffset: '-1px', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    gap: 6, 
-                    display: 'flex',
-                    cursor: 'pointer'
+                    boxShadow: '0px 1px 0.5px 0.05000000074505806px rgba(29, 41, 61, 0.02)'
                   }}
                   onClick={() => {
                     if (newsletterEmail.trim()) {
@@ -1409,7 +1494,7 @@ export default function Home() {
             </div>
         </div>
     </div>
-    <div style={{width: 1080, color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 2, wordWrap: 'break-word'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
+    <div className="w-full max-w-5xl text-gray-600 text-xs font-normal leading-relaxed" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security & Legal Equipool is a private lending marketplace that connects individual borrowers and accredited investors through secured, property-backed loans. All identities are verified, and sensitive data is encrypted and stored securely in compliance with GDPR and other data privacy regulations. Equipool is not a licensed financial institution. We partner with third-party financial service providers to process payments and hold funds in escrow. All lending agreements are executed via legally binding contracts reviewed by independent legal partners. Investments made through Equipool are not insured by any government protection scheme. As with any private loan, the value of your investment can go up or down — you may lose part or all of your invested capital.  © 2025 Equipool. All rights reserved.</div>
 </div>
 
       {/* Login Modal */}
