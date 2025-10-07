@@ -1160,36 +1160,43 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* Value proposition - 20px below Trusted by */}
-      <div style={{marginTop: 160}}>
-        <div style={{width: '100%', height: '100%', paddingLeft: 180, paddingRight: 180, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 24, display: 'inline-flex', boxSizing: 'border-box'}}>
-          <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-            <div style={{color: '#113D7B', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Value proposition</div>
+      {/* Value proposition - Responsive while preserving desktop design */}
+      <div className="mt-16 lg:mt-40">
+        <div className="w-full px-4 lg:px-44 flex flex-col justify-start items-center gap-6">
+          <div className="w-full flex justify-center items-center">
+            <div style={{color: '#113D7B', fontSize: 'clamp(18px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', wordWrap: 'break-word'}}>Value proposition</div>
           </div>
-          <div style={{textAlign: 'center', color: 'black', fontSize: 32, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Fair Capital for Real People</div>
-          <div style={{textAlign: 'center', maxWidth: 698, color: 'black', fontSize: 20, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We eliminate middlemen, confusing terms, and bias. Whether you&apos;re a homeowner seeking refinancing or an investor looking for real-world returns.</div>
-          <div style={{height: 460, justifyContent: 'center', alignItems: 'flex-start', gap: 20, display: 'inline-flex', width: '100%'}}>
-            <div style={{width: 350, alignSelf: 'stretch', padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
-              <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Investors</div>
-                <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Earn strong, asset-backed returns by funding vetted borrowers. Transparent data. Clear risks. Full control.</div>
+          <div className="text-center" style={{color: 'black', fontSize: 'clamp(24px, 6vw, 32px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Fair Capital for Real People</div>
+          <div className="text-center max-w-2xl" style={{color: 'black', fontSize: 'clamp(16px, 4vw, 20px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>We eliminate middlemen, confusing terms, and bias. Whether you&apos;re a homeowner seeking refinancing or an investor looking for real-world returns.</div>
+          
+          {/* Cards Container - Desktop: exact original design, Mobile: stack vertically */}
+          <div className="w-full flex flex-col lg:flex-row lg:justify-center lg:items-start lg:gap-5 lg:h-[460px] gap-6 mt-8">
+            {/* Investors Card */}
+            <div className="w-full max-w-sm mx-auto lg:w-[350px] lg:max-w-none lg:mx-0 h-auto lg:h-full p-8 bg-gray-100 rounded-3xl flex flex-col justify-end items-start gap-2">
+              <div className="w-full flex flex-col justify-end items-start gap-2">
+                <div className="w-full" style={{color: 'black', fontSize: 'clamp(20px, 5vw, 24px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Investors</div>
+                <div className="w-full" style={{color: 'black', fontSize: 'clamp(13px, 3vw, 14px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Earn strong, asset-backed returns by funding vetted borrowers. Transparent data. Clear risks. Full control.</div>
               </div>
             </div>
-            <div style={{width: 350, alignSelf: 'stretch', padding: 32, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
-              <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrowers</div>
-                <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Get access to competitive loan offers without banks, simplified  and straightforward paperwork, avoid vague approval criteria. <br/><br/>Your property speaks for itself.</div>
+            
+            {/* Borrowers Card */}
+            <div className="w-full max-w-sm mx-auto lg:w-[350px] lg:max-w-none lg:mx-0 h-auto lg:h-full p-8 bg-gray-100 rounded-3xl flex flex-col justify-end items-start gap-2">
+              <div className="w-full flex flex-col justify-end items-start gap-2">
+                <div className="w-full" style={{color: 'black', fontSize: 'clamp(20px, 5vw, 24px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrowers</div>
+                <div className="w-full" style={{color: 'black', fontSize: 'clamp(13px, 3vw, 14px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Get access to competitive loan offers without banks, simplified and straightforward paperwork, avoid vague approval criteria. <br/><br/>Your property speaks for itself.</div>
               </div>
             </div>
-            <div style={{width: 350, alignSelf: 'stretch', padding: 32, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
-              <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                <div style={{alignSelf: 'stretch', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Built-In Intelligence</div>
-                <div style={{alignSelf: 'stretch', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>AI verifies documents, suggests ROI ranges, and flags inconsistencies — so you can move faster with confidence.</div>
+            
+            {/* Built-In Intelligence Card */}
+            <div className="w-full max-w-sm mx-auto lg:w-[350px] lg:max-w-none lg:mx-0 h-auto lg:h-full p-8 bg-gray-100 rounded-3xl flex flex-col justify-end items-start gap-2">
+              <div className="w-full flex flex-col justify-end items-start gap-2">
+                <div className="w-full" style={{color: 'black', fontSize: 'clamp(20px, 5vw, 24px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Built-In Intelligence</div>
+                <div className="w-full" style={{color: 'black', fontSize: 'clamp(13px, 3vw, 14px)', fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>AI verifies documents, suggests ROI ranges, and flags inconsistencies — so you can move faster with confidence.</div>
               </div>
             </div>
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
 
     <div className="w-full mt-16 lg:mt-40 px-4 sm:px-8 lg:px-32 xl:px-44 flex flex-col justify-start items-center gap-16 lg:gap-20">
   <div className="w-full flex flex-col justify-start items-center gap-5 text-center">
