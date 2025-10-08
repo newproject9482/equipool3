@@ -51,6 +51,7 @@ export default function Home() {
   const [verificationCode, setVerificationCode] = useState(''); // email verification code (legacy / emailVerification step)
   const [phoneVerificationCode, setPhoneVerificationCode] = useState(''); // phone code for combined verifyContact step
   const [acceptedTerms, setAcceptedTerms] = useState(false); // terms of service checkbox
+  const [isSigningUp, setIsSigningUp] = useState(false); // loading state for signup button
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -495,6 +496,9 @@ export default function Home() {
   }, [formData, acceptedTerms, selectedRole, modalStep, showInvestorErrors, investorTouched, investorSubmitAttempted, investorType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSignUp = async () => {
+    // Prevent multiple clicks
+    if (isSigningUp) return;
+    
     // TODO: RESTORE VALIDATION - On attempt to submit, if borrower step has errors, show them and stop
     if (selectedRole === 'borrower' && modalStep === 'borrowerSignUp') {
       const map = computeBorrowerErrorsByField();
@@ -518,6 +522,7 @@ export default function Home() {
       }
     }
     if(selectedRole === 'borrower') {
+      setIsSigningUp(true);
       try {
         const payload = {
           firstName: formData.firstName.trim(),
@@ -528,37 +533,39 @@ export default function Home() {
           dateOfBirth: formData.dateOfBirth,
           password: formData.password,
         };
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/borrowers/signup`, {
+        
+        console.log('DEBUG: Sending verification email for borrower:', payload.email);
+        
+        // Send email verification instead of creating account directly
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/send-verification-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            email: formData.email,
+            user_type: 'borrower',
+            user_data: payload
+          }),
         });
         const data = await res.json().catch(()=>({}));
         if(!res.ok){
-          const msg = data.error || 'Signup failed';
+          const msg = data.error || 'Failed to send verification email';
           // Surface server error into form error area
           setBorrowerErrors(prev => Array.from(new Set([...(prev||[]), msg])));
           setShowBorrowerErrors(true);
           showError(msg);
           return;
         }
-        // On success mark authenticated and continue to verification
-        setIsAuthenticated(true);
-        showSuccess('Account created successfully! Welcome to EquiPool!');
-        // Persist simple flag (session cookie is real auth)
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('ep-auth','1');
-          if (data?.token) localStorage.setItem('ep-auth-token', data.token);
-        }
-        if (data?.role === 'borrower') setSelectedRole('borrower');
-  // Borrower flow: go to phone verification first, then email verification
-  setModalStep('borrowerPhoneVerification');
+        
+        // On success, go to email verification step
+        showSuccess('Verification email sent! Please check your inbox.');
+        setModalStep('emailVerification');
       } catch (e: unknown) {
         const errorMessage = e instanceof Error ? e.message : 'Network error';
-        alert(errorMessage);
+        showError(errorMessage);
+      } finally {
+        setIsSigningUp(false);
       }
-      
     }
 
     // Investor signup path
@@ -582,16 +589,22 @@ export default function Home() {
           country: formData.country,
           password: formData.password,
         };
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/investors/signup`, {
+        
+        // Send email verification instead of creating account directly
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/send-verification-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            email: formData.email,
+            user_type: 'investor',
+            user_data: payload
+          }),
         });
         const data = await res.json().catch(()=>({}));
         if(!res.ok){
           // Prefer server-provided error, but give a clearer message for 409 Conflict
-          let msg = data?.error || 'Signup failed';
+          let msg = data?.error || 'Failed to send verification email';
           if (res.status === 409) {
             msg = data?.error || 'An account with that email already exists. Please log in instead.';
           }
@@ -601,17 +614,10 @@ export default function Home() {
           showError(msg);
           return;
         }
-        // On success mark authenticated and continue to verification
-        setIsAuthenticated(true);
-        showSuccess('Investor account created successfully! Welcome to EquiPool!');
-        // Persist simple flag (session cookie is real auth)
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('ep-auth','1');
-          if (data?.token) localStorage.setItem('ep-auth-token', data.token);
-        }
-        if (data?.role === 'investor') setSelectedRole('investor');
-        // Investor flow: go to combined contact verification first
-        setModalStep('verifyContact');
+        
+        // On success, go to email verification step
+        showSuccess('Verification email sent! Please check your inbox.');
+        setModalStep('emailVerification');
       } catch (e: unknown) {
         const errorMessage = e instanceof Error ? e.message : 'Network error';
         alert(errorMessage);
@@ -2096,23 +2102,25 @@ export default function Home() {
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', position: 'sticky', bottom: 0, background: 'white', paddingTop: 12, paddingBottom: 12}}>
                   <button 
                     onClick={handleSignUp}
-                    disabled={!borrowerCanContinue}
+                    disabled={!borrowerCanContinue || isSigningUp}
                     style={{
                       paddingLeft: 16, 
                       paddingRight: 16, 
                       paddingTop: 10, 
                       paddingBottom: 10, 
-                      background: borrowerCanContinue ? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)' : '#B2B2B2', 
+                      background: (borrowerCanContinue && !isSigningUp) ? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)' : '#B2B2B2', 
                       borderRadius: 12, 
                       border: 'none',
-                      cursor: borrowerCanContinue ? 'pointer' : 'not-allowed',
+                      cursor: (borrowerCanContinue && !isSigningUp) ? 'pointer' : 'not-allowed',
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: 8, 
                       display: 'inline-flex'
                     }}
                   >
-                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>
+                      {isSigningUp ? 'Sending verification email...' : 'Sign Up'}
+                    </div>
                   </button>
                   <button 
                     onClick={goBackToRoleSelection}
@@ -2137,48 +2145,23 @@ export default function Home() {
             {modalStep === 'borrowerPhoneVerification' && (
               <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                  <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Phone Verification</div>
                   <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
-                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Borrower</span>
-                    <span style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> </span>
+                    <span style={{color: '#113D7B', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Optional Step</span>
                   </div>
                 </div>
                 <div style={{alignSelf: 'stretch', height: 452, paddingLeft: 200, paddingRight: 200, paddingTop: 24, paddingBottom: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
                   <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
                     <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
                       <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your email</div>
-                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your email</div>
-                      </div>
-                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                        <div data-righticon="false" data-state={verificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                          <input
-                            type="text"
-                            placeholder="_ _ _ _"
-                            value={verificationCode}
-                            onChange={(e) => {
-                              const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
-                              setVerificationCode(val);
-                            }}
-                            maxLength={4}
-                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: verificationCode? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5em', textAlign:'center'}}
-                          />
-                        </div>
-                      </div>
-                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn&apos;t receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
-                      </div>
-                    </div>
-                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
-                      <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
                         <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your phone number</div>
-                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your phone</div>
+                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Enter something to proceed (we&apos;ll improve this later)</div>
                       </div>
                       <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         <div data-righticon="false" data-state={phoneVerificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
                           <input
                             type="text"
-                            placeholder="_ _ _ _"
+                            placeholder="Enter any 4 digits"
                             value={phoneVerificationCode}
                             onChange={(e) => {
                               const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
@@ -2190,7 +2173,11 @@ export default function Home() {
                         </div>
                       </div>
                       <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn&apos;t receive the code?</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span></div>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                          <span style={{color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>
+                            This step is optional and will be improved in future updates
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div style={{textAlign: 'center'}}><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>By signing up, you agree to our </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span><span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span></div>
@@ -2202,7 +2189,7 @@ export default function Home() {
                 >
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
-                {(() => { const canProceed = verificationCode.length===4 && phoneVerificationCode.length===4; return (
+                {(() => { const canProceed = phoneVerificationCode.length >= 1; return (
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
                   <div 
                     onClick={()=> { if(canProceed){ setModalStep('accountCreated'); } }}
@@ -2211,10 +2198,10 @@ export default function Home() {
                     <div style={{color:'white', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500}}>Continue</div>
                   </div>
                   <button 
-                    onClick={() => setModalStep('borrowerSignUp')}
-                    style={{background:'transparent', border:'none', cursor:'pointer', color:'#4A5565', fontSize:12, fontFamily:'var(--ep-font-avenir)', fontWeight:400, textDecoration:'underline'}}
+                    onClick={() => setModalStep('accountCreated')}
+                    style={{background:'transparent', border:'none', cursor:'pointer', color:'#113D7B', fontSize:12, fontFamily:'var(--ep-font-avenir)', fontWeight:400, textDecoration:'underline'}}
                   >
-                    ← Back
+                    Skip for now
                   </button>
                 </div>
                 ) })()}
@@ -3086,7 +3073,7 @@ export default function Home() {
             )}
 
             {modalStep === 'emailVerification' && (
-              <div style={{width: '100%', height: '100%', paddingTop: 24, paddingBottom: 24, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+              <div style={{width: '100%', height: '100%', paddingTop: 44, paddingBottom: 44, position: 'relative', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
                   <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 24, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
                   <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
@@ -3094,50 +3081,101 @@ export default function Home() {
                     <span style={{color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}> </span>
                   </div>
                 </div>
-                <div style={{alignSelf: 'stretch', paddingLeft: 200, paddingRight: 200, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-                  <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
-                    <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
-                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your email</div>
-                      <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Please enter the code sent to your email</div>
-                    </div>
-                    <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
-                      <div style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
-                        <input
-                          type="text"
-                          placeholder="_ _ _ _"
-                          value={verificationCode}
-                          onChange={(e) => setVerificationCode(e.target.value)}
-                          maxLength={4}
-                          style={{
-                            flex: '1 1 0',
-                            background: 'transparent',
-                            border: 'none',
-                            outline: 'none',
-                            color: verificationCode ? 'black' : '#B2B2B2',
-                            fontSize: 14,
-                            fontFamily: 'var(--ep-font-avenir)',
-                            fontWeight: '500',
-                            letterSpacing: '0.5em',
-                            textAlign: 'center'
-                          }}
-                        />
+                <div style={{alignSelf: 'stretch', height: 452, paddingLeft: 200, paddingRight: 200, paddingTop: 24, paddingBottom: 24, flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
+                  <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
+                    {/* Email Verification Section */}
+                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your email</div>
+                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your email</div>
+                      </div>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state={verificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="text"
+                            placeholder="_ _ _ _"
+                            value={verificationCode}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
+                              setVerificationCode(val);
+                            }}
+                            maxLength={4}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: verificationCode? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5em', textAlign:'center'}}
+                          />
+                        </div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn't receive the code? </span>
+                          <span 
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/resend-verification-email`, {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  credentials: 'include',
+                                  body: JSON.stringify({
+                                    email: formData.email,
+                                    user_type: selectedRole
+                                  }),
+                                });
+                                
+                                const data = await res.json().catch(()=>({}));
+                                if(!res.ok){
+                                  const msg = data.error || 'Failed to resend verification email';
+                                  showError(msg);
+                                  return;
+                                }
+                                
+                                showSuccess('Verification email resent! Please check your inbox.');
+                              } catch (e: unknown) {
+                                const errorMessage = e instanceof Error ? e.message : 'Network error';
+                                showError(errorMessage);
+                              }
+                            }}
+                            style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}
+                          >
+                            Resend
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
-                      <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Didn&apos;t receive the code?</span>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> </span>
-                        <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word', cursor: 'pointer'}}>Resend</span>
+                    
+                    {/* Phone Verification Section */}
+                    <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 12, display: 'flex'}}>
+                      <div style={{alignSelf: 'stretch', paddingLeft: 70, paddingRight: 70, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center', color: 'black', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Verify your phone number</div>
+                        <div style={{textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Please enter the code sent to your phone</div>
+                      </div>
+                      <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
+                        <div data-righticon="false" data-state={phoneVerificationCode? 'focus':'default'} style={{width: 322, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'inline-flex'}}>
+                          <input
+                            type="text"
+                            placeholder="_ _ _ _"
+                            value={phoneVerificationCode}
+                            onChange={(e) => {
+                              const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
+                              setPhoneVerificationCode(val);
+                            }}
+                            maxLength={4}
+                            style={{flex:'1 1 0', background:'transparent', border:'none', outline:'none', color: phoneVerificationCode? 'black':'#B2B2B2', fontSize:14, fontFamily:'var(--ep-font-avenir)', fontWeight:500, letterSpacing:'0.5em', textAlign:'center'}}
+                          />
+                        </div>
+                      </div>
+                      <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                        <div style={{alignSelf: 'stretch', textAlign: 'center'}}>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>Didn't receive the code? </span>
+                          <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '800', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word', cursor:'pointer'}}>Resend</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                    
                     <div style={{textAlign: 'center'}}>
-                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>By signing up, you agree to our </span>
-                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Terms of Service</span>
-                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}> and </span>
-                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: 1.67, wordWrap: 'break-word'}}>Privacy Policy</span>
-                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>.</span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>By signing up, you agree to our </span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Terms of Service</span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}> and </span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', textDecoration: 'underline', lineHeight: '20px', wordWrap: 'break-word'}}>Privacy Policy</span>
+                      <span style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: '20px', wordWrap: 'break-word'}}>.</span>
                     </div>
                   </div>
                 </div>
@@ -3147,14 +3185,50 @@ export default function Home() {
                 >
                   <Image src="/material-symbols-close.svg" alt="Close" width={24} height={24} />
                 </button>
+                
+                {/* Updated button logic - email required, phone optional */}
                 <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
                   <button 
-                    onClick={() => {
-                      console.log('Verification code:', verificationCode);
-                      if(selectedRole === 'borrower') {
-                        setModalStep('accountCreated');
-                      } else {
+                    onClick={async () => {
+                      if (!verificationCode || verificationCode.length !== 4) {
+                        showError('Please enter the 4-digit email verification code');
+                        return;
+                      }
+                      
+                      try {
+                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/verify-email-code`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          credentials: 'include',
+                          body: JSON.stringify({
+                            email: formData.email,
+                            code: verificationCode,
+                            user_type: selectedRole
+                          }),
+                        });
+                        
+                        const data = await res.json().catch(()=>({}));
+                        if(!res.ok){
+                          const msg = data.error || 'Invalid verification code';
+                          showError(msg);
+                          return;
+                        }
+                        
+                        // Account created successfully!
+                        setIsAuthenticated(true);
+                        showSuccess('Account created successfully! Welcome to EquiPool!');
+                        
+                        // Persist auth data
+                        if (typeof window !== 'undefined') {
+                          localStorage.setItem('ep-auth','1');
+                          if (data?.token) localStorage.setItem('ep-auth-token', data.token);
+                        }
+                        
+                        // Go to next step (phone verification is optional, so we can continue)
                         setModalStep('livenessCheck');
+                      } catch (e: unknown) {
+                        const errorMessage = e instanceof Error ? e.message : 'Network error';
+                        showError(errorMessage);
                       }
                     }}
                     style={{
@@ -3162,18 +3236,17 @@ export default function Home() {
                       paddingRight: 16, 
                       paddingTop: 10, 
                       paddingBottom: 10, 
-                      background: '#113D7B', 
+                      background: verificationCode.length === 4 ? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)' : '#B8C5D7', 
                       borderRadius: 12, 
-                      outline: '1px #F4F4F4 solid',
                       border: 'none',
-                      cursor: 'pointer',
+                      cursor: verificationCode.length === 4 ? 'pointer' : 'not-allowed',
                       justifyContent: 'center', 
                       alignItems: 'center', 
                       gap: 8, 
                       display: 'inline-flex'
                     }}
                   >
-                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Sign Up</div>
+                    <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue</div>
                   </button>
                   <button 
                     onClick={() => setModalStep(selectedRole === 'investor' ? 'investorSignUp' : 'borrowerSignUp')}

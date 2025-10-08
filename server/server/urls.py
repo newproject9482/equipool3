@@ -27,6 +27,10 @@ urlpatterns = [
     path('api/auth/logout', views.auth_logout, name='auth-logout'),
     path('api/auth/me', views.auth_me, name='auth-me'),
     path('api/validate/email', views.validate_email, name='validate-email'),
+    # Email verification endpoints
+    path('api/auth/send-verification-email', views.send_verification_email, name='send-verification-email'),
+    path('api/auth/verify-email-code', views.verify_email_code, name='verify-email-code'),
+    path('api/auth/resend-verification-email', views.resend_verification_email, name='resend-verification-email'),
     path('api/pools/create', views.create_pool, name='create-pool'),
     path('api/pools', views.get_pools, name='get-pools'),
     path('api/pools/<int:pool_id>', views.get_pool_detail, name='get-pool-detail'),

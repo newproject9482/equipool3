@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from datetime import timedelta
+import random
+import string
 
 class Borrower(models.Model):
     first_name = models.CharField(max_length=100)
@@ -11,6 +13,7 @@ class Borrower(models.Model):
     phone = models.CharField(max_length=20)
     date_of_birth = models.DateField()
     password_hash = models.CharField(max_length=128)
+    email_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def set_password(self, raw_password: str):
@@ -39,6 +42,7 @@ class Investor(models.Model):
     zip_code = models.CharField(max_length=10)
     country = models.CharField(max_length=100, default='United States')
     password_hash = models.CharField(max_length=128)
+    email_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def set_password(self, raw_password: str):
@@ -78,6 +82,35 @@ class AuthToken(models.Model):
     def __str__(self):
         user = self.borrower or self.investor
         return f"AuthToken({user.email if user else 'None'})"
+
+class EmailVerification(models.Model):
+    """Store email verification codes for users during signup"""
+    email = models.EmailField()
+    code = models.CharField(max_length=6)
+    user_type = models.CharField(max_length=10, choices=[('borrower', 'Borrower'), ('investor', 'Investor')])
+    user_data = models.JSONField()  # Store the signup data until verification
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    verified = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(minutes=15)  # 15 minute expiry
+        if not self.code:
+            self.code = self.generate_code()
+        super().save(*args, **kwargs)
+    
+    @staticmethod
+    def generate_code():
+        """Generate a 4-digit verification code"""
+        return ''.join(random.choices(string.digits, k=4))
+    
+    def is_valid(self):
+        """Check if code is still valid (not expired and not verified)"""
+        return not self.verified and timezone.now() < self.expires_at
+    
+    def __str__(self):
+        return f"EmailVerification({self.email}, {self.code})"
 
 class Pool(models.Model):
     POOL_TYPE_CHOICES = [

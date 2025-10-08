@@ -7,7 +7,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-from .models import Borrower, Investor, Pool, AuthToken, Investment
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Borrower, Investor, Pool, AuthToken, Investment, EmailVerification
 from django.contrib.auth.hashers import check_password
 
 REQUIRED_FIELDS = {"firstName", "lastName", "email", "phone", "dateOfBirth", "password"}
@@ -79,6 +81,40 @@ def _parse_date(date_str: str):
         except ValueError:
             continue
     raise ValidationError("Invalid date format; expected YYYY-MM-DD")
+
+def _send_verification_email(email, code, user_type):
+    """Send verification email to user"""
+    print(f"DEBUG: _send_verification_email called with email={email}, code={code}, user_type={user_type}")
+    subject = "Verify your EquiPool account"
+    message = f"""
+    Welcome to EquiPool!
+    
+    Your verification code is: {code}
+    
+    This code will expire in 15 minutes.
+    
+    If you didn't request this verification, please ignore this email.
+    
+    Best regards,
+    The EquiPool Team
+    """
+    
+    try:
+        print(f"DEBUG: Attempting to send email from {settings.DEFAULT_FROM_EMAIL} to {email}")
+        print(f"DEBUG: Email backend: {settings.EMAIL_BACKEND}")
+        print(f"DEBUG: Email host: {settings.EMAIL_HOST}")
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        print("DEBUG: Email sent successfully")
+        return True
+    except Exception as e:
+        print(f"DEBUG: Failed to send email: {e}")
+        return False
 
 @csrf_exempt  # For now; recommend enabling proper CSRF/token auth later
 def borrower_signup(request: HttpRequest):
@@ -307,6 +343,283 @@ def validate_email(request: HttpRequest):
         return JsonResponse({'error': 'Valid email required'}, status=400)
     exists = Borrower.objects.filter(email=email).exists() or Investor.objects.filter(email=email).exists()
     return JsonResponse({'available': not exists})
+
+@csrf_exempt
+def send_verification_email(request: HttpRequest):
+    """Send verification email for signup process"""
+    print(f"DEBUG: send_verification_email called")
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        print(f"DEBUG: Received data: {data}")
+    except json.JSONDecodeError:
+        print("DEBUG: Invalid JSON received")
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    email = data.get('email', '').strip().lower()
+    user_type = data.get('user_type', '').strip().lower()  # 'borrower' or 'investor'
+    user_data = data.get('user_data', {})  # The signup form data
+    
+    print(f"DEBUG: email={email}, user_type={user_type}, user_data keys={list(user_data.keys())}")
+    
+    if not email or '@' not in email:
+        print("DEBUG: Invalid email")
+        return JsonResponse({'error': 'Valid email required'}, status=400)
+    
+    if user_type not in ['borrower', 'investor']:
+        print("DEBUG: Invalid user type")
+        return JsonResponse({'error': 'Invalid user type'}, status=400)
+    
+    if not user_data:
+        print("DEBUG: No user data provided")
+        return JsonResponse({'error': 'User data required'}, status=400)
+    
+    # Check if email is already taken
+    exists = Borrower.objects.filter(email=email).exists() or Investor.objects.filter(email=email).exists()
+    if exists:
+        print("DEBUG: Email already registered")
+        return JsonResponse({'error': 'Email already registered'}, status=409)
+    
+    try:
+        # Clean up any existing verification for this email
+        EmailVerification.objects.filter(email=email, user_type=user_type).delete()
+        print("DEBUG: Cleaned up existing verifications")
+        
+        # Create new verification
+        verification = EmailVerification.objects.create(
+            email=email,
+            user_type=user_type,
+            user_data=user_data
+        )
+        print(f"DEBUG: Created verification with code: {verification.code}")
+        
+        # Send email
+        print(f"DEBUG: Attempting to send email to {email}")
+        if _send_verification_email(email, verification.code, user_type):
+            print("DEBUG: Email sent successfully")
+            return JsonResponse({
+                'success': True,
+                'message': 'Verification email sent',
+                'expires_in': 900  # 15 minutes
+            })
+        else:
+            print("DEBUG: Failed to send email")
+            return JsonResponse({'error': 'Failed to send email'}, status=500)
+            
+    except Exception as e:
+        print(f"DEBUG: Exception occurred: {str(e)}")
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+@csrf_exempt
+def verify_email_code(request: HttpRequest):
+    """Verify the email verification code and create user account"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    email = data.get('email', '').strip().lower()
+    code = data.get('code', '').strip()
+    user_type = data.get('user_type', '').strip().lower()
+    
+    if not email or not code or not user_type:
+        return JsonResponse({'error': 'Email, code, and user_type required'}, status=400)
+    
+    try:
+        # Find valid verification
+        verification = EmailVerification.objects.filter(
+            email=email,
+            code=code,
+            user_type=user_type,
+            verified=False
+        ).first()
+        
+        if not verification:
+            return JsonResponse({'error': 'Invalid or expired verification code'}, status=400)
+        
+        if not verification.is_valid():
+            return JsonResponse({'error': 'Verification code has expired'}, status=400)
+        
+        # Mark verification as used
+        verification.verified = True
+        verification.save()
+        
+        # Create the user account based on user_type
+        user_data = verification.user_data
+        
+        if user_type == 'borrower':
+            return _create_borrower_account(user_data, email)
+        elif user_type == 'investor':
+            return _create_investor_account(user_data, email)
+        else:
+            return JsonResponse({'error': 'Invalid user type'}, status=400)
+            
+    except Exception as e:
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+@csrf_exempt
+def resend_verification_email(request: HttpRequest):
+    """Resend verification email"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    email = data.get('email', '').strip().lower()
+    user_type = data.get('user_type', '').strip().lower()
+    
+    if not email or not user_type:
+        return JsonResponse({'error': 'Email and user_type required'}, status=400)
+    
+    try:
+        # Find existing verification
+        verification = EmailVerification.objects.filter(
+            email=email,
+            user_type=user_type,
+            verified=False
+        ).first()
+        
+        if not verification:
+            return JsonResponse({'error': 'No pending verification found'}, status=404)
+        
+        # Generate new code and update expiry
+        verification.code = EmailVerification.generate_code()
+        verification.expires_at = timezone.now() + timedelta(minutes=15)
+        verification.save()
+        
+        # Send email
+        if _send_verification_email(email, verification.code, user_type):
+            return JsonResponse({
+                'success': True,
+                'message': 'Verification email resent',
+                'expires_in': 900  # 15 minutes
+            })
+        else:
+            return JsonResponse({'error': 'Failed to send email'}, status=500)
+            
+    except Exception as e:
+        return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+
+def _create_borrower_account(user_data, email):
+    """Helper function to create borrower account after email verification"""
+    try:
+        with transaction.atomic():
+            # Validate required fields
+            first_name = user_data.get("firstName", "").strip()
+            middle_name = user_data.get("middleName", "").strip()
+            last_name = user_data.get("lastName", "").strip()
+            phone = user_data.get("phone", "").strip()
+            dob_raw = user_data.get("dateOfBirth")
+            password = user_data.get("password")
+            
+            if not all([first_name, last_name, phone, dob_raw, password]):
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+            
+            # Parse and validate date
+            dob = _parse_date(dob_raw)
+            
+            # Create borrower
+            b = Borrower(
+                first_name=first_name,
+                middle_name=middle_name,
+                last_name=last_name,
+                email=email,
+                phone=phone,
+                date_of_birth=dob,
+                email_verified=True  # Already verified via email
+            )
+            b.set_password(password)
+            b.save()
+            
+            # Create auth session
+            # Note: You might want to establish session here if needed
+            auth_token = _create_auth_token(b, 'borrower')
+            
+            return JsonResponse({
+                "id": b.id,
+                "firstName": b.first_name,
+                "middleName": b.middle_name,
+                "lastName": b.last_name,
+                "fullName": b.full_name,
+                "email": b.email,
+                "phone": b.phone,
+                "dateOfBirth": b.date_of_birth.isoformat(),
+                "createdAt": b.created_at.isoformat(),
+                "role": "borrower",
+                "token": auth_token,
+                "authenticated": True,
+                "email_verified": True
+            }, status=201)
+            
+    except Exception as e:
+        return JsonResponse({"error": f"Failed to create account: {str(e)}"}, status=500)
+
+def _create_investor_account(user_data, email):
+    """Helper function to create investor account after email verification"""
+    try:
+        with transaction.atomic():
+            # Validate required fields
+            full_name = user_data.get("fullName", "").strip()
+            dob_raw = user_data.get("dateOfBirth")
+            phone = user_data.get("phone", "").strip()
+            ssn = user_data.get("ssn", "").strip()
+            address1 = user_data.get("address1", "").strip()
+            address2 = user_data.get("address2", "").strip()
+            city = user_data.get("city", "").strip()
+            state = user_data.get("state", "").strip()
+            zip_code = user_data.get("zip", "").strip()
+            country = user_data.get("country", "United States").strip()
+            password = user_data.get("password")
+            
+            if not all([full_name, dob_raw, phone, ssn, address1, city, state, zip_code, password]):
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+            
+            # Parse and validate date
+            dob = _parse_date(dob_raw)
+            
+            # Create investor
+            i = Investor(
+                full_name=full_name,
+                email=email,
+                date_of_birth=dob,
+                phone=phone,
+                ssn=ssn,
+                address1=address1,
+                address2=address2,
+                city=city,
+                state=state,
+                zip_code=zip_code,
+                country=country,
+                email_verified=True  # Already verified via email
+            )
+            i.set_password(password)
+            i.save()
+            
+            # Create auth session
+            auth_token = _create_auth_token(i, 'investor')
+            
+            return JsonResponse({
+                "id": i.id,
+                "fullName": i.full_name,
+                "email": i.email,
+                "dateOfBirth": i.date_of_birth.isoformat(),
+                "createdAt": i.created_at.isoformat(),
+                "role": "investor",
+                "token": auth_token,
+                "authenticated": True,
+                "email_verified": True
+            }, status=201)
+            
+    except Exception as e:
+        return JsonResponse({"error": f"Failed to create account: {str(e)}"}, status=500)
 
 @csrf_exempt
 def investor_signup(request: HttpRequest):
