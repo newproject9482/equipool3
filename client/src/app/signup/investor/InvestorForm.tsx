@@ -56,6 +56,9 @@ export const InvestorForm: React.FC = () => {
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   
+  // Loading state for signup button
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  
   // Error state management similar to main page
   const [investorErrors, setInvestorErrors] = useState<string[]>([]);
   const [showInvestorErrors, setShowInvestorErrors] = useState(false);
@@ -241,6 +244,7 @@ export const InvestorForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     // On attempt to submit, if errors exist, show them and stop
     const map = computeInvestorErrorsByField();
     const allErrs = flattenErrors(map);
@@ -272,9 +276,11 @@ export const InvestorForm: React.FC = () => {
     }
 
     setSubmitAttempted(true);
-    // Submit to backend
+    setIsSigningUp(true);
+    
+    // Send verification email instead of creating account immediately
     try {
-      const payload = {
+      const userData = {
         fullName: [form.firstName, form.middleName, form.surname].map(s => (s||'').trim()).filter(Boolean).join(' '),
         dateOfBirth: form.dob,
         email: form.email,
@@ -288,16 +294,21 @@ export const InvestorForm: React.FC = () => {
         country: form.country,
         password: form.password,
       };
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/investors/signup`, {
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/send-verification-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          email: form.email,
+          user_type: 'investor',
+          user_data: userData
+        }),
       });
+      
       const data = await res.json().catch(()=>({}));
       if(!res.ok){
-        // Surface server error into form error area with special handling for 409 Conflict
-        let serverError = data?.error || 'Signup failed';
+        let serverError = data?.error || 'Failed to send verification email';
         if (res.status === 409) {
           serverError = data?.error || 'An account with that email already exists. Please log in.';
         }
@@ -306,15 +317,18 @@ export const InvestorForm: React.FC = () => {
         alert(serverError);
         return;
       }
-      // Success: redirect to investor pools page
-      alert('Investor account created! Welcome to EquiPool!');
-      router.push('/pools-investor');
+      
+      // Success: Show success message and redirect to verification (or redirect to main page)
+      alert('Verification email sent! Please check your inbox and verify your email to complete signup.');
+      router.push('/'); // Redirect to main page where they can complete email verification
+      
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : 'Network error';
-      // Surface server error into form error area
       setInvestorErrors(prev => Array.from(new Set([...(prev||[]), errorMessage])));
       setShowInvestorErrors(true);
       alert(errorMessage);
+    } finally {
+      setIsSigningUp(false);
     }
   };
 
@@ -451,8 +465,10 @@ export const InvestorForm: React.FC = () => {
           </div>
         </div>
         
-        <button disabled={!investorCanContinue} type="submit" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: investorCanContinue? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)' : 'var(--Inactive-Blue, #B8C5D7)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex', border: 'none', cursor: investorCanContinue? 'pointer':'not-allowed'}}>
-          <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: 500, wordWrap: 'break-word'}}>Continue</div>
+        <button disabled={!investorCanContinue || isSigningUp} type="submit" style={{paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, background: (investorCanContinue && !isSigningUp)? 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)' : 'var(--Inactive-Blue, #B8C5D7)', borderRadius: 12, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'inline-flex', border: 'none', cursor: (investorCanContinue && !isSigningUp)? 'pointer':'not-allowed'}}>
+          <div style={{color: 'white', fontSize: 14, fontFamily: 'Avenir', fontWeight: 500, wordWrap: 'break-word'}}>
+            {isSigningUp ? 'Sending verification email...' : 'Continue'}
+          </div>
         </button>
 
         {/* Error list moved under the second password field to preserve layout */}
