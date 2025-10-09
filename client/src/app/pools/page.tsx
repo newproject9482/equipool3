@@ -75,6 +75,18 @@ export default function PoolsPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   
+  // Date picker state (same as signup modal)
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(17);
+  const [selectedMonth, setSelectedMonth] = useState(5); // June = index 5
+  const [selectedYear, setSelectedYear] = useState(1993);
+  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
+  const [showYearDropdown, setShowYearDropdown] = useState(false);
+  const [editingMonth, setEditingMonth] = useState(false);
+  const [editingYear, setEditingYear] = useState(false);
+  const [monthInput, setMonthInput] = useState('June');
+  const [yearInput, setYearInput] = useState('1993');
+  
   // Prior names state - now supporting multiple prior names
   const [priorNames, setPriorNames] = useState([{ firstName: '', middleName: '', lastName: '' }]);
   
@@ -85,6 +97,13 @@ export default function PoolsPage() {
   const [addressLine2, setAddressLine2] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
+
+  // Personal Info validation state
+  const [personalInfoErrors, setPersonalInfoErrors] = useState<string[]>([]);
+  const [showPersonalInfoErrors, setShowPersonalInfoErrors] = useState(false);
+  type PersonalInfoField = 'firstName' | 'middleName' | 'lastName' | 'email' | 'phoneNumber' | 'dateOfBirth' | 'ssn' | 'ficoScore' | 'addressLine1' | 'city' | 'zipCode';
+  const [personalInfoTouched, setPersonalInfoTouched] = useState<Partial<Record<PersonalInfoField, boolean>>>({});
+  const [personalInfoSubmitAttempted, setPersonalInfoSubmitAttempted] = useState(false);
 
   // Address form state
   const [propertyAddressLine1, setPropertyAddressLine1] = useState('');
@@ -338,6 +357,143 @@ export default function PoolsPage() {
 
   const summaryStats = calculateSummaryStats();
 
+  // ---------- Personal Info Validation helpers ----------
+  const isValidEmail = (email: string) => {
+    if (!email) return false;
+    // Simple RFC5322-like email check
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  // Name part validator (single field like first/surname)
+  const isValidNamePart = (s: string) => {
+    if (!s) return false;
+    return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{1,255}$/.test(s.trim());
+  };
+
+  const isAdult18 = (isoDate: string) => {
+    if (!isoDate) return false;
+    const dob = new Date(isoDate + 'T00:00:00');
+    if (isNaN(dob.getTime())) return false;
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+    return age >= 18;
+  };
+
+  // Normalize US phone digits (strip non-digits)
+  const normalizePhone = (s: string) => (s || '').replace(/\D/g, '');
+  const isValidUSPhone10 = (s: string) => normalizePhone(s).length === 10; // 10 digits required
+
+  // City validator (letters, spaces, hyphens, apostrophes only - no numbers)
+  const isValidCityName = (s: string) => {
+    if (!s || s.trim().length === 0) return false;
+    return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{1,100}$/.test(s.trim());
+  };
+
+  // ZIP code validator (US format)
+  const isValidZipCode = (s: string) => {
+    if (!s) return false;
+    return /^\d{5}(-\d{4})?$/.test(s.trim());
+  };
+
+  // SSN validator (basic format check)
+  const isValidSSN = (s: string) => {
+    if (!s) return false;
+    const cleaned = s.replace(/\D/g, '');
+    return cleaned.length === 9;
+  };
+
+  // FICO Score validator (300-850 range)
+  const isValidFicoScore = (s: string) => {
+    if (!s || s.trim() === '') return true; // Optional field
+    const score = parseInt(s);
+    return !isNaN(score) && score >= 300 && score <= 850;
+  };
+
+  // Date picker utilities
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
+
+  const getDaysInMonth = (month: number, year: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  const formatDate = (day: number, month: number, year: number) => {
+    const monthStr = (month + 1).toString().padStart(2, '0');
+    const dayStr = day.toString().padStart(2, '0');
+    return `${monthStr}/${dayStr}/${year}`;
+  };
+
+  // Compute personal info validation errors per-field
+  type PersonalInfoErrorMap = Partial<Record<PersonalInfoField, string[]>>;
+  const computePersonalInfoErrorsByField = (): PersonalInfoErrorMap => {
+    const errs: PersonalInfoErrorMap = {};
+    // firstName
+    if (!firstName || !isValidNamePart(firstName)) {
+      errs.firstName = [!firstName ? 'First name is required' : 'First name contains invalid characters'];
+    }
+    // middleName (optional, but if provided must be valid)
+    if (middleName && !isValidNamePart(middleName)) {
+      errs.middleName = ['Middle name contains invalid characters'];
+    }
+    // lastName
+    if (!lastName || !isValidNamePart(lastName)) {
+      errs.lastName = [!lastName ? 'Last name is required' : 'Last name contains invalid characters'];
+    }
+    // email
+    if (!isValidEmail(email)) {
+      errs.email = ['Valid email required'];
+    }
+    // phone (US 10-digit required)
+    if (!isValidUSPhone10(phoneNumber)) {
+      errs.phoneNumber = ['Enter a valid 10-digit US phone number'];
+    }
+    // dateOfBirth
+    if (!dateOfBirth) {
+      errs.dateOfBirth = ['Date of birth is required'];
+    } else if (!isAdult18(dateOfBirth)) {
+      errs.dateOfBirth = ['You must be at least 18 years old'];
+    }
+    // ssn
+    if (!ssn || !isValidSSN(ssn)) {
+      errs.ssn = [!ssn ? 'SSN is required' : 'Enter a valid 9-digit SSN'];
+    }
+    // addressLine1
+    if (!addressLine1 || addressLine1.trim().length === 0) {
+      errs.addressLine1 = ['Address is required'];
+    }
+    // city
+    if (!city || !isValidCityName(city)) {
+      errs.city = [!city ? 'City is required' : 'City name can only contain letters, spaces, hyphens, and apostrophes'];
+    }
+    // zipCode
+    if (!zipCode || !isValidZipCode(zipCode)) {
+      errs.zipCode = [!zipCode ? 'ZIP code is required' : 'Enter a valid ZIP code (e.g., 12345 or 12345-6789)'];
+    }
+    // ficoScore (optional but must be valid if provided)
+    if (!isValidFicoScore(ficoScore)) {
+      errs.ficoScore = ['FICO score must be between 300 and 850'];
+    }
+    return errs;
+  };
+
+  const flattenPersonalInfoErrors = (map: PersonalInfoErrorMap, onlyFields?: PersonalInfoField[]) => {
+    const entries = Object.entries(map) as [PersonalInfoField, string[]][];
+    return entries
+      .filter(([field]) => !onlyFields || onlyFields.includes(field))
+      .flatMap(([, msgs]) => msgs || []);
+  };
+
+  // Personal Info field error checking for UI highlighting
+  const personalInfoErrorsByField = computePersonalInfoErrorsByField();
+  const personalInfoFieldHasError = (field: PersonalInfoField) => !!personalInfoErrorsByField[field] && (showPersonalInfoErrors || personalInfoTouched[field] || personalInfoSubmitAttempted);
+
   // Removed filter sort helpers and dropdown handlers
 
   // Function to fetch pools from backend
@@ -383,6 +539,87 @@ export default function PoolsPage() {
       fetchPools();
     }
   }, [isAuthenticated, fetchPools]);
+
+  // Recompute personal info errors when relevant state changes,
+  // but only after the user has interacted or submit attempt happened.
+  useEffect(() => {
+    const map = computePersonalInfoErrorsByField();
+    if (showPersonalInfoErrors) {
+      if (personalInfoSubmitAttempted) {
+        // Show all errors after submit attempt
+        setPersonalInfoErrors(flattenPersonalInfoErrors(map));
+      } else {
+        // Show only touched field errors while typing
+        const touchedFields = (Object.keys(personalInfoTouched) as PersonalInfoField[]).filter(k => personalInfoTouched[k]);
+        setPersonalInfoErrors(flattenPersonalInfoErrors(map, touchedFields));
+      }
+    } else {
+      setPersonalInfoErrors([]);
+    }
+  }, [firstName, middleName, lastName, email, phoneNumber, dateOfBirth, ssn, ficoScore, addressLine1, city, zipCode, showPersonalInfoErrors, personalInfoTouched, personalInfoSubmitAttempted]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Personal Info input change handlers with validation
+  const handlePersonalInfoInputChange = (field: PersonalInfoField, value: string) => {
+    // Update the state for the specific field
+    switch (field) {
+      case 'firstName':
+        setFirstName(value);
+        break;
+      case 'middleName':
+        setMiddleName(value);
+        break;
+      case 'lastName':
+        setLastName(value);
+        break;
+      case 'email':
+        setEmail(value);
+        break;
+      case 'phoneNumber':
+        setPhoneNumber(value);
+        break;
+      case 'dateOfBirth':
+        setDateOfBirth(value);
+        break;
+      case 'ssn':
+        setSsn(value);
+        break;
+      case 'ficoScore':
+        setFicoScore(value);
+        break;
+      case 'addressLine1':
+        setAddressLine1(value);
+        break;
+      case 'city':
+        setCity(value);
+        break;
+      case 'zipCode':
+        setZipCode(value);
+        break;
+    }
+    
+    // Mark field as touched and show error area after user starts typing
+    setPersonalInfoTouched(prev => ({ ...prev, [field]: true }));
+    setShowPersonalInfoErrors(true);
+  };
+
+  // Date picker event handlers
+  const handleDateSelect = (day: number) => {
+    setSelectedDate(day);
+    const formattedDate = formatDate(day, selectedMonth, selectedYear);
+    setDateOfBirth(formattedDate);
+    handlePersonalInfoInputChange('dateOfBirth', formattedDate);
+    setShowDatePicker(false);
+  };
+
+  const handleMonthSelect = (monthIndex: number) => {
+    setSelectedMonth(monthIndex);
+    setEditingMonth(false);
+  };
+
+  const handleYearSelect = (year: number) => {
+    setSelectedYear(year);
+    setEditingYear(false);
+  };
 
   // Function to create pool
   const createPool = async () => {
@@ -1513,28 +1750,344 @@ export default function PoolsPage() {
                       <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
+                            <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: personalInfoFieldHasError('firstName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('firstName') ? '-1px' : undefined}}>
+                              <input type="text" value={firstName} onChange={(e) => handlePersonalInfoInputChange('firstName', e.target.value)} placeholder="First name" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
-                            <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                              <input type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
+                            <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: personalInfoFieldHasError('middleName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('middleName') ? '-1px' : undefined}}>
+                              <input type="text" value={middleName} onChange={(e) => handlePersonalInfoInputChange('middleName', e.target.value)} placeholder="Middle name" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                           </div>
-                          <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
-                            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
+                          <div data-righticon="false" data-state="default" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', outline: personalInfoFieldHasError('lastName') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('lastName') ? '-1px' : undefined}}>
+                            <input type="text" value={lastName} onChange={(e) => handlePersonalInfoInputChange('lastName', e.target.value)} placeholder="Last name" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                           </div>
-                          <div data-righticon="true" data-state="dropdown closed" style={{alignSelf: 'stretch', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{dateOfBirth ? new Date(dateOfBirth).toLocaleDateString('en-US') : '11/09/2002'}</div>
-                            <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
-                              <Image src="/angle-down.svg" alt="Dropdown" width={16} height={16} />
+                          <div style={{width: '100%', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'inline-flex', position: 'relative', outline: personalInfoFieldHasError('dateOfBirth') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('dateOfBirth') ? '-1px' : undefined}}>
+                            <div 
+                              onClick={() => setShowDatePicker(!showDatePicker)}
+                              style={{
+                                flex: '1 1 0', 
+                                color: dateOfBirth ? 'black' : '#B2B2B2', 
+                                fontSize: 14, 
+                                fontFamily: 'var(--ep-font-avenir)', 
+                                fontWeight: '500', 
+                                wordWrap: 'break-word',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {dateOfBirth ? `${months[selectedMonth]} ${selectedDate}, ${selectedYear}` : 'Date of Birth'}
                             </div>
+                            
+                            {showDatePicker && (
+                              <div 
+                                style={{
+                                  width: 288, 
+                                  padding: 20, 
+                                  left: 35, 
+                                  top: 47, 
+                                  position: 'absolute', 
+                                  background: 'white', 
+                                  boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.05)', 
+                                  overflow: 'hidden', 
+                                  borderRadius: 12, 
+                                  outline: '1px #E5E7EB solid', 
+                                  outlineOffset: '-1px', 
+                                  flexDirection: 'column', 
+                                  justifyContent: 'flex-start', 
+                                  alignItems: 'center', 
+                                  gap: 16, 
+                                  display: 'inline-flex',
+                                  zIndex: 1000
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div style={{alignSelf: 'stretch', overflow: 'hidden', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+                                  <button 
+                                    onClick={() => {
+                                      const newMonth = selectedMonth === 0 ? 11 : selectedMonth - 1;
+                                      const newYear = selectedMonth === 0 ? selectedYear - 1 : selectedYear;
+                                      setSelectedMonth(newMonth);
+                                      setSelectedYear(newYear);
+                                    }}
+                                    style={{width: 24, height: 24, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                  >
+                                    <Image src="/weui-arrow-filled-left.svg" alt="Previous month" width={24} height={24} />
+                                  </button>
+                                  <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex', position: 'relative'}}>
+                                    <div style={{position: 'relative'}}>
+                                      {editingMonth ? (
+                                        <input
+                                          type="text"
+                                          value={monthInput}
+                                          onChange={(e) => setMonthInput(e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                              const monthIndex = months.indexOf(monthInput);
+                                              if (monthIndex !== -1) {
+                                                setSelectedMonth(monthIndex);
+                                              }
+                                              setEditingMonth(false);
+                                            }
+                                            if (e.key === 'Escape') {
+                                              setEditingMonth(false);
+                                            }
+                                          }}
+                                          onBlur={() => {
+                                            const monthIndex = months.indexOf(monthInput);
+                                            if (monthIndex !== -1) {
+                                              setSelectedMonth(monthIndex);
+                                            }
+                                            setEditingMonth(false);
+                                          }}
+                                          autoFocus
+                                          style={{
+                                            paddingLeft: 8, 
+                                            paddingRight: 8, 
+                                            paddingTop: 6, 
+                                            paddingBottom: 6, 
+                                            borderRadius: 8, 
+                                            outline: '1px #767676 solid', 
+                                            outlineOffset: '-1px',
+                                            background: 'white',
+                                            border: 'none',
+                                            textAlign: 'center',
+                                            color: '#101828', 
+                                            fontSize: 14, 
+                                            fontFamily: 'var(--ep-font-avenir)', 
+                                            fontWeight: '500',
+                                            width: 80
+                                          }}
+                                        />
+                                      ) : (
+                                        <button
+                                          onClick={() => {
+                                            setEditingMonth(true);
+                                            setMonthInput(months[selectedMonth]);
+                                            setShowMonthDropdown(!showMonthDropdown);
+                                          }}
+                                          style={{paddingLeft: 8, paddingRight: 8, paddingTop: 6, paddingBottom: 6, borderRadius: 8, outline: '1px #767676 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 2, display: 'flex', background: 'transparent', border: 'none', cursor: 'pointer'}}
+                                        >
+                                          <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.43, wordWrap: 'break-word'}}>{months[selectedMonth]}</div>
+                                        </button>
+                                      )}
+                                      {showMonthDropdown && (
+                                        <div style={{position: 'absolute', top: '100%', left: 0, background: 'white', border: '1px solid #767676', borderRadius: 8, boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', zIndex: 1001, maxHeight: 200, overflowY: 'auto'}}>
+                                          {months.map((month, index) => (
+                                            <div
+                                              key={month}
+                                              onClick={() => {
+                                                setSelectedMonth(index);
+                                                setShowMonthDropdown(false);
+                                              }}
+                                              style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
+                                              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5'; }}
+                                              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent'; }}
+                                            >
+                                              {month}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div style={{position: 'relative'}}>
+                                      {editingYear ? (
+                                        <input
+                                          type="number"
+                                          value={yearInput}
+                                          onChange={(e) => setYearInput(e.target.value)}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                              const year = parseInt(yearInput);
+                                              if (year >= 1900 && year <= new Date().getFullYear()) {
+                                                setSelectedYear(year);
+                                              }
+                                              setEditingYear(false);
+                                            }
+                                            if (e.key === 'Escape') {
+                                              setEditingYear(false);
+                                            }
+                                          }}
+                                          onBlur={() => {
+                                            const year = parseInt(yearInput);
+                                            if (year >= 1900 && year <= new Date().getFullYear()) {
+                                              setSelectedYear(year);
+                                            }
+                                            setEditingYear(false);
+                                          }}
+                                          autoFocus
+                                          min="1900"
+                                          max={new Date().getFullYear()}
+                                          style={{
+                                            paddingLeft: 8, 
+                                            paddingRight: 8, 
+                                            paddingTop: 6, 
+                                            paddingBottom: 6, 
+                                            borderRadius: 8, 
+                                            outline: '1px #767676 solid', 
+                                            outlineOffset: '-1px',
+                                            background: 'white',
+                                            border: 'none',
+                                            textAlign: 'center',
+                                            color: '#101828', 
+                                            fontSize: 14, 
+                                            fontFamily: 'var(--ep-font-avenir)', 
+                                            fontWeight: '500',
+                                            width: 60
+                                          }}
+                                        />
+                                      ) : (
+                                        <button
+                                          onClick={() => {
+                                            setEditingYear(true);
+                                            setYearInput(selectedYear.toString());
+                                            setShowYearDropdown(!showYearDropdown);
+                                          }}
+                                          style={{paddingLeft: 8, paddingRight: 8, paddingTop: 6, paddingBottom: 6, borderRadius: 8, outline: '1px #767676 solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 2, display: 'flex', background: 'transparent', border: 'none', cursor: 'pointer'}}
+                                        >
+                                          <div style={{textAlign: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column', color: '#101828', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1.43, wordWrap: 'break-word'}}>{selectedYear}</div>
+                                        </button>
+                                      )}
+                                      {showYearDropdown && (
+                                        <div style={{position: 'absolute', top: '100%', left: 0, background: 'white', border: '1px solid #767676', borderRadius: 8, boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', zIndex: 1001, maxHeight: 200, overflowY: 'auto'}}>
+                                          {years.map((year) => (
+                                            <div
+                                              key={year}
+                                              onClick={() => {
+                                                setSelectedYear(year);
+                                                setShowYearDropdown(false);
+                                              }}
+                                              style={{padding: '8px 12px', cursor: 'pointer', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', color: '#101828', borderBottom: '1px solid #f0f0f0'}}
+                                              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5'; }}
+                                              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent'; }}
+                                            >
+                                              {year}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <button 
+                                    onClick={() => {
+                                      const newMonth = selectedMonth === 11 ? 0 : selectedMonth + 1;
+                                      const newYear = selectedMonth === 11 ? selectedYear + 1 : selectedYear;
+                                      setSelectedMonth(newMonth);
+                                      setSelectedYear(newYear);
+                                    }}
+                                    style={{width: 24, height: 24, background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                  >
+                                    <Image src="/weui-arrow-filled_right.svg" alt="Next month" width={24} height={24} />
+                                  </button>
+                                </div>
+                                <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+                                  <div style={{width: 252, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                    <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Sun</div>
+                                    </div>
+                                    <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Mon</div>
+                                    </div>
+                                    <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Tue</div>
+                                    </div>
+                                    <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Wed</div>
+                                    </div>
+                                    <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Thu</div>
+                                    </div>
+                                    <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Fri</div>
+                                    </div>
+                                    <div style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                      <div style={{alignSelf: 'stretch', textAlign: 'center', color: '#4A5565', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', lineHeight: 1, wordWrap: 'break-word'}}>Sat</div>
+                                    </div>
+                                  </div>
+                                  <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                    {(() => {
+                                      const daysInMonth = getDaysInMonth(selectedMonth, selectedYear);
+                                      const firstDay = new Date(selectedYear, selectedMonth, 1).getDay();
+                                      const days = [];
+                                      
+                                      // Create weeks
+                                      for (let week = 0; week < 6; week++) {
+                                        const weekDays = [];
+                                        for (let day = 0; day < 7; day++) {
+                                          const dayNumber = week * 7 + day - firstDay + 1;
+                                          if (dayNumber > 0 && dayNumber <= daysInMonth) {
+                                            const isToday = dayNumber === new Date().getDate() && 
+                                                          selectedMonth === new Date().getMonth() && 
+                                                          selectedYear === new Date().getFullYear();
+                                            const isSelected = dayNumber === selectedDate;
+                                            
+                                            weekDays.push(
+                                              <div key={`${week}-${day}`} style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                                <div 
+                                                  onClick={() => handleDateSelect(dayNumber)}
+                                                  style={{
+                                                    width: 32, 
+                                                    height: 32, 
+                                                    justifyContent: 'center', 
+                                                    alignItems: 'center', 
+                                                    display: 'inline-flex',
+                                                    borderRadius: 8,
+                                                    cursor: 'pointer',
+                                                    background: isSelected ? '#113D7B' : isToday ? '#f0f0f0' : 'transparent'
+                                                  }}
+                                                  onMouseEnter={(e) => {
+                                                    if (!isSelected) {
+                                                      (e.currentTarget as HTMLDivElement).style.backgroundColor = '#f5f5f5';
+                                                    }
+                                                  }}
+                                                  onMouseLeave={(e) => {
+                                                    if (!isSelected) {
+                                                      (e.currentTarget as HTMLDivElement).style.backgroundColor = isToday ? '#f0f0f0' : 'transparent';
+                                                    }
+                                                  }}
+                                                >
+                                                  <div style={{
+                                                    textAlign: 'center', 
+                                                    color: isSelected ? 'white' : '#101828', 
+                                                    fontSize: 14, 
+                                                    fontFamily: 'var(--ep-font-avenir)', 
+                                                    fontWeight: '500', 
+                                                    lineHeight: 1.43, 
+                                                    wordWrap: 'break-word'
+                                                  }}>
+                                                    {dayNumber}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          } else {
+                                            weekDays.push(
+                                              <div key={`${week}-${day}`} style={{flex: '1 1 0', overflow: 'hidden', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                                <div style={{width: 32, height: 32}} />
+                                              </div>
+                                            );
+                                          }
+                                        }
+                                        
+                                        if (weekDays.some(day => day.props.children.props.style?.width !== 32 || day.props.children.props.children)) {
+                                          days.push(
+                                            <div key={week} style={{width: 252, overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex'}}>
+                                              {weekDays}
+                                            </div>
+                                          );
+                                        }
+                                      }
+                                      
+                                      return days;
+                                    })()}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                          <div data-righticon="false" data-state="default" style={{width: 325, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex'}}>
-                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
+                          <div data-righticon="false" data-state="default" style={{width: 325, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'space-between', alignItems: 'flex-start', display: 'inline-flex', outline: personalInfoFieldHasError('email') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('email') ? '-1px' : undefined}}>
+                            <input type="email" value={email} onChange={(e) => handlePersonalInfoInputChange('email', e.target.value)} placeholder="Email address" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word', background: 'transparent', border: 'none', outline: 'none'}} />
                           </div>
-                          <div data-righticon="false" data-state="phoneNumber" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex'}}>
+                          <div data-righticon="false" data-state="phoneNumber" style={{alignSelf: 'stretch', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: '#F4F4F4', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'inline-flex', outline: personalInfoFieldHasError('phoneNumber') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('phoneNumber') ? '-1px' : undefined}}>
                             <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
                               <div style={{width: 22, height: 16, position: 'relative', overflow: 'hidden', borderRadius: 2}}>
                                 <Image src="/flagpack-us.svg" alt="US Flag" width={22} height={16} />
@@ -1544,7 +2097,7 @@ export default function PoolsPage() {
                               </div>
                             </div>
                             <div style={{width: 1, height: 20, background: 'var(--Stroke-Grey, #E5E7EB)'}}></div>
-                            <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>{phoneNumber || '944898988'}</div>
+                            <input type="tel" value={phoneNumber} onChange={(e) => handlePersonalInfoInputChange('phoneNumber', e.target.value)} placeholder="Phone number" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                           </div>
                         </div>
                       </div>
@@ -1649,9 +2202,9 @@ export default function PoolsPage() {
                   <div style={{width: '100%', height: '100%', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                     <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                       <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Social security number</div>
-                      <div data-righticon="true" data-state="contextualized" style={{alignSelf: 'stretch', minHeight: 79, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
+                      <div data-righticon="true" data-state="contextualized" style={{alignSelf: 'stretch', minHeight: 79, padding: 8, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex', outline: personalInfoFieldHasError('ssn') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('ssn') ? '-1px' : undefined}}>
                         <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--White, white)', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                          <input type="text" value={ssn} onChange={(e) => setSsn(e.target.value)} placeholder="SSN" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                          <input type="text" pattern="[0-9]{3}-?[0-9]{2}-?[0-9]{4}" maxLength={11} value={ssn} onChange={(e) => handlePersonalInfoInputChange('ssn', e.target.value)} placeholder="123-45-6789" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                         </div>
                         <div style={{alignSelf: 'stretch', paddingLeft: 8, paddingRight: 8, paddingTop: 4, paddingBottom: 4, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'inline-flex'}}>
                           <div style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.4, wordWrap: 'break-word'}}>Used for identity and investor risk verification</div>
@@ -1663,9 +2216,8 @@ export default function PoolsPage() {
                         <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>FICO Score</div>
                         <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                       </div>
-                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
-                        <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>%</div>
-                        <input type="text" value={ficoScore} onChange={(e) => setFicoScore(e.target.value)} placeholder="e.g. 76" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                      <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex', outline: personalInfoFieldHasError('ficoScore') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('ficoScore') ? '-1px' : undefined}}>
+                        <input type="number" min="300" max="850" value={ficoScore} onChange={(e) => handlePersonalInfoInputChange('ficoScore', e.target.value)} placeholder="e.g. 750" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                       </div>
                     </div>
                   </div>
@@ -1680,8 +2232,8 @@ export default function PoolsPage() {
                         <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                           <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                              <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                                <input type="text" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} placeholder="Address Line 1" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                              <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: personalInfoFieldHasError('addressLine1') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('addressLine1') ? '-1px' : undefined}}>
+                                <input type="text" value={addressLine1} onChange={(e) => handlePersonalInfoInputChange('addressLine1', e.target.value)} placeholder="Address Line 1" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                               </div>
                             </div>
                             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
@@ -1692,16 +2244,16 @@ export default function PoolsPage() {
                           </div>
                           <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                              <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                                <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                              <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: personalInfoFieldHasError('city') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('city') ? '-1px' : undefined}}>
+                                <input type="text" value={city} onChange={(e) => handlePersonalInfoInputChange('city', e.target.value)} placeholder="City" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                               </div>
                               <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
                                 <div style={{flex: '1 1 0', color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>California</div>
                               </div>
                             </div>
                             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                              <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
-                                <input type="text" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="Zip Code" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                              <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: personalInfoFieldHasError('zipCode') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: personalInfoFieldHasError('zipCode') ? '-1px' : undefined}}>
+                                <input type="text" pattern="[0-9]{5}(-[0-9]{4})?" value={zipCode} onChange={(e) => handlePersonalInfoInputChange('zipCode', e.target.value)} placeholder="Zip Code" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                               </div>
                               <div data-righticon="false" data-state="default" style={{width: 158.5, height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, outline: '1px var(--Mid-Grey, #B2B2B2) solid', outlineOffset: '-1px', justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
                                 <div style={{flex: '1 1 0', color: '#B2B2B2', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>United States</div>
@@ -1712,6 +2264,15 @@ export default function PoolsPage() {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Personal Info Error Display */}
+                  {personalInfoErrors.length > 0 && showPersonalInfoErrors && (
+                    <div style={{marginTop: 8, textAlign: 'left', alignSelf: 'stretch'}}>
+                      {personalInfoErrors.map((err, idx) => (
+                        <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
+                      ))}
+                    </div>
+                  )}
                   
                   {/* Continue Button */}
                   <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 'auto'}}>
@@ -1729,7 +2290,24 @@ export default function PoolsPage() {
                         display: 'inline-flex',
                         cursor: 'pointer'
                       }}
-                      onClick={() => setCurrentStep(2)}
+                      onClick={() => {
+                        // Validate personal info before continuing
+                        const map = computePersonalInfoErrorsByField();
+                        const allErrs = flattenPersonalInfoErrors(map);
+                        
+                        if (allErrs.length > 0) {
+                          // Show all errors and prevent navigation
+                          setPersonalInfoErrors(allErrs);
+                          setShowPersonalInfoErrors(true);
+                          setPersonalInfoSubmitAttempted(true);
+                          // Mark all fields as touched to surface all messages
+                          setPersonalInfoTouched({ firstName: true, middleName: true, lastName: true, email: true, phoneNumber: true, dateOfBirth: true, ssn: true, ficoScore: true, addressLine1: true, city: true, zipCode: true });
+                          return;
+                        }
+                        
+                        // No errors, proceed to next step
+                        setCurrentStep(2);
+                      }}
                     >
                       <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
