@@ -51,6 +51,7 @@ export default function PoolsPage() {
   // Hover states
   const [equityHover, setEquityHover] = useState(false);
   const [refinanceHover, setRefinanceHover] = useState(false);
+  const [createPoolHover, setCreatePoolHover] = useState(false);
   
   // Review page toggle states
   const [expandedSections, setExpandedSections] = useState({
@@ -1490,18 +1491,61 @@ export default function PoolsPage() {
             
             {/* Create Pool Button - Responsive */}
             <div 
-              className="w-full p-6 lg:px-10 lg:py-6 bg-blue-50 overflow-hidden rounded-3xl flex flex-col lg:flex-row justify-start items-center gap-4 lg:gap-2 cursor-pointer min-h-[120px] lg:min-h-[138px]"
+              className="w-full overflow-hidden rounded-3xl cursor-pointer min-h-[120px] lg:min-h-[138px] transition-all duration-300"
+              style={{
+                width: '100%',
+                height: '100%',
+                paddingLeft: createPoolHover ? 40 : 24,
+                paddingRight: createPoolHover ? 40 : 24,
+                paddingTop: 24,
+                paddingBottom: 24,
+                background: createPoolHover ? '#BFCDE1' : '#EBF4FF',
+                overflow: 'hidden',
+                borderRadius: createPoolHover ? 54 : 24,
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: createPoolHover ? 8 : 16,
+                display: 'inline-flex'
+              }}
               onClick={() => setShowPoolTypeModal(true)}
+              onMouseEnter={() => setCreatePoolHover(true)}
+              onMouseLeave={() => setCreatePoolHover(false)}
             >
               <div className="flex-1 flex flex-col justify-start items-start lg:items-start gap-2">
                 <div className="flex flex-col justify-end items-start gap-2">
-                  <div className="text-black text-2xl lg:text-3xl font-medium text-center lg:text-left w-full" style={{fontFamily: 'var(--ep-font-avenir)'}}>Create a pool</div>
+                  <div 
+                    className="text-black font-medium text-center lg:text-left w-full transition-all duration-300" 
+                    style={{
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontSize: createPoolHover ? 32 : 32,
+                      fontWeight: '500'
+                    }}
+                  >
+                    Create a pool
+                  </div>
                 </div>
                 <div className="w-full flex flex-col justify-end items-start gap-2">
-                  <div className="text-black text-sm font-medium text-center lg:text-left" style={{fontFamily: 'var(--ep-font-avenir)'}}>Start a new funding request backed by your property.<br/>Define your loan amount, term, and target return — we&apos;ll guide you from there.</div>
+                  <div 
+                    className="text-black font-medium text-center lg:text-left transition-all duration-300" 
+                    style={{
+                      fontFamily: 'var(--ep-font-avenir)',
+                      fontSize: 14,
+                      fontWeight: '500'
+                    }}
+                  >
+                    Start a new funding request backed by your property.<br/>Define your loan amount, term, and target return — we&apos;ll guide you from there.
+                  </div>
                 </div>
               </div>
-              <div className="w-10 h-10 lg:w-10 lg:h-10 bg-white overflow-hidden rounded-full flex justify-center items-center flex-shrink-0">
+              <div 
+                className="overflow-hidden flex justify-center items-center flex-shrink-0 transition-all duration-300"
+                style={{
+                  width: createPoolHover ? 40 : 40,
+                  height: createPoolHover ? 40 : 40,
+                  background: 'white',
+                  borderRadius: createPoolHover ? 40 : 20
+                }}
+              >
                 <Image src="/add_pool.svg" alt="Add Pool" width={26} height={26} />
               </div>
             </div>
