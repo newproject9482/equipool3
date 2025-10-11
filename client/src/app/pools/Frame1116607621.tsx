@@ -35,7 +35,19 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
         >
           <div className={styles.text}>1</div>
         </div>
-        <div className={styles.investorsCardDescription}>Personal Info</div>
+        <div 
+          className={styles.investorsCardDescription}
+          role={onStepClick ? 'button' : undefined}
+          tabIndex={onStepClick ? 0 : -1}
+          onClick={onStepClick ? () => onStepClick(1) : undefined}
+          onKeyDown={onStepClick ? (e) => handleKey(e, 1) : undefined}
+          style={{
+            cursor: onStepClick ? 'pointer' : undefined,
+            textDecoration: currentStep === 1 ? 'underline' : 'none'
+          }}
+        >
+          Personal Info
+        </div>
       </div>
   <Component1 />
 
@@ -50,7 +62,19 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
         >
           <div className={styles.text}>2</div>
         </div>
-        <div className={styles.investorsCardDescription}>Property Info</div>
+        <div 
+          className={styles.investorsCardDescription}
+          role={onStepClick ? 'button' : undefined}
+          tabIndex={onStepClick ? 0 : -1}
+          onClick={onStepClick ? () => onStepClick(2) : undefined}
+          onKeyDown={onStepClick ? (e) => handleKey(e, 2) : undefined}
+          style={{
+            cursor: onStepClick ? 'pointer' : undefined,
+            textDecoration: currentStep === 2 ? 'underline' : 'none'
+          }}
+        >
+          Property Info
+        </div>
       </div>
   <Component1 />
 
@@ -65,7 +89,19 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
         >
           <div className={styles.text}>3</div>
         </div>
-        <div className={styles.investorsCardDescription}>Pool Terms</div>
+        <div 
+          className={styles.investorsCardDescription}
+          role={onStepClick ? 'button' : undefined}
+          tabIndex={onStepClick ? 0 : -1}
+          onClick={onStepClick ? () => onStepClick(3) : undefined}
+          onKeyDown={onStepClick ? (e) => handleKey(e, 3) : undefined}
+          style={{
+            cursor: onStepClick ? 'pointer' : undefined,
+            textDecoration: currentStep === 3 ? 'underline' : 'none'
+          }}
+        >
+          Pool Terms
+        </div>
       </div>
   <Component1 />
 
@@ -80,7 +116,19 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
         >
           <div className={styles.text}>4</div>
         </div>
-        <div className={styles.investorsCardDescription}>Documents</div>
+        <div 
+          className={styles.investorsCardDescription}
+          role={onStepClick ? 'button' : undefined}
+          tabIndex={onStepClick ? 0 : -1}
+          onClick={onStepClick ? () => onStepClick(4) : undefined}
+          onKeyDown={onStepClick ? (e) => handleKey(e, 4) : undefined}
+          style={{
+            cursor: onStepClick ? 'pointer' : undefined,
+            textDecoration: currentStep === 4 ? 'underline' : 'none'
+          }}
+        >
+          Documents
+        </div>
       </div>
   <Component1 />
 
@@ -95,7 +143,19 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
         >
           <div className={styles.text}>5</div>
         </div>
-        <div className={styles.investorsCardDescription}>Liability &amp; Credit Info</div>
+        <div 
+          className={styles.investorsCardDescription}
+          role={onStepClick ? 'button' : undefined}
+          tabIndex={onStepClick ? 0 : -1}
+          onClick={onStepClick ? () => onStepClick(5) : undefined}
+          onKeyDown={onStepClick ? (e) => handleKey(e, 5) : undefined}
+          style={{
+            cursor: onStepClick ? 'pointer' : undefined,
+            textDecoration: currentStep === 5 ? 'underline' : 'none'
+          }}
+        >
+          Liability &amp; Credit Info
+        </div>
       </div>
   <Component1 />
 
@@ -110,7 +170,19 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
         >
           <div className={styles.text}>6</div>
         </div>
-        <div className={styles.investorsCardDescription}>Review</div>
+        <div 
+          className={styles.investorsCardDescription}
+          role={onStepClick ? 'button' : undefined}
+          tabIndex={onStepClick ? 0 : -1}
+          onClick={onStepClick ? () => onStepClick(6) : undefined}
+          onKeyDown={onStepClick ? (e) => handleKey(e, 6) : undefined}
+          style={{
+            cursor: onStepClick ? 'pointer' : undefined,
+            textDecoration: currentStep === 6 ? 'underline' : 'none'
+          }}
+        >
+          Review
+        </div>
       </div>
   {/* toggle removed: header always minimized */}
     </div>

@@ -105,6 +105,13 @@ export default function PoolsPage() {
   const [personalInfoTouched, setPersonalInfoTouched] = useState<Partial<Record<PersonalInfoField, boolean>>>({});
   const [personalInfoSubmitAttempted, setPersonalInfoSubmitAttempted] = useState(false);
 
+  // Property Info validation state
+  const [propertyInfoErrors, setPropertyInfoErrors] = useState<string[]>([]);
+  const [showPropertyInfoErrors, setShowPropertyInfoErrors] = useState(false);
+  type PropertyInfoField = 'propertyAddressLine1' | 'propertyAddressLine2' | 'propertyCity' | 'propertyZipCode' | 'primaryAddressChoice' | 'propertyValue' | 'propertyLink' | 'coOwnerFirstName' | 'coOwnerLastName' | 'coOwnerPercentage' | 'existingLoanAmount' | 'existingLoanBalance';
+  const [propertyInfoTouched, setPropertyInfoTouched] = useState<Partial<Record<PropertyInfoField, boolean>>>({});
+  const [propertyInfoSubmitAttempted, setPropertyInfoSubmitAttempted] = useState(false);
+
   // Address form state
   const [propertyAddressLine1, setPropertyAddressLine1] = useState('');
   const [propertyAddressLine2, setPropertyAddressLine2] = useState('');
@@ -619,6 +626,188 @@ export default function PoolsPage() {
   const handleYearSelect = (year: number) => {
     setSelectedYear(year);
     setEditingYear(false);
+  };
+
+  // ---------- Property Info Validation helpers ----------
+
+  // Property Value validator (optional, but if filled must be valid number)
+  const isValidPropertyValue = (s: string) => {
+    if (!s || s.trim() === '') return true; // Optional field
+    const cleaned = s.replace(/[$,\s]/g, '');
+    const num = parseFloat(cleaned);
+    return !isNaN(num) && num > 0;
+  };
+
+  // Co-owner percentage validator (must be 1-100)
+  const isValidCoOwnerPercentage = (s: string) => {
+    if (!s || s.trim() === '') return false;
+    const num = parseFloat(s);
+    return !isNaN(num) && num > 0 && num <= 100;
+  };
+
+  // URL validator for property links
+  const isValidPropertyLink = (s: string) => {
+    if (!s || s.trim() === '') return true; // Optional field
+    try {
+      new URL(s);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Loan amount validator (must be positive number)
+  const isValidLoanAmount = (s: string) => {
+    if (!s || s.trim() === '') return false;
+    const cleaned = s.replace(/[$,\s]/g, '');
+    const num = parseFloat(cleaned);
+    return !isNaN(num) && num > 0;
+  };
+
+  // Compute property info validation errors per-field
+  type PropertyInfoErrorMap = Partial<Record<PropertyInfoField, string[]>>;
+  
+  const computePropertyInfoErrorsByField = (): PropertyInfoErrorMap => {
+    const errs: PropertyInfoErrorMap = {};
+
+    // Required: Property Address Line 1
+    if (!propertyAddressLine1 || propertyAddressLine1.trim().length === 0) {
+      errs.propertyAddressLine1 = ['Property address is required'];
+    }
+
+    // Required: Property City (use same validation as personal info city)
+    if (!propertyCity || !isValidCityName(propertyCity)) {
+      errs.propertyCity = ['Valid city name is required (letters, spaces, hyphens, apostrophes only)'];
+    }
+
+    // Required: Property Zip Code
+    if (!propertyZipCode || !isValidZipCode(propertyZipCode)) {
+      errs.propertyZipCode = ['Valid zip code is required (format: 12345 or 12345-6789)'];
+    }
+
+    // Required: Primary Address Choice
+    if (!primaryAddressChoice || primaryAddressChoice.trim().length === 0) {
+      errs.primaryAddressChoice = ['Please select how the property is occupied'];
+    }
+
+    // Optional: Property Value validation
+    if (propertyValue && !isValidPropertyValue(propertyValue)) {
+      errs.propertyValue = ['Property value must be a valid positive number'];
+    }
+
+    // Optional: Property Link validation
+    if (propertyLink && !isValidPropertyLink(propertyLink)) {
+      errs.propertyLink = ['Property link must be a valid URL'];
+    }
+
+    // Co-owners validation (if enabled)
+    if (hasCoOwners) {
+      for (let i = 0; i < coOwners.length; i++) {
+        const coOwner = coOwners[i];
+        
+        // Co-owner first name
+        if (!coOwner.firstName || coOwner.firstName.trim().length === 0) {
+          errs.coOwnerFirstName = [...(errs.coOwnerFirstName || []), `Co-owner ${i + 1} first name is required`];
+        }
+
+        // Co-owner last name  
+        if (!coOwner.lastName || coOwner.lastName.trim().length === 0) {
+          errs.coOwnerLastName = [...(errs.coOwnerLastName || []), `Co-owner ${i + 1} last name is required`];
+        }
+
+        // Co-owner percentage
+        if (!coOwner.percentage || !isValidCoOwnerPercentage(coOwner.percentage)) {
+          errs.coOwnerPercentage = [...(errs.coOwnerPercentage || []), `Co-owner ${i + 1} percentage must be between 1-100`];
+        }
+      }
+
+      // Check that total percentages don't exceed 100%
+      const totalCoOwnerPercentage = coOwners.reduce((sum, co) => {
+        const pct = parseFloat(co.percentage || '0');
+        return sum + (isNaN(pct) ? 0 : pct);
+      }, 0);
+      
+      if (totalCoOwnerPercentage >= 100) {
+        errs.coOwnerPercentage = [...(errs.coOwnerPercentage || []), 'Total co-owner percentages must be less than 100%'];
+      }
+    }
+
+    // Existing loans validation (if any)
+    for (let i = 0; i < existingLoans.length; i++) {
+      const loan = existingLoans[i];
+      
+      if (loan.loanAmount && loan.loanAmount.trim().length > 0) {
+        if (!isValidLoanAmount(loan.loanAmount)) {
+          errs.existingLoanAmount = [...(errs.existingLoanAmount || []), `Loan ${i + 1} amount must be a valid positive number`];
+        }
+      }
+      
+      if (loan.remainingBalance && loan.remainingBalance.trim().length > 0) {
+        if (!isValidLoanAmount(loan.remainingBalance)) {
+          errs.existingLoanBalance = [...(errs.existingLoanBalance || []), `Loan ${i + 1} remaining balance must be a valid positive number`];
+        }
+      }
+    }
+
+    return errs;
+  };
+
+  const propertyInfoErrorsByField = computePropertyInfoErrorsByField();
+
+  // Property Info field error checking for UI highlighting
+  const propertyInfoFieldHasError = (field: PropertyInfoField) => !!propertyInfoErrorsByField[field] && (showPropertyInfoErrors || propertyInfoTouched[field] || propertyInfoSubmitAttempted);
+
+  const flattenPropertyInfoErrors = (errorMap: PropertyInfoErrorMap, relevantFields: PropertyInfoField[]) => {
+    return relevantFields.flatMap(field => errorMap[field] || []);
+  };
+
+  // Recompute property info errors when relevant state changes
+  useEffect(() => {
+    if (showPropertyInfoErrors || propertyInfoSubmitAttempted || Object.keys(propertyInfoTouched).length > 0) {
+      const map = computePropertyInfoErrorsByField();
+      if (Object.keys(map).length > 0) {
+        const touchedFields = (Object.keys(propertyInfoTouched) as PropertyInfoField[]).filter(k => propertyInfoTouched[k]);
+        setPropertyInfoErrors(flattenPropertyInfoErrors(map, touchedFields));
+      }
+    } else {
+      setPropertyInfoErrors([]);
+    }
+  }, [propertyAddressLine1, propertyAddressLine2, propertyCity, propertyZipCode, primaryAddressChoice, propertyValue, propertyLink, hasCoOwners, coOwners, existingLoans, showPropertyInfoErrors, propertyInfoTouched, propertyInfoSubmitAttempted]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Property Info input change handlers with validation
+  const handlePropertyInfoInputChange = (field: PropertyInfoField, value: string) => {
+    // Update the state for the specific field
+    switch (field) {
+      case 'propertyAddressLine1':
+        setPropertyAddressLine1(value);
+        setAddressLine(value);
+        if (sameAsMailingAddress) setSameAsMailingAddress(false);
+        break;
+      case 'propertyAddressLine2':
+        setPropertyAddressLine2(value);
+        if (sameAsMailingAddress) setSameAsMailingAddress(false);
+        break;
+      case 'propertyCity':
+        setPropertyCity(value);
+        setCity(value);
+        if (sameAsMailingAddress) setSameAsMailingAddress(false);
+        break;
+      case 'propertyZipCode':
+        setPropertyZipCode(value);
+        setZipCode(value);
+        if (sameAsMailingAddress) setSameAsMailingAddress(false);
+        break;
+      case 'propertyValue':
+        setPropertyValue(value);
+        break;
+      case 'propertyLink':
+        setPropertyLink(value);
+        break;
+    }
+    
+    // Mark field as touched and show error area after user starts typing
+    setPropertyInfoTouched(prev => ({ ...prev, [field]: true }));
+    setShowPropertyInfoErrors(true);
   };
 
   // Function to create pool
@@ -2372,29 +2561,22 @@ export default function PoolsPage() {
                       <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'flex'}}>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: propertyInfoFieldHasError('propertyAddressLine1') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: propertyInfoFieldHasError('propertyAddressLine1') ? '-1px' : undefined}}>
                               <input 
                                 type="text" 
                                 value={propertyAddressLine1} 
-                                onChange={(e) => {
-                                  setPropertyAddressLine1(e.target.value);
-                                  setAddressLine(e.target.value);
-                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
-                                }} 
+                                onChange={(e) => handlePropertyInfoInputChange('propertyAddressLine1', e.target.value)} 
                                 placeholder="Address Line 1*" 
                                 style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
                               />
                             </div>
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: propertyInfoFieldHasError('propertyAddressLine2') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: propertyInfoFieldHasError('propertyAddressLine2') ? '-1px' : undefined}}>
                               <input 
                                 type="text" 
                                 value={propertyAddressLine2} 
-                                onChange={(e) => {
-                                  setPropertyAddressLine2(e.target.value);
-                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
-                                }} 
+                                onChange={(e) => handlePropertyInfoInputChange('propertyAddressLine2', e.target.value)} 
                                 placeholder="Address Line 2" 
                                 style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
                               />
@@ -2403,15 +2585,11 @@ export default function PoolsPage() {
                         </div>
                         <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: propertyInfoFieldHasError('propertyCity') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: propertyInfoFieldHasError('propertyCity') ? '-1px' : undefined}}>
                               <input 
                                 type="text" 
                                 value={propertyCity} 
-                                onChange={(e) => {
-                                  setPropertyCity(e.target.value);
-                                  setCity(e.target.value);
-                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
-                                }} 
+                                onChange={(e) => handlePropertyInfoInputChange('propertyCity', e.target.value)} 
                                 placeholder="City*" 
                                 style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
                               />
@@ -2421,15 +2599,11 @@ export default function PoolsPage() {
                             </div>
                           </div>
                           <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex'}}>
+                            <div data-righticon="false" data-state="default" style={{flex: '1 1 0', height: 43, paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 8, justifyContent: 'flex-start', alignItems: 'center', gap: 16, display: 'flex', outline: propertyInfoFieldHasError('propertyZipCode') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: propertyInfoFieldHasError('propertyZipCode') ? '-1px' : undefined}}>
                               <input 
                                 type="text" 
                                 value={propertyZipCode} 
-                                onChange={(e) => {
-                                  setPropertyZipCode(e.target.value);
-                                  setZipCode(e.target.value);
-                                  if (sameAsMailingAddress) setSameAsMailingAddress(false);
-                                }} 
+                                onChange={(e) => handlePropertyInfoInputChange('propertyZipCode', e.target.value)} 
                                 placeholder="Zip Code*" 
                                 style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} 
                               />
@@ -2736,9 +2910,9 @@ export default function PoolsPage() {
                             <div style={{color: 'var(--Mid-Grey, #B2B2B2)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>(Optional)</div>
                         </div>
                         <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Provide your best estimate of the property&apos;s current <br/>market value. This helps us assess and underwrite your loan faster.</div>
-                        <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'inline-flex', outline: propertyInfoFieldHasError('propertyValue') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: propertyInfoFieldHasError('propertyValue') ? '-1px' : undefined}}>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                            <input type="text" value={propertyValue} onChange={(e) => setPropertyValue(e.target.value)} placeholder="e.g. 100 000" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                            <input type="text" value={propertyValue} onChange={(e) => handlePropertyInfoInputChange('propertyValue', e.target.value)} placeholder="e.g. 100 000" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                         </div>
                     </div>
                     <div style={{flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
@@ -2765,8 +2939,8 @@ export default function PoolsPage() {
                         )}
                         
                         <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
-                            <div style={{flex: '1 1 0', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                                <input type="text" value={propertyLink} onChange={(e) => setPropertyLink(e.target.value)} placeholder="e.g. Zillow, Redfin etc." style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                            <div style={{flex: '1 1 0', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', overflow: 'hidden', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex', outline: propertyInfoFieldHasError('propertyLink') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: propertyInfoFieldHasError('propertyLink') ? '-1px' : undefined}}>
+                                <input type="text" value={propertyLink} onChange={(e) => handlePropertyInfoInputChange('propertyLink', e.target.value)} placeholder="e.g. Zillow, Redfin etc." style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                             </div>
                             <div 
                               onClick={addPropertyLink}
@@ -2877,6 +3051,15 @@ export default function PoolsPage() {
                     ))}
                   </div>
 
+                  {/* Property Info Error Display */}
+                  {propertyInfoErrors.length > 0 && showPropertyInfoErrors && (
+                    <div style={{marginTop: 8, textAlign: 'left', alignSelf: 'stretch'}}>
+                      {propertyInfoErrors.map((err, idx) => (
+                        <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
+                      ))}
+                    </div>
+                  )}
+
                   {/* Continue Button */}
                   <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 'auto'}}>
                     <div 
@@ -2893,7 +3076,21 @@ export default function PoolsPage() {
                         display: 'inline-flex',
                         cursor: 'pointer'
                       }}
-                      onClick={() => setCurrentStep(3)}
+                      onClick={() => {
+                        // Validate property info before continuing
+                        setPropertyInfoSubmitAttempted(true);
+                        setShowPropertyInfoErrors(true);
+                        
+                        const errors = computePropertyInfoErrorsByField();
+                        if (Object.keys(errors).length === 0) {
+                          // No errors, can proceed to next step
+                          setCurrentStep(3);
+                        } else {
+                          // Show errors to user
+                          const allErrors = Object.values(errors).flat();
+                          setPropertyInfoErrors(allErrors);
+                        }
+                      }}
                     >
                       <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
