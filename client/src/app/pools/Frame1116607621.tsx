@@ -132,9 +132,9 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
       </div>
   <Component1 />
 
-  <div className={styles.frameGroup}>
+      <div className={styles.frameGroup}>
         <div
-          className={stepClass(5)}
+          className={`${styles.textWrapper4} ${currentStep >= 5 ? styles.active : ''}`}
           role={onStepClick ? 'button' : undefined}
           tabIndex={onStepClick ? 0 : -1}
           onClick={onStepClick ? () => onStepClick(5) : undefined}
@@ -152,33 +152,6 @@ const Frame1116607621: FunctionComponent<Props> = ({ currentStep, onStepClick })
           style={{
             cursor: onStepClick ? 'pointer' : undefined,
             textDecoration: currentStep === 5 ? 'underline' : 'none'
-          }}
-        >
-          Liability &amp; Credit Info
-        </div>
-      </div>
-  <Component1 />
-
-      <div className={styles.frameGroup}>
-        <div
-          className={`${styles.textWrapper4} ${currentStep >= 6 ? styles.active : ''}`}
-          role={onStepClick ? 'button' : undefined}
-          tabIndex={onStepClick ? 0 : -1}
-          onClick={onStepClick ? () => onStepClick(6) : undefined}
-          onKeyDown={onStepClick ? (e) => handleKey(e, 6) : undefined}
-          style={onStepClick ? { cursor: 'pointer' } : undefined}
-        >
-          <div className={styles.text}>6</div>
-        </div>
-        <div 
-          className={styles.investorsCardDescription}
-          role={onStepClick ? 'button' : undefined}
-          tabIndex={onStepClick ? 0 : -1}
-          onClick={onStepClick ? () => onStepClick(6) : undefined}
-          onKeyDown={onStepClick ? (e) => handleKey(e, 6) : undefined}
-          style={{
-            cursor: onStepClick ? 'pointer' : undefined,
-            textDecoration: currentStep === 6 ? 'underline' : 'none'
           }}
         >
           Review
