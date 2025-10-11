@@ -112,6 +112,13 @@ export default function PoolsPage() {
   const [propertyInfoTouched, setPropertyInfoTouched] = useState<Partial<Record<PropertyInfoField, boolean>>>({});
   const [propertyInfoSubmitAttempted, setPropertyInfoSubmitAttempted] = useState(false);
 
+  // Pool Terms validation state
+  const [poolTermsErrors, setPoolTermsErrors] = useState<string[]>([]);
+  const [showPoolTermsErrors, setShowPoolTermsErrors] = useState(false);
+  type PoolTermsField = 'poolAmount' | 'roiRate' | 'loanType' | 'termMonths';
+  const [poolTermsTouched, setPoolTermsTouched] = useState<Partial<Record<PoolTermsField, boolean>>>({});
+  const [poolTermsSubmitAttempted, setPoolTermsSubmitAttempted] = useState(false);
+
   // Address form state
   const [propertyAddressLine1, setPropertyAddressLine1] = useState('');
   const [propertyAddressLine2, setPropertyAddressLine2] = useState('');
@@ -211,6 +218,7 @@ export default function PoolsPage() {
     setTermMonths(months);
     setIsCustomTerm(false);
     setCustomTermMonths('');
+    handlePoolTermsInputChange('termMonths', months);
   };
 
   const handleCustomTermChange = (value: string) => {
@@ -221,6 +229,7 @@ export default function PoolsPage() {
     } else {
       setIsCustomTerm(false);
     }
+    handlePoolTermsInputChange('termMonths', value);
   };
 
   // Calculator functions
@@ -808,6 +817,109 @@ export default function PoolsPage() {
     // Mark field as touched and show error area after user starts typing
     setPropertyInfoTouched(prev => ({ ...prev, [field]: true }));
     setShowPropertyInfoErrors(true);
+  };
+
+  // Pool Terms validation functions
+  const isValidPoolAmount = (amount: string): boolean => {
+    if (!amount.trim()) return false;
+    const numericAmount = parseFloat(amount.replace(/[,$\s]/g, ''));
+    return !isNaN(numericAmount) && numericAmount > 0 && numericAmount <= 10000000; // Max $10M
+  };
+
+  const isValidRoiRate = (rate: string): boolean => {
+    if (!rate.trim()) return false;
+    const numericRate = parseFloat(rate.replace(/[%\s]/g, ''));
+    return !isNaN(numericRate) && numericRate > 0 && numericRate <= 100; // Max 100%
+  };
+
+  const isValidTerm = (term: string): boolean => {
+    if (!term.trim()) return false;
+    const numericTerm = parseFloat(term);
+    return !isNaN(numericTerm) && numericTerm > 0 && numericTerm <= 360; // Max 30 years
+  };
+
+  type PoolTermsErrorMap = Partial<Record<PoolTermsField, string[]>>;
+  const computePoolTermsErrorsByField = (): PoolTermsErrorMap => {
+    const errs: PoolTermsErrorMap = {};
+
+    // Pool Amount validation
+    if (!poolAmount.trim()) {
+      errs.poolAmount = ['Pool amount is required'];
+    } else if (!isValidPoolAmount(poolAmount)) {
+      errs.poolAmount = ['Please enter a valid amount (between $1 and $10,000,000)'];
+    }
+
+    // ROI Rate validation
+    if (!roiRate.trim()) {
+      errs.roiRate = ['ROI rate is required'];
+    } else if (!isValidRoiRate(roiRate)) {
+      errs.roiRate = ['Please enter a valid percentage (between 0.1% and 100%)'];
+    }
+
+    // Loan Type validation
+    if (!loanType) {
+      errs.loanType = ['Please select a loan type'];
+    }
+
+    // Term validation
+    const currentTerm = isCustomTerm ? customTermMonths : termMonths;
+    if (!currentTerm || currentTerm === '') {
+      errs.termMonths = ['Please select or enter a term length'];
+    } else if (isCustomTerm && !isValidTerm(customTermMonths)) {
+      errs.termMonths = ['Please enter a valid term (between 1 and 360 months)'];
+    }
+
+    return errs;
+  };
+
+  const flattenPoolTermsErrors = (map: PoolTermsErrorMap, onlyFields?: PoolTermsField[]) => {
+    const fields = onlyFields || Object.keys(map) as PoolTermsField[];
+    return fields.flatMap(field => map[field] || []);
+  };
+
+  const poolTermsErrorsByField = computePoolTermsErrorsByField();
+  const poolTermsFieldHasError = (field: PoolTermsField) => !!poolTermsErrorsByField[field] && (showPoolTermsErrors || poolTermsTouched[field] || poolTermsSubmitAttempted);
+
+  // Update pool terms errors when inputs change
+  useEffect(() => {
+    const map = computePoolTermsErrorsByField();
+    if (showPoolTermsErrors) {
+      const touchedFields = Object.keys(poolTermsTouched).filter(field => poolTermsTouched[field as PoolTermsField]) as PoolTermsField[];
+      if (touchedFields.length > 0) {
+        setPoolTermsErrors(flattenPoolTermsErrors(map, touchedFields));
+      } else {
+        setPoolTermsErrors(flattenPoolTermsErrors(map));
+      }
+    } else {
+      setPoolTermsErrors([]);
+    }
+  }, [poolAmount, roiRate, loanType, termMonths, customTermMonths, isCustomTerm, showPoolTermsErrors, poolTermsTouched, poolTermsSubmitAttempted]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Pool Terms input change handlers with validation
+  const handlePoolTermsInputChange = (field: PoolTermsField, value: string) => {
+    // Update the state for the specific field
+    switch (field) {
+      case 'poolAmount':
+        setPoolAmount(value);
+        break;
+      case 'roiRate':
+        setRoiRate(value);
+        break;
+      case 'loanType':
+        setLoanType(value);
+        break;
+      case 'termMonths':
+        if (isCustomTerm) {
+          setCustomTermMonths(value);
+        } else {
+          setTermMonths(value);
+        }
+        break;
+    }
+    
+    // Mark field as touched and show error area after user starts typing
+    setPoolTermsTouched(prev => ({ ...prev, [field]: true }));
+    setShowPoolTermsErrors(true);
   };
 
   // Function to create pool
@@ -3120,9 +3232,9 @@ export default function PoolsPage() {
                             <div style={{alignSelf: 'stretch', color: 'var(--Black, black)', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Amount</div>
                             <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>How much capital are you requesting from investors?</div>
                         </div>
-                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex'}}>
+                        <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'inline-flex', outline: poolTermsFieldHasError('poolAmount') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: poolTermsFieldHasError('poolAmount') ? '-1px' : undefined}}>
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>$</div>
-                            <input type="text" value={poolAmount} onChange={(e) => setPoolAmount(e.target.value)} placeholder="e.g. 350 000" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                            <input type="text" value={poolAmount} onChange={(e) => handlePoolTermsInputChange('poolAmount', e.target.value)} placeholder="e.g. 350 000" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                         </div>
                     </div>
                     <div style={{flex: '1 1 0', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 4, display: 'flex'}}>
@@ -3134,8 +3246,8 @@ export default function PoolsPage() {
                                 <div style={{alignSelf: 'stretch', color: 'var(--Grey, #767676)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>What annual return are you offering investors?</div>
                             </div>
                             <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                                <div style={{flex: '1 1 0', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
-                                    <input type="text" value={roiRate} onChange={(e) => setRoiRate(e.target.value)} placeholder="%" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
+                                <div style={{flex: '1 1 0', height: 39, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex', outline: poolTermsFieldHasError('roiRate') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: poolTermsFieldHasError('roiRate') ? '-1px' : undefined}}>
+                                    <input type="text" value={roiRate} onChange={(e) => handlePoolTermsInputChange('roiRate', e.target.value)} placeholder="%" style={{flex: '1 1 0', color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', background: 'transparent', border: 'none', outline: 'none'}} />
                                 </div>
                                 <div style={{alignSelf: 'stretch', paddingLeft: 12, paddingRight: 12, paddingTop: 4, paddingBottom: 4, background: 'rgba(89.37, 59.38, 209.33, 0.16)', borderRadius: 8, justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
                                     <div style={{color: 'var(--Black, black)', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>Recommended: 6% – 12%</div>
@@ -3152,7 +3264,10 @@ export default function PoolsPage() {
                     </div>
                     <div style={{alignSelf: 'stretch', justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'inline-flex'}}>
                         <div 
-                          onClick={() => setLoanType('interest-only')}
+                          onClick={() => {
+                            setLoanType('interest-only');
+                            handlePoolTermsInputChange('loanType', 'interest-only');
+                          }}
                           style={{
                             flex: '1 1 0', 
                             paddingLeft: 16, 
@@ -3165,7 +3280,9 @@ export default function PoolsPage() {
                             alignItems: 'center', 
                             gap: 6, 
                             display: 'flex',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            outline: poolTermsFieldHasError('loanType') ? '1px var(--Error, #CC4747) solid' : undefined, 
+                            outlineOffset: poolTermsFieldHasError('loanType') ? '-1px' : undefined
                           }}
                         >
                             <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
@@ -3187,7 +3304,10 @@ export default function PoolsPage() {
                             </div>
                         </div>
                         <div 
-                          onClick={() => setLoanType('maturity')}
+                          onClick={() => {
+                            setLoanType('maturity');
+                            handlePoolTermsInputChange('loanType', 'maturity');
+                          }}
                           style={{
                             flex: '1 1 0', 
                             paddingLeft: 16, 
@@ -3200,7 +3320,9 @@ export default function PoolsPage() {
                             alignItems: 'center', 
                             gap: 6, 
                             display: 'flex',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            outline: poolTermsFieldHasError('loanType') ? '1px var(--Error, #CC4747) solid' : undefined, 
+                            outlineOffset: poolTermsFieldHasError('loanType') ? '-1px' : undefined
                           }}
                         >
                             <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
@@ -3244,7 +3366,9 @@ export default function PoolsPage() {
                             alignItems: 'center', 
                             gap: 6, 
                             display: 'flex',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            outline: poolTermsFieldHasError('termMonths') ? '1px var(--Error, #CC4747) solid' : undefined, 
+                            outlineOffset: poolTermsFieldHasError('termMonths') ? '-1px' : undefined
                           }}
                         >
                             <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
@@ -3275,7 +3399,9 @@ export default function PoolsPage() {
                             alignItems: 'center', 
                             gap: 6, 
                             display: 'flex',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            outline: poolTermsFieldHasError('termMonths') ? '1px var(--Error, #CC4747) solid' : undefined, 
+                            outlineOffset: poolTermsFieldHasError('termMonths') ? '-1px' : undefined
                           }}
                         >
                             <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
@@ -3306,7 +3432,9 @@ export default function PoolsPage() {
                             alignItems: 'center', 
                             gap: 6, 
                             display: 'flex',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            outline: poolTermsFieldHasError('termMonths') ? '1px var(--Error, #CC4747) solid' : undefined, 
+                            outlineOffset: poolTermsFieldHasError('termMonths') ? '-1px' : undefined
                           }}
                         >
                             <div style={{width: 16, height: 16, position: 'relative', overflow: 'hidden'}}>
@@ -3325,7 +3453,7 @@ export default function PoolsPage() {
                             <div style={{color: 'var(--Black, black)', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>24 Months</div>
                         </div>
                         <div style={{color: 'black', fontSize: 12, fontFamily: 'var(--ep-font-avenir)', fontWeight: '400', lineHeight: 1.67, wordWrap: 'break-word'}}>or</div>
-                        <div style={{flex: '1 1 0', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex'}}>
+                        <div style={{flex: '1 1 0', paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'var(--Light-Grey, #F4F4F4)', borderRadius: 10, justifyContent: 'flex-start', alignItems: 'center', gap: 10, display: 'flex', outline: poolTermsFieldHasError('termMonths') ? '1px var(--Error, #CC4747) solid' : undefined, outlineOffset: poolTermsFieldHasError('termMonths') ? '-1px' : undefined}}>
                             <input 
                               type="text" 
                               value={customTermMonths} 
@@ -3376,6 +3504,15 @@ export default function PoolsPage() {
                     </div>
                   </div>
                   
+                  {/* Pool Terms Error Display */}
+                  {poolTermsErrors.length > 0 && showPoolTermsErrors && (
+                    <div style={{marginTop: 8, textAlign: 'left', alignSelf: 'stretch'}}>
+                      {poolTermsErrors.map((err, idx) => (
+                        <div key={idx} style={{color: '#cc4747', fontSize: 12, fontFamily: 'var(--ep-font-avenir)'}}>{err}</div>
+                      ))}
+                    </div>
+                  )}
+                  
                   {/* Continue Button */}
                   <div style={{width: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex', marginTop: 'auto'}}>
                     <div 
@@ -3392,7 +3529,17 @@ export default function PoolsPage() {
                         display: 'inline-flex',
                         cursor: 'pointer'
                       }}
-                      onClick={() => setCurrentStep(4)}
+                      onClick={() => {
+                        setPoolTermsSubmitAttempted(true);
+                        const map = computePoolTermsErrorsByField();
+                        const allErrs = flattenPoolTermsErrors(map);
+                        if (allErrs.length === 0) {
+                          setCurrentStep(4);
+                        } else {
+                          setPoolTermsErrors(allErrs);
+                          setShowPoolTermsErrors(true);
+                        }
+                      }}
                     >
                       <div style={{color: 'white', fontSize: 14, fontFamily: 'var(--ep-font-avenir)', fontWeight: '500', wordWrap: 'break-word'}}>Continue and save</div>
                     </div>
