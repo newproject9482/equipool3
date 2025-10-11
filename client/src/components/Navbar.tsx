@@ -277,10 +277,13 @@ export default function Navbar({
                         fontSize: 16, 
                         fontFamily: 'var(--ep-font-avenir)', 
                         fontWeight: 500, 
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'color 0.2s ease'
                       }} 
                       role="menuitem" 
                       onClick={handlePoolsDashboardClick}
+                      onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#1D4ED8'}
+                      onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'black'}
                     >
                       Pools & Dashboard
                     </button>
@@ -292,9 +295,12 @@ export default function Navbar({
                         fontSize: 16, 
                         fontFamily: 'var(--ep-font-avenir)', 
                         fontWeight: 500, 
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'color 0.2s ease'
                       }} 
                       role="menuitem"
+                      onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#6B7280'}
+                      onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#B2B2B2'}
                     >
                       Profile
                     </button>
@@ -302,14 +308,17 @@ export default function Navbar({
                       style={{
                         all: 'unset', 
                         alignSelf: 'stretch', 
-                        color: '#CC4747', 
+                        color: '#DC2626', 
                         fontSize: 16, 
                         fontFamily: 'var(--ep-font-avenir)', 
                         fontWeight: 500, 
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'color 0.2s ease'
                       }} 
                       role="menuitem" 
                       onClick={handleLogout}
+                      onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#F87171'}
+                      onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#DC2626'}
                     >
                       Log out
                     </button>
