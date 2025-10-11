@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { Toaster, useToaster } from '../../components/Toaster';
 import { getAuthenticatedFetchOptions, clearAuthData } from '../../utils/auth';
 import { getPoolsUrlForRole, getSmartPoolsUrl } from '../../utils/navigation';
+import Navbar from '../../components/Navbar';
  
 
 const LoginModal = dynamic(() => import('../../components/LoginModal'), { ssr: false });
@@ -1204,22 +1205,6 @@ export default function PoolsPage() {
     return () => { cancelled = true; };
   }, [router]);
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, getAuthenticatedFetchOptions({
-        method: 'POST'
-      }));
-      setIsAuthenticated(false);
-      setUserRole(null);
-      setShowProfileMenu(false);
-      clearAuthData(); // Clear both session flag and token
-      // Redirect to home page after logout
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
   const handleSameAsMailingAddress = () => {
     setSameAsMailingAddress(!sameAsMailingAddress);
     
@@ -1279,150 +1264,17 @@ export default function PoolsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <header className="fixed top-0 left-0 w-full px-4 sm:px-6 py-4 sm:py-6 bg-white border-b border-gray-100 z-50">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = '/'}>
-            <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-            <span className="text-black text-xl font-bold" style={{fontFamily: 'var(--ep-font-avenir)'}}>EquiPool</span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
-            <a className="text-gray-700 text-sm font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
-            <a className="text-gray-700 text-sm font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
-            <div className="flex items-center gap-2">
-              <a className="text-gray-700 text-sm font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
-              <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
-            </div>
-          </nav>
-
-          {/* Mobile menu button */}
-          <button 
-            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            aria-label="Toggle menu"
-          >
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'opacity-0' : ''}`}></span>
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
-          </button>
-
-          {/* Desktop Auth Section */}
-          <div className="hidden lg:flex items-center gap-4" style={{position:'relative'}}>
-            {isAuthenticated ? (
-              <>
-                {/* Notifications Icon */}
-                <div
-                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}
-                >
-                  <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
-                </div>
-                {/* Profile Icon (right / opens menu) */}
-                <div
-                  style={{width: 56, height: 40, padding: '10px 16px', background: '#F4F4F4', borderRadius: 32, outline: '1px #E5E7EB solid', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', position: 'relative'}}
-                  onClick={() => setShowProfileMenu(v => !v)}
-                  aria-haspopup="menu"
-                  aria-expanded={showProfileMenu}
-                >
-                  <Image src="/profile.svg" alt="Profile" width={16} height={16} />
-                  {showProfileMenu && (
-                    <div style={{width: 220, padding: 24, position: 'absolute', top: 48, right: 0, background: '#F4F4F4', overflow: 'hidden', borderRadius: 24, outline: '1px #E5E7EB solid', display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start', gap: 14, zIndex: 50}} role="menu">
-                      <button style={{all: 'unset', alignSelf: 'stretch', color: 'black', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={() => {
-                        console.log('Pools & Dashboard clicked. userRole:', userRole);
-                        const targetUrl = getSmartPoolsUrl(userRole);
-                        console.log('Redirecting to:', targetUrl);
-                        window.location.href = targetUrl;
-                      }}>Pools & Dashboard</button>
-                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#B2B2B2', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem">Profile</button>
-                      <button style={{all: 'unset', alignSelf: 'stretch', color: '#CC4747', fontSize: 16, fontFamily: 'var(--ep-font-avenir)', fontWeight: 500, cursor: 'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <button className="px-4 py-2 text-gray-700 font-medium cursor-pointer hover:text-blue-900" style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}} onClick={() => setShowLoginModal(true)}>Login</button>
-                <button className="px-4 py-2 bg-blue-900 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-800" style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}} onClick={() => window.location.href = '/'}>Join Equipool</button>
-              </>
-            )}
-          </div>
-        </div>
-        
-        {/* Mobile Menu */}
-        {showMobileMenu && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 mt-0">
-            <div className="px-4 py-4 space-y-4">
-              {/* Navigation Links */}
-              <div className="space-y-3">
-                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
-                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
-                <div className="flex items-center gap-2 py-2">
-                  <a className="text-gray-700 hover:text-blue-900 cursor-pointer text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
-                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
-                </div>
-              </div>
-              
-              {/* Auth Section */}
-              <div className="pt-4 border-t border-gray-200">
-                {isAuthenticated ? (
-                  <div className="space-y-3">
-                    <button 
-                      className="w-full text-left py-2 text-black text-base font-medium"
-                      onClick={() => {
-                        console.log('Pools & Dashboard clicked (mobile). userRole:', userRole);
-                        const targetUrl = getSmartPoolsUrl(userRole);
-                        console.log('Redirecting to:', targetUrl);
-                        window.location.href = targetUrl;
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Pools & Dashboard
-                    </button>
-                    <button className="w-full text-left py-2 text-gray-500 text-base font-medium">Profile</button>
-                    <button 
-                      className="w-full text-left py-2 text-red-600 text-base font-medium"
-                      onClick={() => {
-                        handleLogout();
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Log out
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <button 
-                      className="w-full text-center py-3 border border-gray-200 rounded-lg text-gray-700 font-medium bg-white hover:bg-gray-50"
-                      style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}}
-                      onClick={() => {
-                        setShowLoginModal(true);
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Login
-                    </button>
-                    <button 
-                      className="w-full text-center py-3 rounded-lg text-white font-medium"
-                      style={{
-                        fontFamily: 'var(--ep-font-avenir)', 
-                        fontSize: '14px',
-                        background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)'
-                      }}
-                      onClick={() => {
-                        window.location.href = '/';
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Join Equipool
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      <Navbar 
+        variant="fixed"
+        isAuthenticated={isAuthenticated}
+        userRole={userRole}
+        onLoginClick={() => setShowLoginModal(true)}
+        onSignupClick={() => window.location.href = '/'}
+        showProfileMenu={showProfileMenu}
+        onProfileMenuToggle={setShowProfileMenu}
+        showMobileMenu={showMobileMenu}
+        onMobileMenuToggle={setShowMobileMenu}
+      />
 
       {/* Main Content */}
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">

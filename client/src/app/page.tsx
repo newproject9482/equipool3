@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { Toaster, useToaster } from '../components/Toaster';
 import { getPoolsUrlForRole } from '../utils/navigation';
 import { getAuthenticatedFetchOptions, clearAuthData } from '../utils/auth';
+import Navbar from '../components/Navbar';
 const LoginModal = dynamic(()=> import('../components/LoginModal'), { ssr:false });
 
 export default function Home() {
@@ -89,8 +90,6 @@ export default function Home() {
   // Hover states for buttons
   const [borrowerHover, setBorrowerHover] = useState(false);
   const [investorHover, setInvestorHover] = useState(false);
-  const [joinHover, setJoinHover] = useState(false);
-  const [loginHover, setLoginHover] = useState(false);
   const [ctaBorrowerHover, setCtaBorrowerHover] = useState(false);
   const [ctaInvestorHover, setCtaInvestorHover] = useState(false);
   const [investorType, setInvestorType] = useState<'individual' | 'company'>('individual');
@@ -631,20 +630,6 @@ export default function Home() {
     await handleSignUp();
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/logout`, getAuthenticatedFetchOptions({ 
-        method:'POST'
-      }));
-    } catch {
-      // Ignore logout errors
-    }
-    setIsAuthenticated(false);
-    setShowProfileMenu(false);
-    showSuccess('You have been logged out successfully!');
-    clearAuthData();
-  };
-
   // On mount, probe backend session; fallback to localStorage flag
   useEffect(()=>{
     let cancelled = false;
@@ -847,201 +832,17 @@ export default function Home() {
   };
   return (
     <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <header className="w-full px-4 sm:px-6 py-4 sm:py-6 relative">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Image src="/logo-icon.svg" alt="EquiPool Logo" width={26} height={27} />
-            <span className="ep-nav-brand">EquiPool</span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
-            <a className="ep-nav-link cursor-pointer">About Us</a>
-            <a className="ep-nav-link cursor-pointer">Security</a>
-            <div className="flex items-center gap-2">
-              <a className="ep-nav-link cursor-pointer">Learn</a>
-              <span className="px-2 py-1 rounded bg-gray-100 ep-nav-soon">Soon</span>
-            </div>
-          </nav>
-
-          {/* Mobile menu button */}
-          <button 
-            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            aria-label="Toggle menu"
-          >
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? 'opacity-0' : ''}`}></span>
-            <span className={`block w-6 h-0.5 bg-gray-600 transition-all duration-500 ease-in-out ${showMobileMenu ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
-          </button>
-
-          {/* Desktop Auth Section */}
-          <div className="hidden lg:flex items-center gap-4" style={{position:'relative'}}>
-            {isAuthenticated ? (
-              <>
-                {/* Notification Icon (left) */}
-                <div
-                  style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer'}}
-                  onClick={()=> alert('Notifications placeholder')}
-                  aria-label="Notifications"
-                >
-                  <Image src="/notifs.svg" alt="Notifications" width={16} height={16} />
-                </div>
-                {/* Profile Icon (right / opens menu) */}
-                <div
-                  style={{width:56,height:40,padding:'10px 16px',background:'#F4F4F4',borderRadius:32,outline:'1px #E5E7EB solid',display:'inline-flex',justifyContent:'center',alignItems:'center',cursor:'pointer', position:'relative'}}
-                  onClick={()=> setShowProfileMenu(v=>!v)}
-                  aria-haspopup="menu"
-                  aria-expanded={showProfileMenu}
-                >
-                  <Image src="/profile.svg" alt="Profile" width={16} height={16} />
-                  {showProfileMenu && (
-                    <div style={{width:220,padding:24,position:'absolute',top:48,right:0,background:'#F4F4F4',overflow:'hidden',borderRadius:24,outline:'1px #E5E7EB solid',display:'inline-flex',flexDirection:'column',justifyContent:'flex-end',alignItems:'flex-start',gap:14,zIndex:50}} role="menu">
-                      <button style={{all:'unset',alignSelf:'stretch',color:'black',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={async () => {
-                        try {
-                          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
-                          if (res.ok) {
-                            const data = await res.json();
-                            if (data.authenticated) {
-                              const role = data.role;
-                              setSelectedRole(role);
-                              window.location.href = getPoolsUrlForRole(role);
-                              return;
-                            }
-                          }
-                        } catch (e) {
-                          console.error('Failed to fetch user role:', e);
-                        }
-                        setShowLoginModal(true);
-                      }}>Pools & Dashboard</button>
-                      <button style={{all:'unset',alignSelf:'stretch',color:'#B2B2B2',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem">Profile</button>
-                      <button style={{all:'unset',alignSelf:'stretch',color:'#CC4747',fontSize:16,fontFamily:'var(--ep-font-avenir)',fontWeight:500,cursor:'pointer'}} role="menuitem" onClick={handleLogout}>Log out</button>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <button 
-                  className="ep-nav-login" 
-                  onClick={()=> setShowLoginModal(true)} 
-                  style={{
-                    cursor:'pointer',
-                    transition: 'all 0.2s ease',
-                    opacity: loginHover ? 0.8 : 1,
-                    transform: loginHover ? 'translateY(-1px)' : 'translateY(0)'
-                  }}
-                  onMouseEnter={() => setLoginHover(true)}
-                  onMouseLeave={() => setLoginHover(false)}
-                >
-                  Login
-                </button>
-                <button 
-                  className="ep-cta-join" 
-                  onClick={openSignUpModal}
-                  style={{
-                    cursor:'pointer',
-                    transition: 'all 0.2s ease',
-                    transform: joinHover ? 'translateY(-1px)' : 'translateY(0)',
-                    boxShadow: joinHover ? '0px 4px 12px rgba(17, 61, 123, 0.3)' : '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                    background: joinHover ? 'linear-gradient(128deg, #0E3A6F 0%, #0C3E91 100%)' : undefined
-                  }}
-                  onMouseEnter={() => setJoinHover(true)}
-                  onMouseLeave={() => setJoinHover(false)}
-                >
-                  Join Equipool
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-        
-        {/* Mobile Menu */}
-        {showMobileMenu && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 mt-0">
-            <div className="px-4 py-4 space-y-4">
-              {/* Navigation Links */}
-              <div className="space-y-3">
-                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>About Us</a>
-                <a className="block text-gray-700 hover:text-blue-900 cursor-pointer py-2 text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Security</a>
-                <div className="flex items-center gap-2 py-2">
-                  <a className="text-gray-700 hover:text-blue-900 cursor-pointer text-base font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Learn</a>
-                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-medium" style={{fontFamily: 'var(--ep-font-avenir)'}}>Soon</span>
-                </div>
-              </div>
-              
-              {/* Auth Section */}
-              <div className="pt-4 border-t border-gray-200">
-                {isAuthenticated ? (
-                  <div className="space-y-3">
-                    <button 
-                      className="w-full text-left py-2 text-black text-base font-medium"
-                      onClick={async () => {
-                        try {
-                          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/auth/me`, getAuthenticatedFetchOptions());
-                          if (res.ok) {
-                            const data = await res.json();
-                            if (data.authenticated) {
-                              const role = data.role;
-                              setSelectedRole(role);
-                              window.location.href = getPoolsUrlForRole(role);
-                              return;
-                            }
-                          }
-                        } catch (e) {
-                          console.error('Failed to fetch user role:', e);
-                        }
-                        setShowLoginModal(true);
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Pools & Dashboard
-                    </button>
-                    <button className="w-full text-left py-2 text-gray-500 text-base font-medium">Profile</button>
-                    <button 
-                      className="w-full text-left py-2 text-red-600 text-base font-medium"
-                      onClick={() => {
-                        handleLogout();
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Log out
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <button 
-                      className="w-full text-center py-3 border border-gray-200 rounded-lg text-gray-700 font-medium bg-white hover:bg-gray-50"
-                      style={{fontFamily: 'var(--ep-font-avenir)', fontSize: '14px'}}
-                      onClick={() => {
-                        setShowLoginModal(true);
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Login
-                    </button>
-                    <button 
-                      className="w-full text-center py-3 rounded-lg text-white font-medium"
-                      style={{
-                        fontFamily: 'var(--ep-font-avenir)', 
-                        fontSize: '14px',
-                        background: 'linear-gradient(128deg, #113D7B 0%, #0E4EA8 100%)'
-                      }}
-                      onClick={() => {
-                        openSignUpModal();
-                        setShowMobileMenu(false);
-                      }}
-                    >
-                      Join Equipool
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      <Navbar 
+        variant="default"
+        isAuthenticated={isAuthenticated}
+        userRole={selectedRole}
+        onLoginClick={() => setShowLoginModal(true)}
+        onSignupClick={openSignUpModal}
+        showProfileMenu={showProfileMenu}
+        onProfileMenuToggle={setShowProfileMenu}
+        showMobileMenu={showMobileMenu}
+        onMobileMenuToggle={setShowMobileMenu}
+      />
 
       {/* Hero */}
       <main className="w-full px-4 sm:px-6 py-8 sm:py-12" style={{marginTop: '60px'}}>

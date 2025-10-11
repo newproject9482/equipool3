@@ -3,17 +3,13 @@ import React from 'react';
 import InvestorForm from './InvestorForm';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Navbar from '../../../components/Navbar';
 
 export default function InvestorSignupPage() {
   const router = useRouter();
   return (
     <div style={{minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'white'}}>
-      <header style={{padding: '24px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-        <div style={{fontFamily: 'var(--ep-font-avenir)', fontWeight: 800, fontSize: 24, color: '#113D7B', cursor: 'pointer'}} onClick={()=>router.push('/')}>EquiPool</div>
-        <div style={{display: 'flex', gap: 16}}>
-          <button onClick={()=>router.push('/')} style={{background: 'transparent', border: 'none', fontFamily: 'var(--ep-font-avenir)', fontSize: 14, fontWeight: 500, cursor: 'pointer'}}>Home</button>
-        </div>
-      </header>
+      <Navbar variant="simple" />
       <main style={{flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 32}}>
         <div style={{width: 720, background: 'white', borderRadius: 24, position: 'relative'}}>
           <div style={{width: '100%', height: '100%', position: 'relative', background: 'white', overflow: 'hidden', borderRadius: 24}}>
